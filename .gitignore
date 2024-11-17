@@ -1,3 +1,5 @@
+.vscode
+bin/
 .gradle
 **/build/
 !src/**/build/
