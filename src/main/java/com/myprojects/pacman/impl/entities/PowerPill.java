@@ -3,15 +3,14 @@ package com.myprojects.pacman.impl.entities;
 import com.myprojects.pacman.api.entities.Collidable;
 import com.myprojects.pacman.impl.util.Vector2;
 
-public class PowerPill extends Entity implements Collidable {
+public class PowerPill extends Entity2D implements Collidable {
 
     /**
      * Create a pill that if eaten by pacman ghosts are vulnerable
      * @param position
-     * @param speed
      */
-    public PowerPill(final Vector2 position, final Vector2 speed) {
-        super(position, speed);
+    public PowerPill(final Vector2 position) {
+        super(position, Vector2.zero());
     }
 
     /**

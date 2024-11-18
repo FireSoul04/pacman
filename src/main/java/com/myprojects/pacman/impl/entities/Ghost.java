@@ -4,7 +4,7 @@ import com.myprojects.pacman.api.entities.Collidable;
 import com.myprojects.pacman.api.entities.Movable;
 import com.myprojects.pacman.impl.util.Vector2;
 
-public abstract class Ghost extends Entity implements Movable, Collidable {
+public abstract class Ghost extends Entity2D implements Movable, Collidable {
 
     /**
      * Create a ghost

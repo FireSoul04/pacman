@@ -6,7 +6,7 @@ import com.myprojects.pacman.api.util.Timer;
 import com.myprojects.pacman.impl.util.TimerImpl;
 import com.myprojects.pacman.impl.util.Vector2;
 
-public class Player extends Entity implements Movable, Collidable {
+public class Player extends Entity2D implements Movable, Collidable {
 
     private enum State {
         IDLE,

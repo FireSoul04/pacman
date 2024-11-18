@@ -1,8 +1,9 @@
 package com.myprojects.pacman.impl.entities;
 
+import com.myprojects.pacman.api.util.Entity;
 import com.myprojects.pacman.impl.util.Vector2;
 
-public abstract class Entity {
+public abstract class Entity2D implements Entity {
 
     private Vector2 position;
     private Vector2 speed;
@@ -12,22 +13,24 @@ public abstract class Entity {
      * @param position
      * @param speed
      */
-    public Entity(final Vector2 position, final Vector2 speed) {
+    public Entity2D(final Vector2 position, final Vector2 speed) {
         this.position = position;
         this.speed = speed;
     }
 
     /**
-     * @return Entity's current position
+     * {@inheritDoc}
      */
-    protected Vector2 getPosition() {
+    @Override
+    public Vector2 getPosition() {
         return this.position;
     }
-
+    
     /**
-     * @return Entity's speed
+     * {@inheritDoc}
      */
-    protected Vector2 getSpeed() {
+    @Override
+    public Vector2 getSpeed() {
         return this.speed;
     }
 
