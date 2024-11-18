@@ -10,6 +10,11 @@ public interface Timer {
     void start();
 
     /**
+     * Restart the time count
+     */
+    void restart();
+
+    /**
      * Stop when the time count reach the end
      */
     void stopAtTimerEnd();
