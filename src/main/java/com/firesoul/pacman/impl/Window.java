@@ -1,15 +1,15 @@
 package com.firesoul.pacman.impl;
 
-import java.awt.Canvas;
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
 
 import com.firesoul.pacman.api.Renderer;
 
-public class Window extends Canvas implements Renderer {
+public class Window implements Renderer {
     
     private final JFrame frame;
+    private final Context canvas;
     private int width;
     private int height;
     private int scale;
@@ -21,6 +21,7 @@ public class Window extends Canvas implements Renderer {
         final int scale
     ) {
         this.frame = new JFrame(title);
+        this.canvas = new Context();
         this.width = width;
         this.height = height;
         this.scale = scale;
@@ -33,8 +34,8 @@ public class Window extends Canvas implements Renderer {
     public void init() {
         this.frame.setSize(new Dimension(this.width * this.scale, this.height * this.scale));
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.frame.add(this.canvas);
         this.frame.setVisible(true);
-        this.frame.add(this);
     }
 
     /**
@@ -42,8 +43,7 @@ public class Window extends Canvas implements Renderer {
      */
     @Override
     public void draw() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'draw'");
+        this.canvas.draw(this);
     }
 
     /**
@@ -68,7 +68,7 @@ public class Window extends Canvas implements Renderer {
      */
     @Override
     public int getWidth() {
-        return this.width;
+        return this.width * this.scale;
     }
 
     /**
@@ -76,6 +76,6 @@ public class Window extends Canvas implements Renderer {
      */
     @Override
     public int getHeight() {
-        return this.height;
+        return this.height * this.scale;
     }
 }

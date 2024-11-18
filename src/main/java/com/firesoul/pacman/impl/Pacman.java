@@ -86,7 +86,7 @@ public class Pacman implements Game {
      */
     @Override
     public void render() {
-        // TODO
+        this.renderer.draw();
     }
 
     /**
@@ -95,5 +95,12 @@ public class Pacman implements Game {
     @Override
     public void gameOver() {
         this.state = State.GAME_OVER;
+    }
+
+    /**
+     * 
+     */
+    public Renderer getWindow() {
+        return this.renderer;
     }
 }
