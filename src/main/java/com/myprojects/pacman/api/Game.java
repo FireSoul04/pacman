@@ -11,13 +11,23 @@ public interface Game {
     /**
      * Setup for the game
      */
-    void start();
+    void run();
+
+    /**
+     * Setup for the game
+     */
+    void init();
 
     /**
      * Main game loop
      * @param deltaTime
      */
-    void loop(final double deltaTime);
+    void update(final double deltaTime);
+
+    /**
+     * What to do on render
+     */
+    void render();
 
     /**
      * Set game over flag
