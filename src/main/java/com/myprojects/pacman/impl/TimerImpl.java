@@ -10,6 +10,10 @@ public class TimerImpl implements Timer {
     private boolean isStopped;
     private long pauseTime;
 
+    /**
+     * Create a timer
+     * @param endTime Time when the timer stops
+     */
     public TimerImpl(final long endTime) {
         this.endTime = endTime;
         this.currentTime = 0;
