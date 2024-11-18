@@ -1,6 +1,6 @@
 package com.myprojects.pacman.impl.entities;
 
-import com.myprojects.pacman.api.util.Entity;
+import com.myprojects.pacman.api.Entity;
 import com.myprojects.pacman.impl.util.Vector2;
 
 public abstract class Entity2D implements Entity {
