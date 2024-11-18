@@ -15,7 +15,7 @@ public class Pill extends Entity implements Collidable {
     }
 
     @Override
-    public boolean isColliding(Collidable other) {
+    public boolean isColliding(final Collidable other) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'isColliding'");
     }
