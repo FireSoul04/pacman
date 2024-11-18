@@ -1,6 +1,6 @@
-package com.myprojects.pacman.impl;
+package com.myprojects.pacman.impl.util;
 
-import com.myprojects.pacman.api.Vector;
+import com.myprojects.pacman.api.util.Vector;
 
 public class Vector2 implements Vector {
 

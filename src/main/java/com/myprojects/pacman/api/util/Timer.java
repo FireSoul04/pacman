@@ -1,4 +1,4 @@
-package com.myprojects.pacman.api;
+package com.myprojects.pacman.api.util;
 
 public interface Timer {
 

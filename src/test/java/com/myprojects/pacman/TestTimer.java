@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.myprojects.pacman.api.Timer;
-import com.myprojects.pacman.impl.TimerImpl;
+import com.myprojects.pacman.api.util.Timer;
+import com.myprojects.pacman.impl.util.TimerImpl;
 
 public class TestTimer {
 

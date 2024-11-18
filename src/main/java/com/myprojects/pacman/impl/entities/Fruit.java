@@ -1,12 +1,14 @@
-package com.myprojects.pacman.impl;
+package com.myprojects.pacman.impl.entities;
 
-import com.myprojects.pacman.api.Collidable;
+import com.myprojects.pacman.api.entities.Collidable;
+import com.myprojects.pacman.impl.util.Vector2;
 
 public class Fruit extends Entity implements Collidable {
     
     private final int points;
 
-    public Fruit(final int points) {
+    public Fruit(final Vector2 position, final Vector2 speed, final int points) {
+        super(position, speed);
         this.points = points;
     }
 

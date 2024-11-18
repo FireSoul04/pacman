@@ -1,6 +1,6 @@
-package com.myprojects.pacman.impl;
+package com.myprojects.pacman.impl.util;
 
-import com.myprojects.pacman.api.Timer;
+import com.myprojects.pacman.api.util.Timer;
 
 public class TimerImpl implements Timer {
 

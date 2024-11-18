@@ -13,11 +13,11 @@ public class Pacman implements Game {
     }
 
     public void start() {
-
+        // TODO
     }
 
     public void loop(final double deltaTime) {
-
+        // TODO
     }
 
     public void gameOver() {
