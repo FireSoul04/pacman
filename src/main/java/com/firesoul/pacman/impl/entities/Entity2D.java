@@ -1,6 +1,6 @@
 package com.firesoul.pacman.impl.entities;
 
-import com.firesoul.pacman.api.Entity;
+import com.firesoul.pacman.api.entities.Entity;
 import com.firesoul.pacman.impl.util.Vector2;
 
 public abstract class Entity2D implements Entity {

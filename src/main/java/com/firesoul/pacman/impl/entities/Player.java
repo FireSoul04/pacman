@@ -52,9 +52,9 @@ public class Player extends Entity2D implements Movable, Collidable {
      * {@inheritDoc}
      */
     @Override
-    public void move(final double deltaTime) {
+    public void update(final double deltaTime) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'move'");
+        throw new UnsupportedOperationException("Unimplemented method 'update'");
     }
 
     /**

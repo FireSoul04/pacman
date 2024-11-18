@@ -3,6 +3,8 @@ package com.firesoul.pacman.api;
 import java.io.IOException;
 import java.util.List;
 
+import com.firesoul.pacman.api.entities.Entity;
+
 public interface Map {
 
     /**

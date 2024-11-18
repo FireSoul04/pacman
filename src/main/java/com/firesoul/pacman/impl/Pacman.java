@@ -3,26 +3,31 @@ package com.firesoul.pacman.impl;
 import java.io.PrintStream;
 
 import com.firesoul.pacman.api.Game;
+import com.firesoul.pacman.api.Renderer;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.util.TimerImpl;
 
 public class Pacman implements Game {
 
-    private final static String MAP_PATH = "/map/";
-    private final static String ENTITY_MAP_PATH = MAP_PATH + "entities.map";
-    private final static String BLOCK_MAP_PATH = MAP_PATH + "blocks.map";
+    private static final String MAP_PATH = "/map/";
+    private static final String ENTITY_MAP_PATH = MAP_PATH + "entities.map";
+    private static final String BLOCK_MAP_PATH = MAP_PATH + "blocks.map";
+    private static final String TITLE = "Pacman";
+    private static final int WIDTH = 400;
+    private static final int HEIGHT = WIDTH * 3 / 4;
+    private static final int SCALE = 3;
     
-    private static int WIDTH = 300;
-    private static int HEIGHT = Pacman.WIDTH * 3 / 4;
-    private static int SCALE = 3;
     private static double MAX_UPDATES = 60.0;
     
     private PrintStream logger;
+    private Renderer renderer;
     private State state;
     private int level;
 
     public Pacman() {
-        logger = System.out;
+        this.logger = System.out;
+        this.renderer = new Window("Pacman", WIDTH, HEIGHT, SCALE);
+        this.renderer.init();
     }
 
     /**

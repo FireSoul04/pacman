@@ -3,8 +3,8 @@ package com.firesoul.pacman.api.entities;
 public interface Movable {
 
     /**
-     * Move the object attached
+     * Update the object attached
      * @param deltaTime
      */
-    void move(final double deltaTime);
+    void update(final double deltaTime);
 }
