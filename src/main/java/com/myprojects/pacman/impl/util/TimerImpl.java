@@ -4,6 +4,8 @@ import com.myprojects.pacman.api.util.Timer;
 
 public class TimerImpl implements Timer {
 
+    private static final int INFINITE_TIMER = -1;
+
     private final long endTime;
     private long currentTime;
     private boolean isCounting;
@@ -23,6 +25,13 @@ public class TimerImpl implements Timer {
     }
 
     /**
+     * Create a timer that ends when stop is called
+     */
+    public TimerImpl() {
+        this(INFINITE_TIMER);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -34,6 +43,17 @@ public class TimerImpl implements Timer {
             this.pauseTime = System.currentTimeMillis();
             this.isCounting = true;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void restart() {
+        this.currentTime = 0;
+        this.isCounting = false;
+        this.isStopped = false;
+        this.start();
     }
 
     /**
