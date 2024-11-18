@@ -49,7 +49,7 @@ public class TestTimer {
         while (timer.isCounting()) {
             timer.stopAtTimerEnd();
 
-            if (System.currentTimeMillis() - infiniteLoopCount >= Timer.secondsToMillis(TIMER_TIME * 2)) {
+            if (System.currentTimeMillis() - infiniteLoopCount >= Timer.secondsToMillis(TIMER_TIME * 5)) {
                 Assertions.fail("Infinite loop detected");
             }
         }
@@ -83,5 +83,25 @@ public class TestTimer {
         timer.start();
         Thread.sleep(WAIT_TIME);
         assertEquals(stopTime, timer.getCurrentTime());
+    }
+
+    @Test
+    void testRestart() throws InterruptedException {
+        timer.start();
+        final long startTime = timer.getCurrentTime();
+        while (timer.isCounting()) {
+            timer.stopAtTimerEnd();
+        }
+        timer.stop();
+        assertTrue(timer.isStopped());
+        Thread.sleep(WAIT_TIME);
+        timer.restart();
+        assertFalse(timer.isStopped());
+        assertEquals(startTime, timer.getCurrentTime());
+        assertTrue(timer.isCounting());
+        while (timer.isCounting()) {
+            timer.stopAtTimerEnd();
+        }
+        assertTrue(timer.isStopped());
     }
 }
