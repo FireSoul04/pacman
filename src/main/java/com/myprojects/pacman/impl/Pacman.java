@@ -1,6 +1,6 @@
-package com.myprojects.impl;
+package com.myprojects.pacman.impl;
 
-import com.myprojects.api.Game;
+import com.myprojects.pacman.api.Game;
 
 public class Pacman implements Game {
 

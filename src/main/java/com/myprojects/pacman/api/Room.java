@@ -1,9 +1,9 @@
-package com.myprojects.api;
+package com.myprojects.pacman.api;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.myprojects.impl.Entity;
+import com.myprojects.pacman.impl.Entity;
 
 public interface Room {
 

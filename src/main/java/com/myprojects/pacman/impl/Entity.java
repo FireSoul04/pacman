@@ -1,4 +1,4 @@
-package com.myprojects.impl;
+package com.myprojects.pacman.impl;
 
 public abstract class Entity {
 

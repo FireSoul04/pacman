@@ -1,4 +1,4 @@
-package com.myprojects.api;
+package com.myprojects.pacman.api;
 
 public interface Collidable {
 

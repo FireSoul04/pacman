@@ -1,6 +1,6 @@
-package com.myprojects;
+package com.myprojects.pacman;
 
-import com.myprojects.impl.Pacman;
+import com.myprojects.pacman.impl.Pacman;
 
 public class Start {
 

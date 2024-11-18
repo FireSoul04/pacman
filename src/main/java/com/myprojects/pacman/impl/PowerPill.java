@@ -1,6 +1,6 @@
-package com.myprojects.impl;
+package com.myprojects.pacman.impl;
 
-import com.myprojects.api.Collidable;
+import com.myprojects.pacman.api.Collidable;
 
 public class PowerPill extends Entity implements Collidable {
 

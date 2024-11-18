@@ -1,8 +1,18 @@
-package com.myprojects.impl;
+package com.myprojects.pacman.impl;
 
-import com.myprojects.api.Collidable;
+import com.myprojects.pacman.api.Collidable;
 
-public class Pill extends Entity implements Collidable {
+public class Fruit extends Entity implements Collidable {
+    
+    private final int points;
+
+    public Fruit(final int points) {
+        this.points = points;
+    }
+
+    public int getPoints() {
+        return this.points;
+    }
 
     @Override
     public boolean isColliding(Collidable other) {
@@ -15,5 +25,4 @@ public class Pill extends Entity implements Collidable {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'onCollide'");
     }
-    
 }
