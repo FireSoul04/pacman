@@ -27,5 +27,5 @@ tasks.withType<Test> {
 }
 
 application {
-	mainClass = "com.myprojects.pacman.Start"
+	mainClass = "com.firesoul.pacman.Start"
 }
