@@ -27,22 +27,20 @@ public class Map2D implements Map {
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
     public List<Entity> getEntityMap() throws IOException, ClassNotFoundException {
-        return (List<Entity>)this.getMap(this.entityMapPath);
+        return this.getMap(this.entityMapPath);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @SuppressWarnings("unchecked")
     public List<Block> getBlockMap() throws IOException, ClassNotFoundException {
-        return (List<Block>)this.getMap(this.blockMapPath);
+        return this.getMap(this.blockMapPath);
     }
     
-    private List<? extends Object> getMap(final String mapPath) throws IOException, ClassNotFoundException {
-        final List<? extends Object> map = new ArrayList<>();
+    private <T> List<T> getMap(final String mapPath) throws IOException, ClassNotFoundException {
+        final List<T> map = new ArrayList<>();
         try (
             final ObjectInputStream reader = new ObjectInputStream(
                 new BufferedInputStream(

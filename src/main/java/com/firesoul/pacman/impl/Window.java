@@ -1,15 +1,21 @@
 package com.firesoul.pacman.impl;
 
+import java.awt.Canvas;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 
 import com.firesoul.pacman.api.Renderer;
+import com.firesoul.pacman.impl.entities.Player;
 
 public class Window implements Renderer {
     
     private final JFrame frame;
-    private final Context canvas;
+    private final Canvas canvas;
     private int width;
     private int height;
     private int scale;
@@ -20,11 +26,11 @@ public class Window implements Renderer {
         final int height, 
         final int scale
     ) {
-        this.frame = new JFrame(title);
-        this.canvas = new Context();
         this.width = width;
         this.height = height;
         this.scale = scale;
+        this.frame = new JFrame(title);
+        this.canvas = new Canvas();
     }
 
     /**
@@ -34,16 +40,36 @@ public class Window implements Renderer {
     public void init() {
         this.frame.setSize(new Dimension(this.width * this.scale, this.height * this.scale));
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.frame.setLocationRelativeTo(null);
         this.frame.add(this.canvas);
         this.frame.setVisible(true);
     }
+
+    //TEMP
+    private int cont = 0;
+    //
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void draw() {
-        this.canvas.draw(this);
+        final Graphics g = this.canvas.getGraphics();
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, this.getWidth(), this.getHeight());
+
+        //TEMP
+        g.setColor(Color.WHITE);
+        g.fillRect(cont++, 0, 40, 40);
+        if (cont >= this.getWidth()) {
+            cont = 0;
+        }
+        try {
+            Thread.sleep(1);
+        } catch (Exception e) {
+
+        }
+        //
     }
 
     /**

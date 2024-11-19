@@ -35,9 +35,9 @@ public class Pacman implements Game {
      */
     @Override
     public void run() {
-        long lastTime = System.nanoTime();
         final Timer timer = new TimerImpl(Timer.secondsToMillis(1));
         final double ns = 1.0E9 / Pacman.MAX_UPDATES;
+        long lastTime = System.nanoTime();
         double deltaTime = 0.0;
         int updates = 0;
         int frames = 0;
@@ -54,13 +54,13 @@ public class Pacman implements Game {
             }
             this.render();
             frames++;
-            timer.stopAtTimerEnd();
             if (timer.isStopped()) {
                 timer.restart();
                 logger.println(updates + " ups, " + frames + " fps");
                 updates = 0;
                 frames = 0;
             }
+            timer.stopAtTimerEnd();
         }
     }
 
