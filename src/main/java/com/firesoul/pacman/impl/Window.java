@@ -4,8 +4,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.image.BufferStrategy;
 
 import javax.swing.JFrame;
 
@@ -16,6 +15,8 @@ public class Window implements Renderer {
     
     private final JFrame frame;
     private final Canvas canvas;
+    private BufferStrategy bufferStrategy;
+    private Graphics graphics;
     private int width;
     private int height;
     private int scale;
@@ -43,33 +44,38 @@ public class Window implements Renderer {
         this.frame.setLocationRelativeTo(null);
         this.frame.add(this.canvas);
         this.frame.setVisible(true);
+        this.canvas.createBufferStrategy(2); // Create double buffering
+        this.bufferStrategy = this.canvas.getBufferStrategy();
     }
-
-    //TEMP
-    private int cont = 0;
-    //
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void draw() {
-        final Graphics g = this.canvas.getGraphics();
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, this.getWidth(), this.getHeight());
+        this.setGraphics();
+        this.clear();
+        this.setColor(Color.WHITE);
+        this.graphics.fillRect(0, 0, 50, 50);
+        this.graphics.dispose();
+        this.bufferStrategy.show();
+    }
 
-        //TEMP
-        g.setColor(Color.WHITE);
-        g.fillRect(cont++, 0, 40, 40);
-        if (cont >= this.getWidth()) {
-            cont = 0;
-        }
-        try {
-            Thread.sleep(1);
-        } catch (Exception e) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setColor(final Color color) {
+        this.graphics.setColor(color);
+    }
 
-        }
-        //
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void clear() {
+        this.setColor(Color.BLACK);
+        this.graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 
     /**
@@ -103,5 +109,9 @@ public class Window implements Renderer {
     @Override
     public int getHeight() {
         return this.height * this.scale;
+    }
+
+    private void setGraphics() {
+        this.graphics = this.bufferStrategy.getDrawGraphics();
     }
 }

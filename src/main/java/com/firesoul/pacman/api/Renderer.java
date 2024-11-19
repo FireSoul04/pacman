@@ -1,5 +1,7 @@
 package com.firesoul.pacman.api;
 
+import java.awt.Color;
+
 public interface Renderer {
 
     /**
@@ -11,6 +13,17 @@ public interface Renderer {
      * Draw the game to the screen
      */
     void draw();
+
+    /**
+     * Clears game's screen
+     */
+    void clear();
+
+    /**
+     * Set render color
+     * @param color
+     */
+    void setColor(Color color);
 
     /**
      * Resize the window
