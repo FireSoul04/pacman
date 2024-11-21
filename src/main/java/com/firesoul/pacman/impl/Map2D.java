@@ -9,6 +9,7 @@ import java.util.List;
 import com.firesoul.pacman.api.Block;
 import com.firesoul.pacman.api.Map;
 import com.firesoul.pacman.api.entities.Entity;
+import com.firesoul.pacman.api.entities.GameObject;
 
 public class Map2D implements Map {
 
@@ -37,6 +38,16 @@ public class Map2D implements Map {
     @Override
     public List<Block> getBlockMap() throws IOException, ClassNotFoundException {
         return this.getMap(this.blockMapPath);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<GameObject> getGameObjects() throws IOException, ClassNotFoundException {
+        final List<GameObject> ret = new ArrayList<>(this.getBlockMap());
+        ret.addAll(this.getEntityMap());
+        return ret;
     }
     
     private <T> List<T> getMap(final String mapPath) throws IOException, ClassNotFoundException {

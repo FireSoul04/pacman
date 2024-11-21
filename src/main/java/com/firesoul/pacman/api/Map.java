@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.firesoul.pacman.api.entities.Entity;
+import com.firesoul.pacman.api.entities.GameObject;
 
 public interface Map {
 
@@ -18,4 +19,12 @@ public interface Map {
      * @return Map of blocks
      */
     List<Block> getBlockMap() throws IOException, ClassNotFoundException;
+
+    /**
+     * 
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    List<GameObject> getGameObjects() throws IOException, ClassNotFoundException;
 }

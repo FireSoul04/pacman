@@ -3,7 +3,7 @@ package com.firesoul.pacman.impl.entities;
 import com.firesoul.pacman.api.entities.Entity;
 import com.firesoul.pacman.impl.util.Vector2;
 
-public abstract class Entity2D implements Entity {
+public abstract class Entity2D extends GameObject2D implements Entity {
 
     private Vector2 position;
     private Vector2 speed;

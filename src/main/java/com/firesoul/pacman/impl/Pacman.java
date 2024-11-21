@@ -47,7 +47,7 @@ public class Pacman implements Game {
             final long now = System.nanoTime();
             deltaTime += (now - lastTime) / ns;
             lastTime = now;
-            while (deltaTime >= 1) {
+            while (deltaTime >= 1.0) {
                 this.update(deltaTime);
                 updates++;
                 deltaTime--;
