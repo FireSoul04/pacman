@@ -23,7 +23,7 @@ public interface Room {
      * @throws IllegalArgumentException when entity is null
      * @throws IllegalStateException if the list of entites is full
      */
-    void addEntity(final Entity2D entity) throws IllegalArgumentException, IllegalStateException;
+    void addEntity(Entity2D entity) throws IllegalArgumentException, IllegalStateException;
 
     /**
      * Remove an entity from the room
@@ -31,5 +31,5 @@ public interface Room {
      * @throws IllegalArgumentException when entity is null
      * @throws NoSuchElementException if it's not present inside the list
      */
-    void removeEntity(final Entity2D entity) throws IllegalArgumentException, NoSuchElementException;
+    void removeEntity(Entity2D entity) throws IllegalArgumentException, NoSuchElementException;
 }

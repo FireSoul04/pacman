@@ -1,19 +1,19 @@
 package com.firesoul.pacman.impl.entities;
 
 import com.firesoul.pacman.api.entities.Entity;
-import com.firesoul.pacman.impl.util.Vector2;
+import com.firesoul.pacman.impl.util.Vector2D;
 
 public abstract class Entity2D extends GameObject2D implements Entity {
 
-    private Vector2 position;
-    private Vector2 speed;
+    private Vector2D position;
+    private Vector2D speed;
 
     /**
      * Create an entity
      * @param position
      * @param speed
      */
-    public Entity2D(final Vector2 position, final Vector2 speed) {
+    public Entity2D(final Vector2D position, final Vector2D speed) {
         this.position = position;
         this.speed = speed;
     }
@@ -22,7 +22,7 @@ public abstract class Entity2D extends GameObject2D implements Entity {
      * {@inheritDoc}
      */
     @Override
-    public Vector2 getPosition() {
+    public Vector2D getPosition() {
         return this.position;
     }
     
@@ -30,7 +30,7 @@ public abstract class Entity2D extends GameObject2D implements Entity {
      * {@inheritDoc}
      */
     @Override
-    public Vector2 getSpeed() {
+    public Vector2D getSpeed() {
         return this.speed;
     }
 
@@ -38,7 +38,7 @@ public abstract class Entity2D extends GameObject2D implements Entity {
      * Set the position of entity
      * @param position
      */
-    protected void setPosition(final Vector2 position) {
+    protected void setPosition(final Vector2D position) {
         this.position = position;
     }
 
@@ -46,7 +46,7 @@ public abstract class Entity2D extends GameObject2D implements Entity {
      * Set the speed of entity
      * @param speed
      */
-    protected void setSpeed(final Vector2 speed) {
+    protected void setSpeed(final Vector2D speed) {
         this.speed = speed;
     }
 }

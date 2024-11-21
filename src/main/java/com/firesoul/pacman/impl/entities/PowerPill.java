@@ -1,7 +1,8 @@
 package com.firesoul.pacman.impl.entities;
 
 import com.firesoul.pacman.api.entities.Collidable;
-import com.firesoul.pacman.impl.util.Vector2;
+import com.firesoul.pacman.api.entities.Collider;
+import com.firesoul.pacman.impl.util.Vector2D;
 
 public class PowerPill extends Entity2D implements Collidable {
 
@@ -9,17 +10,8 @@ public class PowerPill extends Entity2D implements Collidable {
      * Create a pill that if eaten by pacman ghosts are vulnerable
      * @param position
      */
-    public PowerPill(final Vector2 position) {
-        super(position, Vector2.zero());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isColliding(final Collidable other) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isColliding'");
+    public PowerPill(final Vector2D position) {
+        super(position, Vector2D.zero());
     }
 
     /**
@@ -29,6 +21,12 @@ public class PowerPill extends Entity2D implements Collidable {
     public void onCollide() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'onCollide'");
+    }
+
+    @Override
+    public Collider getCollider() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCollider'");
     }
 
 }

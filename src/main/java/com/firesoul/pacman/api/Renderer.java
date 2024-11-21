@@ -30,13 +30,13 @@ public interface Renderer {
      * @param width
      * @param height
      */
-    void resize(final int width, final int height);
+    void resize(int width, int height);
 
     /**
      * Set new scale factor
      * @param scale
      */
-    void setScale(final int scale);
+    void setScale(int scale);
 
     /**
      * @return Screen width

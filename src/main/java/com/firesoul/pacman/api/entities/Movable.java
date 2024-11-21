@@ -6,5 +6,5 @@ public interface Movable {
      * Update the object attached
      * @param deltaTime
      */
-    void update(final double deltaTime);
+    void update(double deltaTime);
 }

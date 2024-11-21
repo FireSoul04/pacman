@@ -22,7 +22,7 @@ public interface Game {
      * Main game loop
      * @param deltaTime
      */
-    void update(final double deltaTime);
+    void update(double deltaTime);
 
     /**
      * What to do on render

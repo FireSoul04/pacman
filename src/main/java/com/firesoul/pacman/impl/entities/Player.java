@@ -1,10 +1,11 @@
 package com.firesoul.pacman.impl.entities;
 
 import com.firesoul.pacman.api.entities.Collidable;
+import com.firesoul.pacman.api.entities.Collider;
 import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.util.TimerImpl;
-import com.firesoul.pacman.impl.util.Vector2;
+import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Player extends Entity2D implements Movable, Collidable {
 
@@ -17,26 +18,19 @@ public class Player extends Entity2D implements Movable, Collidable {
     private static final long MAX_EATING_TIME = 5000;
     private static final int MAX_LIVES = 3;
 
+    private final Collider collider;
     private State state;
     private Timer eatTimer;
     private int lives;
     private boolean canEat;
 
-    public Player(final Vector2 position, final Vector2 speed) {
+    public Player(final Vector2D position, final Vector2D speed) {
         super(position, speed);
-        state = State.IDLE;
-        eatTimer = new TimerImpl(MAX_EATING_TIME);
-        lives = MAX_LIVES;
-        canEat = false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isColliding(final Collidable other) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isColliding'");
+        this.state = State.IDLE;
+        this.eatTimer = new TimerImpl(MAX_EATING_TIME);
+        this.lives = MAX_LIVES;
+        this.canEat = false;
+        this.collider = new BoxCollider2D(new Vector2D(8, 8)); // For debugging purposes 8 pxs
     }
 
     /**
@@ -55,6 +49,14 @@ public class Player extends Entity2D implements Movable, Collidable {
     public void update(final double deltaTime) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collider getCollider() {
+        return this.collider;
     }
 
     /**

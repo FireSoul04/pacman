@@ -2,7 +2,7 @@ package com.firesoul.pacman.impl.util;
 
 import com.firesoul.pacman.api.util.Vector;
 
-public class Vector2 implements Vector {
+public class Vector2D implements Vector {
 
     private double x;
     private double y;
@@ -12,7 +12,7 @@ public class Vector2 implements Vector {
      * @param x coordinate
      * @param y coordinate
      */
-    public Vector2(final double x, final double y) {
+    public Vector2D(final double x, final double y) {
         this.x = x;
         this.y = y;
     }
@@ -20,7 +20,7 @@ public class Vector2 implements Vector {
     /**
      * Create a vector with both coordinates at 0
      */
-    public Vector2() {
+    public Vector2D() {
         this(0, 0);
     }
 
@@ -55,22 +55,34 @@ public class Vector2 implements Vector {
     /**
      * {@inheritDoc}
      */
-    public Vector2 add(final Vector2 v) {
-        return Vector2.add(this, v);
+    @Override
+    public Vector2D add(final Vector2D v) {
+        return Vector2D.add(this, v);
     }
     
     /**
      * {@inheritDoc}
      */
-    public Vector2 sub(final Vector2 v) {
-        return Vector2.sub(this, v);
+    @Override
+    public Vector2D sub(final Vector2D v) {
+        return Vector2D.sub(this, v);
     }
     
     /**
      * {@inheritDoc}
      */
-    public Vector2 invert() {
-        return Vector2.invert(this);
+    @Override
+    public Vector2D invert() {
+        return Vector2D.invert(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean intersect(final Vector2D v) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'intersect'");
     }
 
     /**
@@ -79,8 +91,8 @@ public class Vector2 implements Vector {
      * @param v2
      * @return The sum of the two vectors
      */
-    public static Vector2 add(final Vector2 v1, final Vector2 v2) {
-        return new Vector2(v1.x + v2.x, v1.y + v2.y);
+    public static Vector2D add(final Vector2D v1, final Vector2D v2) {
+        return new Vector2D(v1.x + v2.x, v1.y + v2.y);
     }
 
     /**
@@ -89,7 +101,7 @@ public class Vector2 implements Vector {
      * @param v2
      * @return The subtraction of the two vectors
      */
-    public static Vector2 sub(final Vector2 v1, final Vector2 v2) {
+    public static Vector2D sub(final Vector2D v1, final Vector2D v2) {
         return add(v1, v2.invert());
     }
 
@@ -98,14 +110,19 @@ public class Vector2 implements Vector {
      * @param v the vector to invert
      * @return The inverted vector
      */
-    public static Vector2 invert(final Vector2 v) {
-        return new Vector2(-v.x, -v.y);
+    public static Vector2D invert(final Vector2D v) {
+        return new Vector2D(-v.x, -v.y);
     }
 
     /**
      * @return A vector with zero as coordinates
      */
-    public static Vector2 zero() {
-        return new Vector2();
+    public static Vector2D zero() {
+        return new Vector2D();
+    }
+
+    public boolean intersects(Vector2D bounds) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'intersects'");
     }
 }
