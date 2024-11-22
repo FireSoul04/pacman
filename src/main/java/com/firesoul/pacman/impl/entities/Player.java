@@ -27,9 +27,9 @@ public class Player extends Entity2D implements Movable, Collidable {
     public Player(final Vector2D position, final Vector2D speed) {
         super(position, speed);
         this.state = State.IDLE;
-        this.eatTimer = new TimerImpl(MAX_EATING_TIME);
         this.lives = MAX_LIVES;
         this.canEat = false;
+        this.eatTimer = new TimerImpl(MAX_EATING_TIME);
         this.collider = new BoxCollider2D(new Vector2D(8, 8)); // For debugging purposes 8 pxs
     }
 
@@ -37,9 +37,8 @@ public class Player extends Entity2D implements Movable, Collidable {
      * {@inheritDoc}
      */
     @Override
-    public void onCollide() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onCollide'");
+    public void onCollide(final Collidable other) {
+        System.out.println("Entity is colliding with " + other);
     }
 
     /**
@@ -47,8 +46,7 @@ public class Player extends Entity2D implements Movable, Collidable {
      */
     @Override
     public void update(final double deltaTime) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        // TODO
     }
 
     /**

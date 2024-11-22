@@ -6,8 +6,9 @@ public interface Collidable {
 
     /**
      * The action perfomed when this entity is colliding
+     * @param other entity whom is colliding
      */
-    void onCollide();
+    void onCollide(Collidable other);
 
     /**
      * @return the collider of this entity
@@ -27,6 +28,6 @@ public interface Collidable {
      * @return if the two entity are colliding
      */
     default boolean isColliding(final Collidable other) {
-        return this.getBounds().intersects(other.getBounds());
+        return this.getBounds().intersect(other.getBounds());
     }
 }

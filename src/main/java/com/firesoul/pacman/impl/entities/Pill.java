@@ -15,7 +15,7 @@ public class Pill extends Entity2D implements Collidable {
     }
 
     @Override
-    public void onCollide() {
+    public void onCollide(final Collidable other) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'onCollide'");
     }

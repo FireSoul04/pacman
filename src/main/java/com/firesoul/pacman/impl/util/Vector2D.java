@@ -81,8 +81,12 @@ public class Vector2D implements Vector {
      */
     @Override
     public boolean intersect(final Vector2D v) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'intersect'");
+        // TODO
+        return false;
+    }
+
+    public String toString() {
+        return "[x: " + this.x + ", y:" + this.y + "]";
     }
 
     /**
@@ -119,10 +123,5 @@ public class Vector2D implements Vector {
      */
     public static Vector2D zero() {
         return new Vector2D();
-    }
-
-    public boolean intersects(Vector2D bounds) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'intersects'");
     }
 }

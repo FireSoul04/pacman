@@ -28,7 +28,7 @@ public abstract class Ghost extends Entity2D implements Movable, Collidable {
      * {@inheritDoc}
      */
     @Override
-    public void onCollide() {
+    public void onCollide(final Collidable other) {
         // TODO
     }
 

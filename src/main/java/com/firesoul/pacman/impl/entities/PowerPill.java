@@ -18,7 +18,7 @@ public class PowerPill extends Entity2D implements Collidable {
      * {@inheritDoc}
      */
     @Override
-    public void onCollide() {
+    public void onCollide(final Collidable other) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'onCollide'");
     }

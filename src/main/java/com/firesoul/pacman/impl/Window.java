@@ -9,7 +9,6 @@ import java.awt.image.BufferStrategy;
 import javax.swing.JFrame;
 
 import com.firesoul.pacman.api.Renderer;
-import com.firesoul.pacman.impl.entities.Player;
 
 public class Window implements Renderer {
     

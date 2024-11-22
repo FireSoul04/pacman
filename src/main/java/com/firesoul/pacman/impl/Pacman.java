@@ -4,8 +4,6 @@ import java.io.PrintStream;
 
 import com.firesoul.pacman.api.Game;
 import com.firesoul.pacman.api.Renderer;
-import com.firesoul.pacman.api.util.Timer;
-import com.firesoul.pacman.impl.util.TimerImpl;
 
 public class Pacman implements Game {
 
@@ -17,8 +15,6 @@ public class Pacman implements Game {
     private static final int HEIGHT = WIDTH * 3 / 4;
     private static final int SCALE = 3;
     
-    private static double MAX_UPDATES = 60.0;
-    
     private PrintStream logger;
     private Renderer renderer;
     private State state;
@@ -27,41 +23,6 @@ public class Pacman implements Game {
     public Pacman() {
         this.logger = System.out;
         this.renderer = new Window("Pacman", WIDTH, HEIGHT, SCALE);
-        this.renderer.init();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void run() {
-        final Timer timer = new TimerImpl(Timer.secondsToMillis(1));
-        final double ns = 1.0E9 / Pacman.MAX_UPDATES;
-        long lastTime = System.nanoTime();
-        double deltaTime = 0.0;
-        int updates = 0;
-        int frames = 0;
-        this.init();
-        timer.start();
-        while (this.state == State.RUNNING) {
-            final long now = System.nanoTime();
-            deltaTime += (now - lastTime) / ns;
-            lastTime = now;
-            while (deltaTime >= 1.0) {
-                this.update(deltaTime);
-                updates++;
-                deltaTime--;
-            }
-            this.render();
-            frames++;
-            if (timer.isStopped()) {
-                timer.restart();
-                logger.println(updates + " ups, " + frames + " fps");
-                updates = 0;
-                frames = 0;
-            }
-            timer.stopAtTimerEnd();
-        }
     }
 
     /**
@@ -71,6 +32,7 @@ public class Pacman implements Game {
     public void init() {
         this.level = 1;
         this.state = State.RUNNING;
+        this.renderer.init();
     }
 
     /**
@@ -87,6 +49,14 @@ public class Pacman implements Game {
     @Override
     public void render() {
         this.renderer.draw();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public State getState() {
+        return this.state;
     }
 
     /**
