@@ -10,10 +10,9 @@ import javax.swing.JFrame;
 
 import com.firesoul.pacman.api.Renderer;
 
-public class Window implements Renderer {
+public class Window extends Canvas implements Renderer {
     
     private final JFrame frame;
-    private final Canvas canvas;
     private BufferStrategy bufferStrategy;
     private Graphics graphics;
     private int width;
@@ -30,7 +29,6 @@ public class Window implements Renderer {
         this.height = height;
         this.scale = scale;
         this.frame = new JFrame(title);
-        this.canvas = new Canvas();
     }
 
     /**
@@ -41,10 +39,10 @@ public class Window implements Renderer {
         this.frame.setSize(new Dimension(this.width * this.scale, this.height * this.scale));
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.frame.setLocationRelativeTo(null);
-        this.frame.add(this.canvas);
+        this.frame.add(this);
         this.frame.setVisible(true);
-        this.canvas.createBufferStrategy(2); // Create double buffering
-        this.bufferStrategy = this.canvas.getBufferStrategy();
+        this.createBufferStrategy(2); // Create double buffering
+        this.bufferStrategy = this.getBufferStrategy();
     }
 
     /**

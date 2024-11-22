@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -172,6 +171,11 @@ public class TestCollisions {
         
             @Override
             public void init() {
+                this.start();
+            }
+
+            @Override
+            public void start() {
                 this.state = State.RUNNING;
             }
 

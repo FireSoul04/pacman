@@ -17,6 +17,11 @@ public interface Game {
     void init();
 
     /**
+     * Start the game
+     */
+    void start();
+
+    /**
      * Pause the game
      */
     void pause();

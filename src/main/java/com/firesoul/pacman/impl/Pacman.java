@@ -22,7 +22,7 @@ public class Pacman implements Game {
 
     public Pacman() {
         this.logger = System.out;
-        this.renderer = new Window("Pacman", WIDTH, HEIGHT, SCALE);
+        this.renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
     }
 
     /**
@@ -31,8 +31,32 @@ public class Pacman implements Game {
     @Override
     public void init() {
         this.level = 1;
-        this.state = State.RUNNING;
+        this.start();
         this.renderer.init();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void start() {
+        this.state = State.RUNNING;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void pause() {
+        this.state = State.PAUSED;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void gameOver() {
+        this.state = State.GAME_OVER;
     }
 
     /**
@@ -57,22 +81,6 @@ public class Pacman implements Game {
     @Override
     public State getState() {
         return this.state;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void pause() {
-        this.state = State.PAUSED;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void gameOver() {
-        this.state = State.GAME_OVER;
     }
 
     /**
