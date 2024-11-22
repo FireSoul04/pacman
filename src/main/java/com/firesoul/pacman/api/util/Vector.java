@@ -39,4 +39,20 @@ public interface Vector {
      * @return if the two vectors intersect
      */
     boolean intersect(Vector2D v);
+
+    /**
+     * Clamp the vector to a range
+     * @param min the minimum value of the magnitude
+     * @param max the maximum value of the magnitude
+     * @return the magnitude of the vector
+     */
+    Vector2D clamp(Vector2D min, Vector2D max);
+
+    /**
+     * Wrap the vector to a range
+     * @param min the minimum value of the magnitude
+     * @param max the maximum value of the magnitude
+     * @return the magnitude of the vector
+     */
+    Vector2D wrap(Vector2D min, Vector2D max);
 }

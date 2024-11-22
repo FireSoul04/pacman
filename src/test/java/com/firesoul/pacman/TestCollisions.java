@@ -23,7 +23,7 @@ public class TestCollisions {
     @BeforeEach
     void setup() {
         game = new GameTest();
-        entity = new EntityTest(Vector2D.zero(), new Vector2D(2, 0));
+        entity = new EntityTest(Vector2D.zero(), new Vector2D(2, -3));
         game.addGameObject(entity);
     }
 
@@ -53,12 +53,8 @@ public class TestCollisions {
 
         @Override
         public void update(final double deltaTime) {
-            Vector2D newPos = this.getPosition().add(this.getSpeed().dot(deltaTime));
-            if (this.getPosition().intersect(new Vector2D(200, 0)) ||
-                this.getPosition().intersect(new Vector2D(0, 200))) {
-                System.out.println("Out of bounds");
-                newPos = Vector2D.zero();
-            }
+            Vector2D newPos = this.getPosition().add(this.getSpeed().dot(deltaTime))
+                .wrap(new Vector2D(0, 0), new Vector2D(100, 100));
             this.setPosition(newPos);
         }
 
@@ -81,7 +77,7 @@ public class TestCollisions {
         
             @Override
             public void update(final double deltaTime) {
-                gs.forEach((g) -> {
+                gs.forEach(g -> {
                     if (g instanceof Movable) {
                         ((Movable)g).update(deltaTime);
                     }

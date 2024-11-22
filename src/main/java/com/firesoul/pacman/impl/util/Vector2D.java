@@ -92,6 +92,37 @@ public class Vector2D implements Vector {
         return this.x <= v.x + Vector.EPSILON && this.x >= v.x - Vector.EPSILON &&
                this.y <= v.y + Vector.EPSILON && this.y >= v.y - Vector.EPSILON;
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Vector2D clamp(final Vector2D min, final Vector2D max) {
+        return new Vector2D(
+            Math.min(Math.max(this.x, min.x), max.x),
+            Math.min(Math.max(this.y, min.y), max.y)
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Vector2D wrap(final Vector2D min, final Vector2D max) {
+        Vector2D wrapped = new Vector2D(this.x, this.y);
+        if (wrapped.getX() > max.getX()) {
+            wrapped.setX(min.getX());
+        } else if (wrapped.getX() < min.getX()) {
+            wrapped.setX(max.getX());
+        }
+        if (wrapped.getY() > max.getY()) {
+            wrapped.setY(min.getY());
+        } else if (wrapped.getY() < min.getY()) {
+            wrapped.setY(max.getY());
+        }
+        return wrapped;
+    }
+
 
     public String toString() {
         return "[x: " + this.x + ", y:" + this.y + "]";
