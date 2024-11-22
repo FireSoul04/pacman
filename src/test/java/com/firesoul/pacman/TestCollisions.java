@@ -1,6 +1,5 @@
 package com.firesoul.pacman;
 
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class TestCollisions {
     @BeforeEach
     void setup() {
         game = new GameTest();
-        entity = new EntityTest(Vector2D.zero(), new Vector2D(2, 2));
+        entity = new EntityTest(Vector2D.zero(), new Vector2D(2, 0));
         game.addGameObject(entity);
     }
 
@@ -54,10 +53,13 @@ public class TestCollisions {
 
         @Override
         public void update(final double deltaTime) {
-            this.setPosition(this.getPosition().add(new Vector2D(this.getSpeed().getX() * deltaTime, 0)));
-            if (this.getPosition().getX() > 200) {
+            Vector2D newPos = this.getPosition().add(this.getSpeed().dot(deltaTime));
+            if (this.getPosition().intersect(new Vector2D(200, 0)) ||
+                this.getPosition().intersect(new Vector2D(0, 200))) {
                 System.out.println("Out of bounds");
+                newPos = Vector2D.zero();
             }
+            this.setPosition(newPos);
         }
 
         public String toString() {

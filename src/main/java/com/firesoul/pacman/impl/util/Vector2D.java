@@ -80,9 +80,17 @@ public class Vector2D implements Vector {
      * {@inheritDoc}
      */
     @Override
+    public Vector2D dot(final double scalar) {
+        return new Vector2D(this.x * scalar, this.y * scalar);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean intersect(final Vector2D v) {
-        // TODO
-        return false;
+        return this.x <= v.x + Vector.EPSILON && this.x >= v.x - Vector.EPSILON &&
+               this.y <= v.y + Vector.EPSILON && this.y >= v.y - Vector.EPSILON;
     }
 
     public String toString() {

@@ -4,6 +4,8 @@ import com.firesoul.pacman.impl.util.Vector2D;
 
 public interface Vector {
 
+    static double EPSILON = 0.1;
+
     /**
      * Add this vector to another
      * @param v the vector to sum
@@ -23,6 +25,13 @@ public interface Vector {
      * @return The inverted vector
      */
     Vector2D invert();
+
+    /**
+     * Multiply this vector by a scalar
+     * @param scalar the scalar to multiply
+     * @return The product of the vector and the scalar
+     */
+    Vector2D dot(double scalar);
 
     /**
      * Check if this vector intersects with another
