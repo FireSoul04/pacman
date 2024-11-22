@@ -30,7 +30,7 @@ public class Player extends Entity2D implements Movable, Collidable {
         this.lives = MAX_LIVES;
         this.canEat = false;
         this.eatTimer = new TimerImpl(MAX_EATING_TIME);
-        this.collider = new BoxCollider2D(new Vector2D(8, 8)); // For debugging purposes 8 pxs
+        this.collider = new BoxCollider2D(this, new Vector2D(8, 8)); // For debugging purposes 8 pxs
     }
 
     /**

@@ -63,6 +63,14 @@ public class Pacman implements Game {
      * {@inheritDoc}
      */
     @Override
+    public void pause() {
+        this.state = State.PAUSED;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void gameOver() {
         this.state = State.GAME_OVER;
     }

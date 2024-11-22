@@ -23,11 +23,18 @@ public interface Collidable {
     }
 
     /**
+     * @return the position of this entity
+     */
+    default Vector2D getColliderPosition() {
+        return this.getCollider().getPosition();
+    }
+
+    /**
      * Check if this entity is colliding with the other
-     * @param other
+     * @param other entity to check collision with
      * @return if the two entity are colliding
      */
     default boolean isColliding(final Collidable other) {
-        return this.getBounds().intersect(other.getBounds());
+        return this.getCollider().collides(other.getCollider());
     }
 }

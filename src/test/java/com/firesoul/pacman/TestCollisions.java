@@ -3,6 +3,8 @@ package com.firesoul.pacman;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -32,17 +34,48 @@ public class TestCollisions {
 
     @BeforeEach
     void setup() {
-        timer = new TimerImpl(Timer.secondsToMillis(5));
+        timer = new TimerImpl(Timer.secondsToMillis(0.2));
         game = new GameTest();
         bounds = new Vector2D(BOUNDS_X, BOUNDS_Y);
-        entity = new EntityTest(new Vector2D(BOUNDS_X / 2, BOUNDS_Y / 2), new Vector2D(20, -30));
-        game.addGameObject(entity);
     }
 
     @AfterEach
     void start() {
         timer.start();
         game.run();
+    }
+
+    @Test
+    void testOutOfBoundsX() {
+        outOfBounds(newPos -> newPos.getX() < 0 || newPos.getX() > bounds.getX());
+    }
+
+    @Test
+    void testOutOfBoundsY() {
+        outOfBounds(newPos -> newPos.getY() < 0 || newPos.getY() > bounds.getY());
+    }
+
+    @Test
+    void testOutOfBoundsXAndY() {
+        outOfBounds(newPos -> 
+            newPos.getX() < 0 || newPos.getX() > bounds.getX() ||
+            newPos.getY() < 0 || newPos.getY() > bounds.getY()
+        );
+    }
+
+    void outOfBounds(final Function<Vector2D, Boolean> outOfBoundsCondition) {
+        entity = new EntityTest(new Vector2D(BOUNDS_X / 2, BOUNDS_Y / 2), new Vector2D(20, -30));
+        game.addGameObject(entity);
+        entity.setTestFunction((e, dt) -> {
+            Vector2D newPos = move(e, dt);
+            if (outOfBoundsCondition.apply(newPos)) {
+                Assertions.fail("Entity's y coordinate is out of bounds");
+            }
+            timer.stopAtTimerEnd();
+            if (timer.isStopped()) {
+                game.gameOver();
+            }
+        });
     }
 
     Vector2D move(final EntityTest e, final double deltaTime) {
@@ -54,31 +87,41 @@ public class TestCollisions {
     }
 
     @Test
-    void testOutOfBoundsX() {
-        entity.setTestFunction((e, dt) -> {
-            Vector2D newPos = move(e, dt);
-            if (newPos.getX() < 0 || newPos.getX() > bounds.getX()) {
-                Assertions.fail("Entity's x coordinate is out of bounds");
-            }
-            timer.stopAtTimerEnd();
-            if (timer.isStopped()) {
-                game.gameOver();
-            }
-        });
+    void testCollisionsX() {
+        EntityTest collidingEntity = new EntityTest(
+            new Vector2D(BOUNDS_X / 2, 0), Vector2D.zero());
+        setupCollisions(collidingEntity, new Vector2D(20, 0));
     }
 
     @Test
-    void testOutOfBoundsY() {
+    void testCollisionsY() {
+        EntityTest collidingEntity = new EntityTest(
+            new Vector2D(0, BOUNDS_Y / 2), Vector2D.zero());
+        setupCollisions(collidingEntity, new Vector2D(0, 15));
+    }
+
+    @Test
+    void testCollisionsXAndY() {
+        EntityTest collidingEntity = new EntityTest(
+            new Vector2D(BOUNDS_X / 2, BOUNDS_Y / 2), Vector2D.zero());
+        setupCollisions(collidingEntity, new Vector2D(20, 15));
+    }
+
+    void setupCollisions(final EntityTest collidingEntity, final Vector2D speed) {
+        entity = new EntityTest(Vector2D.zero(), speed);
         entity.setTestFunction((e, dt) -> {
-            Vector2D newPos = move(e, dt);
-            if (newPos.getY() < 0 || newPos.getY() > bounds.getY()) {
-                Assertions.fail("Entity's y coordinate is out of bounds");
-            }
-            timer.stopAtTimerEnd();
-            if (timer.isStopped()) {
+            if (entity.getCollider().collides(collidingEntity.getCollider())) {
                 game.gameOver();
             }
+            move(e, dt);
+            timer.stopAtTimerEnd();
+            if (timer.isStopped()) {
+                Assertions.fail("Entity did not collide with other entity");
+            }
         });
+        collidingEntity.setTestFunction((e, dt) -> {});
+        game.addGameObject(collidingEntity);
+        game.addGameObject(entity);
     }
 
     class EntityTest extends Entity2D implements Movable, Collidable {
@@ -88,7 +131,7 @@ public class TestCollisions {
         
         public EntityTest(final Vector2D position, final Vector2D speed) {
             super(position, speed);
-            this.collider = new BoxCollider2D(new Vector2D(8, 8));
+            this.collider = new BoxCollider2D(this, new Vector2D(8, 8));
         }
 
         public void setTestFunction(final BiConsumer<EntityTest, Double> test) {
@@ -97,7 +140,7 @@ public class TestCollisions {
 
         @Override
         public void onCollide(final Collidable other) {
-            // TODO
+            System.out.println("Collided with " + other);
         }
 
         @Override
@@ -112,9 +155,9 @@ public class TestCollisions {
 
         @Override
         public String toString() {
-            return "GameObject [" +
+            return this.getClass().getSimpleName() + " [" +
                 "pos: " + this.getPosition() + ", " +
-                "speed: " + this.getSpeed() + "]]";
+                "speed: " + this.getSpeed() + "]";
         }
 
         public void setTestPosition(final Vector2D position) {
@@ -131,6 +174,16 @@ public class TestCollisions {
             public void init() {
                 this.state = State.RUNNING;
             }
+
+            @Override
+            public void pause() {
+                this.state = State.PAUSED;
+            }
+        
+            @Override
+            public void gameOver() {
+                this.state = State.GAME_OVER;
+            }
         
             @Override
             public void update(final double deltaTime) {
@@ -139,17 +192,11 @@ public class TestCollisions {
                         ((Movable)g).update(deltaTime);
                     }
                 });
-                this.log(this.gs.toString());
             }
         
             @Override
             public void render() {
             
-            }
-        
-            @Override
-            public void gameOver() {
-                this.state = State.GAME_OVER;
             }
 
             @Override

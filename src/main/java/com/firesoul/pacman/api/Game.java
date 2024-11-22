@@ -17,6 +17,16 @@ public interface Game {
     void init();
 
     /**
+     * Pause the game
+     */
+    void pause();
+
+    /**
+     * Set game over flag
+     */
+    void gameOver();
+
+    /**
      * Main game loop
      * @param deltaTime
      */
@@ -26,11 +36,6 @@ public interface Game {
      * What to do on render
      */
     void render();
-
-    /**
-     * Set game over flag
-     */
-    void gameOver();
 
     /**
      * 

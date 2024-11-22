@@ -2,17 +2,17 @@ package com.firesoul.pacman.api.entities;
 
 import java.io.Serializable;
 
-import com.firesoul.pacman.api.util.Vector;
+import com.firesoul.pacman.impl.util.Vector2D;
 
 public interface GameObject extends Serializable {
 
     /**
      * @return Entity's current position
      */
-    Vector getPosition();
+    Vector2D getPosition();
 
     /**
      * @return Entity's speed
      */
-    Vector getSpeed();
+    Vector2D getSpeed();
 }

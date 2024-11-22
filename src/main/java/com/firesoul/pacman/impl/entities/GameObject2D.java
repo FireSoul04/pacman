@@ -1,7 +1,7 @@
 package com.firesoul.pacman.impl.entities;
 
 import com.firesoul.pacman.api.entities.GameObject;
-import com.firesoul.pacman.api.util.Vector;
+import com.firesoul.pacman.impl.util.Vector2D;
 
 public class GameObject2D implements GameObject {
 
@@ -9,7 +9,7 @@ public class GameObject2D implements GameObject {
      * {@inheritDoc}
      */
     @Override
-    public Vector getPosition() {
+    public Vector2D getPosition() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getPosition'");
     }
@@ -18,7 +18,7 @@ public class GameObject2D implements GameObject {
      * {@inheritDoc}
      */
     @Override
-    public Vector getSpeed() {
+    public Vector2D getSpeed() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getSpeed'");
     }
