@@ -1,6 +1,7 @@
 package com.firesoul.pacman.api;
 
 import java.awt.Color;
+import java.util.List;
 
 public interface Renderer {
 
@@ -20,10 +21,10 @@ public interface Renderer {
     void clear();
 
     /**
-     * Load game object.
-     * @param gameObject
+     * Load game objects to render them to the screen.
+     * @param gameObjects
      */
-    void load(GameObject gameObject);
+    void load(List<GameObject> gameObjects);
 
     /**
      * Set render color.

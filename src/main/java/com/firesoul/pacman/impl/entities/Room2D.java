@@ -6,8 +6,11 @@ import java.util.ArrayList;
 import com.firesoul.pacman.api.Block;
 import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.Room;
+import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Movable;
+import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.Map2D;
+import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Room2D implements Room {
@@ -15,8 +18,10 @@ public class Room2D implements Room {
     private static final int DEFAULT_WIDTH = 400;
     private static final int DEFAULT_HEIGHT = 300;
 
+    private final Timer collisionTimer = new TimerImpl(Timer.secondsToMillis(1 / 60));
     private final Map2D map;
-    private final List<GameObject> gameObjects;
+    private final List<GameObject> gameObjects = new ArrayList<GameObject>();
+    private final List<Collidable> cachedCollidables = new ArrayList<Collidable>();
 
     /**
      * Default constructor for a room with no entities or blocks.
@@ -27,7 +32,7 @@ public class Room2D implements Room {
 
     public Room2D(final int width, final int height) {
         this.map = new Map2D(width, height);
-        this.gameObjects = new ArrayList<GameObject>();
+        this.collisionTimer.start();
     }
 
     /**
@@ -38,8 +43,8 @@ public class Room2D implements Room {
      */
     public Room2D(final String entityMapPath, final String blockMapPath) {
         this.map = new Map2D(entityMapPath, blockMapPath);
-        this.gameObjects = new ArrayList<GameObject>();
         this.gameObjects.addAll(this.map.getGameObjects());
+        this.collisionTimer.start();
     }
 
     /**
@@ -52,6 +57,7 @@ public class Room2D implements Room {
                 ((Movable) gameObject).update(deltaTime);
             }
         }
+        this.checkCollisions();
     }
 
     /**
@@ -60,6 +66,9 @@ public class Room2D implements Room {
     @Override
     public void addGameObject(final GameObject gameObject) {
         this.gameObjects.add(gameObject);
+        if (gameObject instanceof Collidable) {
+            this.cachedCollidables.add((Collidable) gameObject);
+        }
     }
 
     /**
@@ -68,6 +77,9 @@ public class Room2D implements Room {
     @Override
     public void removeGameObject(final GameObject gameObject) {
         this.gameObjects.remove(gameObject);
+        if (gameObject instanceof Collidable) {
+            this.cachedCollidables.remove((Collidable) gameObject);
+        }
     }
 
     /**
@@ -107,5 +119,19 @@ public class Room2D implements Room {
             }
         }
         return filtered;
+    }
+
+    private void checkCollisions() {
+        this.collisionTimer.stopAtTimerEnd();
+        if (this.collisionTimer.isStopped()) {
+            for (final Collidable c1 : this.cachedCollidables) {
+                for (final Collidable c2 : this.cachedCollidables) {
+                    if (c1 != c2 && c1.isColliding(c2)) {
+                        c1.onCollide(c2);
+                    }
+                }
+            }
+            this.collisionTimer.restart();
+        }
     }
 }

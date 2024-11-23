@@ -18,7 +18,7 @@ import com.firesoul.pacman.api.Renderer;
 public class Window extends Canvas implements Renderer {
     
     private final JFrame frame;
-    private final List<GameObject> gameObjects;
+    private List<GameObject> gameObjects;
     private BufferStrategy bufferStrategy;
     private Graphics graphics;
     private int width;
@@ -77,8 +77,8 @@ public class Window extends Canvas implements Renderer {
     }
 
     @Override
-    public void load(final GameObject gameObject) {
-        this.gameObjects.add(gameObject);
+    public void load(final List<GameObject> gameObjects) {
+        this.gameObjects = gameObjects;
     }
 
     /**
