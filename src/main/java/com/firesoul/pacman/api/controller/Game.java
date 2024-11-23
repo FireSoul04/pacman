@@ -1,4 +1,4 @@
-package com.firesoul.pacman.api;
+package com.firesoul.pacman.api.controller;
 
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.util.TimerImpl;

@@ -8,12 +8,14 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.firesoul.pacman.api.Drawable;
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
+import com.firesoul.pacman.api.entities.Drawable;
 import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
-import com.firesoul.pacman.impl.Pacman;
+import com.firesoul.pacman.impl.controller.Pacman;
+import com.firesoul.pacman.impl.entities.bases.Entity2D;
+import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 

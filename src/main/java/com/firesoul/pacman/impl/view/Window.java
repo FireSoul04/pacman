@@ -1,4 +1,4 @@
-package com.firesoul.pacman.impl;
+package com.firesoul.pacman.impl.view;
 
 import java.awt.Canvas;
 import java.awt.Color;
@@ -11,9 +11,9 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import com.firesoul.pacman.api.Drawable;
 import com.firesoul.pacman.api.GameObject;
-import com.firesoul.pacman.api.Renderer;
+import com.firesoul.pacman.api.entities.Drawable;
+import com.firesoul.pacman.api.view.Renderer;
 
 public class Window extends Canvas implements Renderer {
     

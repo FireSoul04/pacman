@@ -1,6 +1,6 @@
-package com.firesoul.pacman.impl.entities;
+package com.firesoul.pacman.impl.entities.bases;
 
-import com.firesoul.pacman.api.entities.Entity;
+import com.firesoul.pacman.api.Entity;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public abstract class Entity2D extends GameObject2D implements Entity {

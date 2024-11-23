@@ -1,7 +1,7 @@
 package com.firesoul.pacman;
 
-import com.firesoul.pacman.api.Game;
-import com.firesoul.pacman.impl.Pacman;
+import com.firesoul.pacman.api.controller.Game;
+import com.firesoul.pacman.impl.controller.Pacman;
 
 public class Start {
 

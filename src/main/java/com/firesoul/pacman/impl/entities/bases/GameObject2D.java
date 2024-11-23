@@ -1,4 +1,4 @@
-package com.firesoul.pacman.impl.entities;
+package com.firesoul.pacman.impl.entities.bases;
 
 import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.impl.util.Vector2D;

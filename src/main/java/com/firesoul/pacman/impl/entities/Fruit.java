@@ -2,6 +2,7 @@ package com.firesoul.pacman.impl.entities;
 
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
+import com.firesoul.pacman.impl.entities.bases.Entity2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Fruit extends Entity2D implements Collidable {

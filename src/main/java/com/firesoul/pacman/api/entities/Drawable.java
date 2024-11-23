@@ -1,4 +1,4 @@
-package com.firesoul.pacman.api;
+package com.firesoul.pacman.api.entities;
 
 import java.awt.Image;
 

@@ -1,13 +1,13 @@
-package com.firesoul.pacman.impl;
+package com.firesoul.pacman.impl.controller;
 
 import java.io.PrintStream;
 
-import com.firesoul.pacman.api.Game;
-import com.firesoul.pacman.api.GameObject;
-import com.firesoul.pacman.api.Renderer;
+import com.firesoul.pacman.api.controller.Game;
+import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.entities.Player;
-import com.firesoul.pacman.impl.entities.Room2D;
+import com.firesoul.pacman.impl.model.Room2D;
 import com.firesoul.pacman.impl.util.Vector2D;
+import com.firesoul.pacman.impl.view.Window;
 
 public class Pacman implements Game {
 

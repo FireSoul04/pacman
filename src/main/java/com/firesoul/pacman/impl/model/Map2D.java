@@ -1,4 +1,4 @@
-package com.firesoul.pacman.impl;
+package com.firesoul.pacman.impl.model;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -8,9 +8,9 @@ import java.util.Collections;
 import java.util.List;
 
 import com.firesoul.pacman.api.Block;
+import com.firesoul.pacman.api.Entity;
 import com.firesoul.pacman.api.GameObject;
-import com.firesoul.pacman.api.Map;
-import com.firesoul.pacman.api.entities.Entity;
+import com.firesoul.pacman.api.model.Map;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Map2D implements Map {

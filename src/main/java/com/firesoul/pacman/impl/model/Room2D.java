@@ -1,15 +1,15 @@
-package com.firesoul.pacman.impl.entities;
+package com.firesoul.pacman.impl.model;
 
 import java.util.List;
 import java.util.ArrayList;
 
 import com.firesoul.pacman.api.Block;
 import com.firesoul.pacman.api.GameObject;
-import com.firesoul.pacman.api.Room;
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Movable;
+import com.firesoul.pacman.api.model.Room;
 import com.firesoul.pacman.api.util.Timer;
-import com.firesoul.pacman.impl.Map2D;
+import com.firesoul.pacman.impl.entities.bases.Entity2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 

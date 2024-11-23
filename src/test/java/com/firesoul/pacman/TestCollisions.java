@@ -8,15 +8,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.firesoul.pacman.api.Game;
 import com.firesoul.pacman.api.GameObject;
+import com.firesoul.pacman.api.controller.Game;
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
 import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
-import com.firesoul.pacman.impl.entities.BoxCollider2D;
-import com.firesoul.pacman.impl.entities.Entity2D;
-import com.firesoul.pacman.impl.entities.Room2D;
+import com.firesoul.pacman.impl.entities.bases.Entity2D;
+import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
+import com.firesoul.pacman.impl.model.Room2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 

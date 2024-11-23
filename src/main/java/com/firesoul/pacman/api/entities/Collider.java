@@ -1,6 +1,6 @@
 package com.firesoul.pacman.api.entities;
 
-import com.firesoul.pacman.impl.entities.GameObject2D;
+import com.firesoul.pacman.impl.entities.bases.GameObject2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public interface Collider {

@@ -1,7 +1,8 @@
-package com.firesoul.pacman.impl.entities;
+package com.firesoul.pacman.impl.entities.colliders;
 
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
+import com.firesoul.pacman.impl.entities.bases.GameObject2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class BoxCollider2D implements Collider {
