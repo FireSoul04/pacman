@@ -80,6 +80,14 @@ public class Pacman implements Game {
      * {@inheritDoc}
      */
     @Override
+    public void onPause() {
+        // TODO
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void render() {
         this.renderer.load(Pacman.room.getGameObjects());
         this.renderer.draw();

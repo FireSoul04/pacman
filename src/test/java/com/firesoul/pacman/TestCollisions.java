@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
+import com.firesoul.pacman.testClasses.EntityTest;
+import com.firesoul.pacman.testClasses.GameTest;
 
 public class TestCollisions {
 
@@ -67,9 +69,9 @@ public class TestCollisions {
         });
     }
 
-    Vector2D move(final EntityTest e, final double deltaTime) {
-        Vector2D newPos =  e.getPosition()
-            .add(e.getSpeed().dot(deltaTime))
+    Vector2D move(final EntityTest e, final double dt) {
+        Vector2D newPos = e.getPosition()
+            .add(e.getSpeed().dot(dt))
             .wrap(Vector2D.zero(), bounds);
         e.setTestPosition(newPos);
         return newPos;
@@ -98,18 +100,20 @@ public class TestCollisions {
 
     void setupCollisions(final EntityTest collidingEntity, final Vector2D speed) {
         entity = new EntityTest(Vector2D.zero(), speed);
-        entity.setTestFunction((e, dt) -> {
-            if (entity.getCollider().isColliding(collidingEntity.getCollider())) {
-                game.gameOver();
-            }
-            move(e, dt);
-            timer.stopAtTimerEnd();
-            if (timer.isStopped()) {
-                Assertions.fail("Entity did not collide with other entity");
-            }
-        });
+        entity.setTestFunction(this::checkCollisions);
         collidingEntity.setTestFunction((e, dt) -> {});
         game.addGameObject(collidingEntity);
         game.addGameObject(entity);
+    }
+
+    void checkCollisions(final EntityTest e, final double dt) {
+        if (entity.getCollider().isColliding(e.getCollider())) {
+            game.gameOver();
+        }
+        move(e, dt);
+        timer.stopAtTimerEnd();
+        if (timer.isStopped()) {
+            Assertions.fail("Entity did not collide with other entity");
+        }
     }
 }

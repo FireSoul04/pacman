@@ -54,6 +54,11 @@ public interface Game {
     void update(double deltaTime);
 
     /**
+     * What to do on pause.
+     */
+    void onPause();
+
+    /**
      * What to do on render.
      */
     void render();
@@ -81,13 +86,16 @@ public interface Game {
         double deltaTime = 0.0;
         int updates = 0;
         int frames = 0;
+        this.init();
+        timer.start();
         while (!this.isOver()) {
             if (this.isPaused()) {
-                continue;
-            }
-            this.init();
-            timer.start();
-            while (this.isRunning()) {
+                timer.pause();
+                this.onPause();
+            } else if (!timer.isCounting()) {
+                timer.start();
+                lastTime = System.nanoTime();
+            } else if (this.isRunning()) {
                 final long now = System.nanoTime();
                 deltaTime = deltaTime + ((now - lastTime) / ns);
                 lastTime = now;

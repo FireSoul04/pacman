@@ -1,4 +1,4 @@
-package com.firesoul.pacman;
+package com.firesoul.pacman.testClasses;
 
 import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.controller.Game;
@@ -6,10 +6,19 @@ import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.model.Room2D;
 
-class GameTest implements Game {
-        
+public class GameTest implements Game {
+    
+    private Runnable consumer;
     private Room2D room = new Room2D();
     private State state;
+
+    public GameTest() {
+        this.consumer = () -> {};
+    }
+
+    public GameTest(final Runnable consumer) {
+        this.consumer = consumer;
+    }
 
     @Override
     public void init() {
@@ -19,16 +28,19 @@ class GameTest implements Game {
     @Override
     public void start() {
         this.state = State.RUNNING;
+        System.out.println("Game started");
     }
 
     @Override
     public void pause() {
         this.state = State.PAUSED;
+        System.out.println("Game paused");
     }
 
     @Override
     public void gameOver() {
         this.state = State.GAME_OVER;
+        System.out.println("Game over");
     }
     
     @Override
@@ -53,6 +65,12 @@ class GameTest implements Game {
                 ((Movable)g).update(deltaTime);
             }
         });
+        consumer.run();
+    }
+
+    @Override
+    public void onPause() {
+        consumer.run();
     }
 
     @Override

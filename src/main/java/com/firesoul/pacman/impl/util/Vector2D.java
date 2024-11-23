@@ -123,7 +123,25 @@ public class Vector2D implements Vector {
         return wrapped;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object o) {
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof Vector2D)) {
+            return false;
+        }
+        Vector2D v = (Vector2D) o;
+        return this.x == v.x && this.y == v.y;
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         return "[x: " + this.x + ", y:" + this.y + "]";
     }

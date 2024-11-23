@@ -1,4 +1,4 @@
-package com.firesoul.pacman;
+package com.firesoul.pacman.testClasses;
 
 import java.util.function.BiConsumer;
 
@@ -9,7 +9,7 @@ import com.firesoul.pacman.impl.entities.bases.Entity2D;
 import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 
-class EntityTest extends Entity2D implements Movable, Collidable {
+public class EntityTest extends Entity2D implements Movable, Collidable {
 
     private static final Vector2D HITBOX_SIZE = new Vector2D(8, 8);
 
