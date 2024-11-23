@@ -9,6 +9,7 @@ import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.api.model.Room;
 import com.firesoul.pacman.api.util.Timer;
+import com.firesoul.pacman.impl.controller.InputController;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 
@@ -50,16 +51,13 @@ public class Room2D implements Room {
      * {@inheritDoc}
      */
     @Override
-    public void updateAll(final double deltaTime) {
-        final Iterator<GameObject> it = this.gameObjects.iterator();
-        while (it.hasNext()) {
-            final GameObject gameObject = it.next();
-            if (!gameObject.isActive()) {
-                removeGameObject(it, gameObject);
-            } else if (gameObject instanceof Movable) {
+    public void updateAll(final InputController inputController, final double deltaTime) {
+        for (final GameObject gameObject : this.gameObjects) {
+            if (gameObject instanceof Movable) {
                 ((Movable) gameObject).update(deltaTime);
             }
         }
+        this.removeInactiveGameObjects();
         this.checkCollisions();
     }
 
@@ -86,18 +84,6 @@ public class Room2D implements Room {
     }
 
     /**
-     * Remove a game object from the room.
-     * @param it the iterator to remove the game object from.
-     * @param gameObject the game object to remove.
-     */
-    public void removeGameObject(final Iterator<GameObject> it, final GameObject gameObject) {
-        it.remove();
-        if (gameObject instanceof Collidable) {
-            this.cachedCollidables.remove((Collidable) gameObject);
-        }
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -110,6 +96,22 @@ public class Room2D implements Room {
      */
     public Vector2D getDimensions() {
         return this.map.getDimensions();
+    }
+
+    /**
+     * Remove all inactive game objects from the room.
+     */
+    public void removeInactiveGameObjects() {
+        final Iterator<GameObject> it = this.gameObjects.iterator();
+        while (it.hasNext()) {
+            final GameObject gameObject = it.next();
+            if (!gameObject.isActive()) {
+                it.remove();
+                if (gameObject instanceof Collidable) {
+                    this.cachedCollidables.remove((Collidable) gameObject);
+                }
+            }
+        }
     }
 
     private void checkCollisions() {

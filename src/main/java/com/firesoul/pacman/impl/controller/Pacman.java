@@ -83,7 +83,7 @@ public class Pacman implements Game {
         if (this.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
             this.pause();
         }
-        Pacman.room.updateAll(deltaTime);
+        Pacman.room.updateAll(this.inputController, deltaTime);
     }
 
     /**

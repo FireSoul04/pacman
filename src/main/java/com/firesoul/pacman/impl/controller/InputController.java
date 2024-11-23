@@ -54,9 +54,9 @@ public class InputController implements KeyListener {
     }
 
     /**
-     * Check if a key is pressed.
+     * Check if a key is pressed once.
      * @param keyCode the key code.
-     * @return true if the key is pressed.
+     * @return true if the key is pressed once.
      */
     public boolean isKeyPressedOnce(final int keyCode) {
         if (keys.get(keyCode)) {
