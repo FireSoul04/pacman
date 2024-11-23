@@ -96,16 +96,22 @@ public class Pacman implements Game {
     }
 
     /**
-     * 
+     * @return the window where the game is rendered.
      */
     public Renderer getWindow() {
         return this.renderer;
     }
 
+    /**
+     * @return the current game level room.
+     */
     public static Room2D getRoom() {
         return Pacman.room;
     }
 
+    /**
+     * @return the current game level room dimensions.
+     */
     public static Vector2D getRoomDimensions() {
         return Pacman.room.getDimensions();
     }
