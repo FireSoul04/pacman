@@ -1,6 +1,7 @@
 package com.firesoul.pacman.api.controller;
 
 import com.firesoul.pacman.api.util.Timer;
+import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.util.TimerImpl;
 
 public interface Game {
@@ -32,6 +33,21 @@ public interface Game {
     void gameOver();
 
     /**
+     * @return if the game is running.
+     */
+    boolean isRunning();
+
+    /**
+     * @return if the game is paused.
+     */
+    boolean isPaused();
+
+    /**
+     * @return if the game is over.
+     */
+    boolean isOver();
+
+    /**
      * Main game loop.
      * @param deltaTime Time between each frame.
      */
@@ -43,17 +59,9 @@ public interface Game {
     void render();
 
     /**
-     * @return Get current game state, that can be RUNNING, PAUSED or GAME_OVER.
+     * @return the window where the game is rendered.
      */
-    State getState();
-
-    /**
-     * Show a log message in standard output.
-     * @param log Message to show.
-     */
-    default void log(final String log) {
-        System.out.println(log);
-    }
+    Renderer getRenderer();
 
     /**
      * @return Get max updates per second.
@@ -73,26 +81,31 @@ public interface Game {
         double deltaTime = 0.0;
         int updates = 0;
         int frames = 0;
-        this.init();
-        timer.start();
-        while (this.getState() == State.RUNNING) {
-            final long now = System.nanoTime();
-            deltaTime += (now - lastTime) / ns;
-            lastTime = now;
-            while (deltaTime >= 1.0) {
-                this.update(deltaTime);
-                updates++;
-                deltaTime--;
+        while (!this.isOver()) {
+            if (this.isPaused()) {
+                continue;
             }
-            this.render();
-            frames++;
-            if (timer.isStopped()) {
-                timer.restart();
-                this.log(updates + " ups, " + frames + " fps");
-                updates = 0;
-                frames = 0;
+            this.init();
+            timer.start();
+            while (this.isRunning()) {
+                final long now = System.nanoTime();
+                deltaTime = deltaTime + ((now - lastTime) / ns);
+                lastTime = now;
+                while (deltaTime >= 1.0) {
+                    this.update(deltaTime);
+                    updates++;
+                    deltaTime--;
+                }
+                this.render();
+                frames++;
+                timer.stopAtTimerEnd();
+                if (timer.isStopped()) {
+                    System.out.println(updates + " ups, " + frames + " fps");
+                    updates = 0;
+                    frames = 0;
+                    timer.restart();
+                }
             }
-            timer.stopAtTimerEnd();
         }
     }
 }

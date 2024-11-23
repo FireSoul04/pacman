@@ -19,15 +19,14 @@ public class Pacman implements Game {
     private static final int HEIGHT = WIDTH * 3 / 4;
     private static final int SCALE = 3;
     
+    private static final PrintStream logger = System.out;
     private static Room2D room;
 
-    private PrintStream logger;
-    private Renderer renderer;
+    private final Renderer renderer;
     private State state;
     private int level;
 
     public Pacman() {
-        this.logger = System.out;
         this.renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
         //Pacman.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
         Pacman.room = new Room2D(WIDTH, HEIGHT);
@@ -90,14 +89,31 @@ public class Pacman implements Game {
      * {@inheritDoc}
      */
     @Override
-    public State getState() {
-        return this.state;
+    public boolean isRunning() {
+        return this.state == State.RUNNING;
     }
 
     /**
-     * @return the window where the game is rendered.
+     * {@inheritDoc}
      */
-    public Renderer getWindow() {
+    @Override
+    public boolean isPaused() {
+        return this.state == State.PAUSED;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isOver() {
+        return this.state == State.GAME_OVER;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Renderer getRenderer() {
         return this.renderer;
     }
 
@@ -113,5 +129,13 @@ public class Pacman implements Game {
      */
     public static Vector2D getRoomDimensions() {
         return Pacman.room.getDimensions();
+    }
+
+    /**
+     * Log a message to standard output.
+     * @param log the message to log.
+     */
+    public static void log(final String log) {
+        Pacman.logger.println(log);
     }
 }

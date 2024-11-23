@@ -19,9 +19,9 @@ public class Room2D implements Room {
     private static final int DEFAULT_HEIGHT = 300;
 
     private final Timer collisionTimer = new TimerImpl(Timer.secondsToMillis(1 / 60));
-    private final Map2D map;
     private final List<GameObject> gameObjects = new ArrayList<GameObject>();
     private final List<Collidable> cachedCollidables = new ArrayList<Collidable>();
+    private final Map2D map;
 
     /**
      * Default constructor for a room with no entities or blocks.

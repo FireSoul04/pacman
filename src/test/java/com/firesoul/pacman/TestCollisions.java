@@ -14,6 +14,7 @@ import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
 import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
+import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.entities.bases.Entity2D;
 import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.model.Room2D;
@@ -187,6 +188,21 @@ public class TestCollisions {
             public void gameOver() {
                 this.state = State.GAME_OVER;
             }
+            
+            @Override
+            public boolean isRunning() {
+                return this.state == State.RUNNING;
+            }
+            
+            @Override
+            public boolean isPaused() {
+                return this.state == State.PAUSED;
+            }
+            
+            @Override
+            public boolean isOver() {
+                return this.state == State.GAME_OVER;
+            }
         
             @Override
             public void update(final double deltaTime) {
@@ -201,10 +217,10 @@ public class TestCollisions {
             public void render() {
             
             }
-
+        
             @Override
-            public State getState() {
-                return this.state;
+            public Renderer getRenderer() {
+                return null;
             }
         
             public void addGameObject(final GameObject g) {
