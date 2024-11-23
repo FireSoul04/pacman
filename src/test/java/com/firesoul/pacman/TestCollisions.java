@@ -1,7 +1,5 @@
 package com.firesoul.pacman;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -18,6 +16,7 @@ import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.entities.BoxCollider2D;
 import com.firesoul.pacman.impl.entities.Entity2D;
+import com.firesoul.pacman.impl.entities.Room2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 
@@ -166,7 +165,7 @@ public class TestCollisions {
 
     class GameTest implements Game {
         
-            private List<GameObject> gs = new ArrayList<>();
+            private Room2D room = new Room2D();
             private State state;
         
             @Override
@@ -191,7 +190,7 @@ public class TestCollisions {
         
             @Override
             public void update(final double deltaTime) {
-                gs.forEach(g -> {
+                room.getEntities().forEach(g -> {
                     if (g instanceof Movable) {
                         ((Movable)g).update(deltaTime);
                     }
@@ -209,7 +208,7 @@ public class TestCollisions {
             }
         
             public void addGameObject(final GameObject g) {
-                gs.add(g);
+                room.addGameObject(g);
             }
     };
 }

@@ -5,13 +5,25 @@ import com.firesoul.pacman.impl.util.Vector2D;
 
 public class GameObject2D implements GameObject {
 
+    private Vector2D position;
+    private Vector2D speed;
+
+    /**
+     * Create a new GameObject2D
+     * @param position
+     * @param speed
+     */
+    public GameObject2D(final Vector2D position, final Vector2D speed) {
+        this.position = position;
+        this.speed = speed;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public Vector2D getPosition() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getPosition'");
+        return this.position;
     }
 
     /**
@@ -19,7 +31,22 @@ public class GameObject2D implements GameObject {
      */
     @Override
     public Vector2D getSpeed() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getSpeed'");
+        return this.speed;
+    }
+
+    /**
+     * Set the position of entity
+     * @param position
+     */
+    protected void setPosition(final Vector2D position) {
+        this.position = position;
+    }
+
+    /**
+     * Set the speed of entity
+     * @param speed
+     */
+    protected void setSpeed(final Vector2D speed) {
+        this.speed = speed;
     }
 }

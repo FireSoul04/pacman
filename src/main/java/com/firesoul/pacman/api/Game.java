@@ -12,59 +12,59 @@ public interface Game {
     }
 
     /**
-     * Setup for the game
+     * Setup for the game.
      */
     void init();
 
     /**
-     * Start the game
+     * Start the game.
      */
     void start();
 
     /**
-     * Pause the game
+     * Pause the game.
      */
     void pause();
 
     /**
-     * Set game over flag
+     * Set game over flag.
      */
     void gameOver();
 
     /**
-     * Main game loop
-     * @param deltaTime
+     * Main game loop.
+     * @param deltaTime Time between each frame.
      */
     void update(double deltaTime);
 
     /**
-     * What to do on render
+     * What to do on render.
      */
     void render();
 
     /**
-     * 
-     * @return
+     * @return Get current game state, that can be RUNNING, PAUSED or GAME_OVER.
      */
     State getState();
 
     /**
-     * 
+     * Show a log message in standard output.
+     * @param log Message to show.
      */
     default void log(final String log) {
         System.out.println(log);
     }
 
     /**
-     * 
-     * @return
+     * @return Get max updates per second.
      */
     default double getMaxUpdates() {
         return 60.0;
     }
 
     /**
-     * Setup for the game
+     * Default game loop, runs at MAX_UPDATES per seconds and handles the rendering and let the game work on multiple platform at the same speed.
+     * It stops whenever the game state is not RUNNING.
      */
     default void run() {
         final Timer timer = new TimerImpl(Timer.secondsToMillis(1));

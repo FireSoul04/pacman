@@ -4,15 +4,21 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.image.BufferStrategy;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 
+import com.firesoul.pacman.api.Drawable;
+import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.Renderer;
 
 public class Window extends Canvas implements Renderer {
     
     private final JFrame frame;
+    private final List<GameObject> gameObjects;
     private BufferStrategy bufferStrategy;
     private Graphics graphics;
     private int width;
@@ -29,6 +35,7 @@ public class Window extends Canvas implements Renderer {
         this.height = height;
         this.scale = scale;
         this.frame = new JFrame(title);
+        this.gameObjects = new ArrayList<>();
     }
 
     /**
@@ -52,10 +59,26 @@ public class Window extends Canvas implements Renderer {
     public void draw() {
         this.setGraphics();
         this.clear();
-        this.setColor(Color.WHITE);
-        this.graphics.fillRect(0, 0, 50, 50);
+        for (final GameObject gameObject : this.gameObjects) {
+            if (gameObject instanceof Drawable) {
+                final Image image = ((Drawable) gameObject).getImage();
+                this.graphics.drawImage(
+                    image,
+                    (int)gameObject.getPosition().getX() * this.scale, 
+                    (int)gameObject.getPosition().getY() * this.scale,
+                    image.getWidth(null) * this.scale,
+                    image.getHeight(null) * this.scale,
+                    null
+                );
+            }
+        }
         this.graphics.dispose();
         this.bufferStrategy.show();
+    }
+
+    @Override
+    public void load(final GameObject gameObject) {
+        this.gameObjects.add(gameObject);
     }
 
     /**

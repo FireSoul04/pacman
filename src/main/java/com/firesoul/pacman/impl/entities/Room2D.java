@@ -1,24 +1,32 @@
 package com.firesoul.pacman.impl.entities;
 
 import java.util.List;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import com.firesoul.pacman.api.Block;
 import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.Room;
 import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.impl.Map2D;
+import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Room2D implements Room {
 
+    private static final int DEFAULT_WIDTH = 400;
+    private static final int DEFAULT_HEIGHT = 300;
+
+    private final Map2D map;
     private final List<GameObject> gameObjects;
 
     /**
      * Default constructor for a room with no entities or blocks.
      */
     public Room2D() {
+        this(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    }
+
+    public Room2D(final int width, final int height) {
+        this.map = new Map2D(width, height);
         this.gameObjects = new ArrayList<GameObject>();
     }
 
@@ -29,14 +37,9 @@ public class Room2D implements Room {
      * @param blockMapPath the path to the block map
      */
     public Room2D(final String entityMapPath, final String blockMapPath) {
-        List<GameObject> gameObjects = Collections.emptyList();
-        try {
-            gameObjects = new Map2D(entityMapPath, blockMapPath).getGameObjects();
-        } catch (final IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        this.map = new Map2D(entityMapPath, blockMapPath);
         this.gameObjects = new ArrayList<GameObject>();
-        this.gameObjects.addAll(gameObjects);
+        this.gameObjects.addAll(this.map.getGameObjects());
     }
 
     /**
@@ -76,19 +79,24 @@ public class Room2D implements Room {
     }
 
     /**
-     * {@inheritDoc}
+     * @return the blocks in the room.
      */
-    @Override
     public List<Block> getBlocks() {
         return filterGameObject(Block.class);
     }
 
     /**
-     * {@inheritDoc}
+     * @return the entities in the room.
      */
-    @Override
     public List<Entity2D> getEntities() {
         return filterGameObject(Entity2D.class);
+    }
+
+    /**
+     * @return the dimensions of the room.
+     */
+    public Vector2D getDimensions() {
+        return this.map.getDimensions();
     }
 
     private <T> List<T> filterGameObject(final Class<T> clazz) {
@@ -100,5 +108,4 @@ public class Room2D implements Room {
         }
         return filtered;
     }
-
 }

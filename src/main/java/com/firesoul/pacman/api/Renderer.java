@@ -5,46 +5,52 @@ import java.awt.Color;
 public interface Renderer {
 
     /**
-     * Setup the game screen
+     * Setup the game screen.
      */
     void init();
 
     /**
-     * Draw the game to the screen
+     * Draw the game to the screen.
      */
     void draw();
 
     /**
-     * Clears game's screen
+     * Clears game's screen.
      */
     void clear();
 
     /**
-     * Set render color
+     * Load game object.
+     * @param gameObject
+     */
+    void load(GameObject gameObject);
+
+    /**
+     * Set render color.
      * @param color
      */
     void setColor(Color color);
 
     /**
-     * Resize the window
+     * Resize the window.
      * @param width
      * @param height
      */
     void resize(int width, int height);
 
     /**
-     * Set new scale factor
+     * Set new scale factor.
      * @param scale
      */
     void setScale(int scale);
 
     /**
-     * @return Screen width
+     * @return Screen width.
      */
     int getWidth();
 
     /**
-     * @return Screen height
+     * @return Screen height.
      */
     int getHeight();
 }

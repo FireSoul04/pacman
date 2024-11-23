@@ -3,30 +3,35 @@ package com.firesoul.pacman.impl;
 import java.io.PrintStream;
 
 import com.firesoul.pacman.api.Game;
+import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.Renderer;
-import com.firesoul.pacman.api.Room;
+import com.firesoul.pacman.impl.entities.Player;
 import com.firesoul.pacman.impl.entities.Room2D;
+import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Pacman implements Game {
 
-    private static final String MAP_PATH = "/map/";
-    private static final String ENTITY_MAP_PATH = MAP_PATH + "entities.map";
-    private static final String BLOCK_MAP_PATH = MAP_PATH + "blocks.map";
+    // private static final String MAP_PATH = "/map/";
+    // private static final String ENTITY_MAP_PATH = MAP_PATH + "entities.map";
+    // private static final String BLOCK_MAP_PATH = MAP_PATH + "blocks.map";
     private static final String TITLE = "Pacman";
     private static final int WIDTH = 400;
     private static final int HEIGHT = WIDTH * 3 / 4;
     private static final int SCALE = 3;
     
+    private static Room2D room;
+
     private PrintStream logger;
     private Renderer renderer;
-    private Room room;
     private State state;
     private int level;
 
     public Pacman() {
         this.logger = System.out;
         this.renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
-        this.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
+        //Pacman.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
+        Pacman.room = new Room2D(WIDTH, HEIGHT);
+        Pacman.room.addGameObject(new Player(Vector2D.zero(), new Vector2D(2, 0)));
     }
 
     /**
@@ -68,10 +73,10 @@ public class Pacman implements Game {
      */
     @Override
     public void update(final double deltaTime) {
-        this.room.updateAll(deltaTime);
-        // this.room.getGameObjects().forEach(e -> {
-        //     e.get
-        // });
+        Pacman.room.updateAll(deltaTime);
+        for (final GameObject g : Pacman.room.getGameObjects()) {
+            this.renderer.load(g);
+        }
     }
 
     /**
@@ -95,5 +100,13 @@ public class Pacman implements Game {
      */
     public Renderer getWindow() {
         return this.renderer;
+    }
+
+    public static Room2D getRoom() {
+        return Pacman.room;
+    }
+
+    public static Vector2D getRoomDimensions() {
+        return Pacman.room.getDimensions();
     }
 }
