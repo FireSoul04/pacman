@@ -22,10 +22,11 @@ public class Pacman implements Game {
     private static final int SCALE = 3;
     
     private static final PrintStream logger = System.out;
-    private static Room2D room;
+    private static Vector2D dimensions;
 
     private final Renderer renderer;
     private final InputController inputController;
+    private Room2D room;
     private State state;
     private int level;
 
@@ -34,11 +35,12 @@ public class Pacman implements Game {
         this.inputController = new InputController();
         this.renderer.addInputController(this.inputController);
         //Pacman.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
-        Pacman.room = new Room2D(WIDTH, HEIGHT);
-        Pacman.room.addGameObject(new Player(Vector2D.zero(), new Vector2D(1, 0)));
+        this.room = new Room2D(WIDTH, HEIGHT);
+        this.room.addGameObject(new Player(Vector2D.zero(), new Vector2D(1, 0)));
         for (int i = 0; i < 10; i++) {
-            Pacman.room.addGameObject(new Pill(new Vector2D(100 + i * 16, 0)));
+            this.room.addGameObject(new Pill(new Vector2D(100 + i * 16, 0)));
         }
+        Pacman.dimensions = this.room.getDimensions();
     }
 
     /**
@@ -83,7 +85,7 @@ public class Pacman implements Game {
         if (this.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
             this.pause();
         }
-        Pacman.room.updateAll(this.inputController, deltaTime);
+        this.room.updateAll(this.inputController, deltaTime);
     }
 
     /**
@@ -101,7 +103,7 @@ public class Pacman implements Game {
      */
     @Override
     public void render() {
-        this.renderer.load(Pacman.room.getGameObjects());
+        this.renderer.load(this.room.getGameObjects());
         this.renderer.draw();
     }
 
@@ -145,17 +147,10 @@ public class Pacman implements Game {
     }
 
     /**
-     * @return the current game level room.
-     */
-    public static Room2D getRoom() {
-        return Pacman.room;
-    }
-
-    /**
      * @return the current game level room dimensions.
      */
     public static Vector2D getRoomDimensions() {
-        return Pacman.room.getDimensions();
+        return Pacman.dimensions;
     }
 
     /**
