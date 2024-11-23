@@ -70,9 +70,13 @@ public class Player extends Entity2D implements Movable, Collidable, Drawable {
         // TODO
 
         //TESTING PURPOSE
+        final Vector2D imageSize = new Vector2D(
+            this.getImage().getWidth(null), 
+            this.getImage().getHeight(null)
+        );
         this.setPosition(this.getPosition()
             .add(this.getSpeed().dot(deltaTime))
-            .wrap(Vector2D.zero(), Pacman.getRoomDimensions()));
+            .wrap(Vector2D.zero().sub(imageSize), Pacman.getRoomDimensions()));
         //
     }
 
@@ -89,7 +93,7 @@ public class Player extends Entity2D implements Movable, Collidable, Drawable {
      */
     @Override
     public Image getImage() {
-        return this.frames.get(animationFrame);
+        return this.frames.get(this.animationFrame);
     }
 
     /**
