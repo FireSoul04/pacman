@@ -16,21 +16,23 @@ import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.Pacman;
 import com.firesoul.pacman.impl.entities.bases.Entity2D;
 import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
+import com.firesoul.pacman.impl.util.TimerImpl;
 // import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Player extends Entity2D implements Movable, Collidable, Drawable {
 
-    private enum State {
-        IDLE,
-        MOVING,
-        DEAD
-    }
+    // private enum State {
+    //     IDLE,
+    //     MOVING,
+    //     DEAD
+    // }
 
     private static final String PATH_TO_SPRITES = "src/main/resources/sprites/pacman/";
     // private static final long MAX_EATING_TIME = Timer.secondsToMillis(5);
     // private static final int MAX_LIVES = 3;
 
+    private final Timer animationTimer;
     private final Collider collider;
     private final List<Image> frames;
     // private final Timer eatTimer;
@@ -48,6 +50,8 @@ public class Player extends Entity2D implements Movable, Collidable, Drawable {
         // this.eatTimer = new TimerImpl(MAX_EATING_TIME);
         this.collider = new BoxCollider2D(this, new Vector2D(8, 8)); // For debugging purposes 8 pxs
         this.frames = new ArrayList<>();
+        this.animationTimer = new TimerImpl(Timer.secondsToMillis(0.2));
+        this.animationTimer.start();
         try {
             this.frames.add(ImageIO.read(new File(PATH_TO_SPRITES + "pacman_0.png")));
             this.frames.add(ImageIO.read(new File(PATH_TO_SPRITES + "pacman_1.png")));
@@ -73,6 +77,12 @@ public class Player extends Entity2D implements Movable, Collidable, Drawable {
         // TODO
 
         //TESTING PURPOSE
+        this.animationTimer.stopAtTimerEnd();
+        if (this.animationTimer.isStopped()) {
+            this.animationFrame = (this.animationFrame + 1) % this.frames.size();
+            this.animationTimer.restart();
+        }
+
         final Vector2D imageSize = new Vector2D(
             this.getImage().getWidth(null), 
             this.getImage().getHeight(null)
