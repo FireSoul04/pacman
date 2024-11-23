@@ -10,15 +10,13 @@ import com.firesoul.pacman.impl.util.Vector2D;
 public class Pill extends GameObject2D implements Collidable {
 
     private final Collider collider;
-    private final Sprite2D sprite;
 
     /**
      * Create a little pill that is required to conclude the current level
      * @param position
      */
     public Pill(final Vector2D position) {
-        super(position, Vector2D.zero());
-        this.sprite = new Sprite2D("pill");
+        super(position, Vector2D.zero(), new Sprite2D("pill"));
         this.collider = new BoxCollider2D(this, new Vector2D(8, 8));
     }
 

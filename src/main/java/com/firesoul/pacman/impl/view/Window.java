@@ -12,7 +12,6 @@ import java.util.List;
 import javax.swing.JFrame;
 
 import com.firesoul.pacman.api.GameObject;
-import com.firesoul.pacman.api.entities.Drawable;
 import com.firesoul.pacman.api.view.Renderer;
 
 public class Window extends Canvas implements Renderer {
@@ -60,8 +59,8 @@ public class Window extends Canvas implements Renderer {
         this.setGraphics();
         this.clear();
         for (final GameObject gameObject : this.gameObjects) {
-            if (gameObject instanceof Drawable) {
-                final Image image = ((Drawable) gameObject).getImage();
+            if (gameObject.isVisible()) {
+                final Image image = gameObject.getDrawable().getImage();
                 this.graphics.drawImage(
                     image,
                     (int)gameObject.getPosition().getX() * this.scale, 

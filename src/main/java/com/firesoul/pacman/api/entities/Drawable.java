@@ -38,13 +38,14 @@ public interface Drawable {
      * @return The image of the drawable object.
      */
     static Image loadImage(final String name) {
+        Image image = null;
         try {
-            return ImageIO.read(new File(PATH_TO_SPRITES + name + "/" + name + ".png"));
+            image = ImageIO.read(new File(PATH_TO_SPRITES + name + "/" + name + ".png"));
         } catch (IOException e) {
             System.err.println("Error loading " + name + " sprite");
             System.exit(1);
         }
-        return null;
+        return image;
     }
 
     /**
@@ -67,6 +68,6 @@ public interface Drawable {
             System.err.println("Error loading " + name + " sprites");
             System.exit(1);
         }
-        return null;
+        return images;
     }
 }

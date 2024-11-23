@@ -23,20 +23,18 @@ public class Player extends GameObject2D implements Movable, Collidable {
     // private static final int MAX_LIVES = 3;
 
     private final Collider collider;
-    private final Animation2D animation;
     // private final Timer eatTimer;
     // private State state;
     // private int lives;
     // private boolean canEat;
 
     public Player(final Vector2D position, final Vector2D speed) {
-        super(position, speed);
+        super(position, speed, new Animation2D("pacman", Timer.secondsToMillis(0.2)));
         // this.state = State.IDLE;
         // this.lives = MAX_LIVES;
         // this.canEat = false;
         // this.eatTimer = new TimerImpl(MAX_EATING_TIME);
         this.collider = new BoxCollider2D(this, new Vector2D(8, 8)); // For debugging purposes 8 pxs
-        this.animation = new Animation2D("pacman", Timer.secondsToMillis(0.2));
     }
 
     /**
@@ -57,8 +55,9 @@ public class Player extends GameObject2D implements Movable, Collidable {
         //TESTING PURPOSE
         this.setPosition(this.getPosition()
             .add(this.getSpeed().dot(deltaTime))
-            .wrap(this.animation.getImageSize().invert(), Pacman.getRoomDimensions())
+            .wrap(this.getDrawable().getImageSize().invert(), Pacman.getRoomDimensions())
         );
+        ((Animation2D)this.getDrawable()).update();
         //
     }
 

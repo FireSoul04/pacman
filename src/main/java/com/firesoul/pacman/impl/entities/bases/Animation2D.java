@@ -1,7 +1,6 @@
 package com.firesoul.pacman.impl.entities.bases;
 
 import java.awt.Image;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.firesoul.pacman.api.entities.Drawable;
@@ -16,8 +15,8 @@ public class Animation2D implements Drawable {
 
     public Animation2D(final String name, final long animationSpeed) {
         this.animationFrame = 0;
-        this.frames = new ArrayList<>();
-        this.animationTimer = new TimerImpl(Timer.secondsToMillis(animationSpeed));
+        this.frames = Drawable.loadImages(name);
+        this.animationTimer = new TimerImpl(animationSpeed);
         this.animationTimer.start();
     }
 
@@ -42,6 +41,7 @@ public class Animation2D implements Drawable {
 
     /**
      * Get the current frame of the animation.
+     * @return The current frame.
      */
     public int getCurrentFrame() {
         return this.animationFrame;
