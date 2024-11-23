@@ -19,7 +19,7 @@ public interface Collidable {
      * @return the bounds of this entity
      */
     default Vector2D getBounds() {
-        return this.getCollider().getBounds();
+        return this.getCollider().getDimensions();
     }
 
     /**

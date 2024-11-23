@@ -18,9 +18,9 @@ public interface Collider {
     Vector2D getPosition();
 
     /**
-     * @return the bounds of this collider
+     * @return the dimensions of this collider
      */
-    Vector2D getBounds();
+    Vector2D getDimensions();
 
     /**
      * @return the entity attached to this collider
