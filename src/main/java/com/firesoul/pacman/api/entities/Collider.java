@@ -6,11 +6,11 @@ import com.firesoul.pacman.impl.util.Vector2D;
 public interface Collider {
 
     /**
-     * Checks if this collider collides with the other collider.
+     * Checks if this collider is colliding with the other collider.
      * @param other the other collider to check for collision
-     * @return true if this collider collides with the other collider
+     * @return true if this collider is colliding with the other collider
      */
-    boolean collides(Collider other);
+    boolean isColliding(Collider other);
 
     /**
      * @return the position of this collider

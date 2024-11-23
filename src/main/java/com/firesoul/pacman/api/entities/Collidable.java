@@ -18,7 +18,7 @@ public interface Collidable {
     /**
      * @return the bounds of this entity
      */
-    default Vector2D getBounds() {
+    default Vector2D getDimensions() {
         return this.getCollider().getDimensions();
     }
 
@@ -35,6 +35,6 @@ public interface Collidable {
      * @return if the two entity are colliding
      */
     default boolean isColliding(final Collidable other) {
-        return this.getCollider().collides(other.getCollider());
+        return this.getCollider().isColliding(other.getCollider());
     }
 }

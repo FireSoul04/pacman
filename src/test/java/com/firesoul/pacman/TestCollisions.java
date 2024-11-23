@@ -108,7 +108,7 @@ public class TestCollisions {
     void setupCollisions(final EntityTest collidingEntity, final Vector2D speed) {
         entity = new EntityTest(Vector2D.zero(), speed);
         entity.setTestFunction((e, dt) -> {
-            if (entity.getCollider().collides(collidingEntity.getCollider())) {
+            if (entity.getCollider().isColliding(collidingEntity.getCollider())) {
                 game.gameOver();
             }
             move(e, dt);
