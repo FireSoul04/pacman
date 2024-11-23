@@ -31,8 +31,10 @@ public class Pacman implements Game {
         this.renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
         //Pacman.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
         Pacman.room = new Room2D(WIDTH, HEIGHT);
-        Pacman.room.addGameObject(new Player(Vector2D.zero(), new Vector2D(2, 0)));
-        Pacman.room.addGameObject(new Pill(new Vector2D(100, 0)));
+        Pacman.room.addGameObject(new Player(Vector2D.zero(), new Vector2D(1, 0)));
+        for (int i = 0; i < 10; i++) {
+            Pacman.room.addGameObject(new Pill(new Vector2D(100 + i * 16, 0)));
+        }
     }
 
     /**

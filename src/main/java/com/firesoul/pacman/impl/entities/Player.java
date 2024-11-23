@@ -42,7 +42,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
      */
     @Override
     public void onCollide(final Collidable other) {
-        System.out.println("Entity is colliding with " + other);
+        
     }
 
     /**
