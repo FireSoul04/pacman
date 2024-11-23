@@ -13,10 +13,12 @@ import javax.swing.JFrame;
 
 import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.view.Renderer;
+import com.firesoul.pacman.impl.controller.InputController;
 
 public class Window extends Canvas implements Renderer {
     
     private final JFrame frame;
+    private final InputController inputController;
     private List<GameObject> gameObjects;
     private BufferStrategy bufferStrategy;
     private Graphics graphics;
@@ -34,6 +36,7 @@ public class Window extends Canvas implements Renderer {
         this.height = height;
         this.scale = scale;
         this.frame = new JFrame(title);
+        this.inputController = new InputController();
         this.gameObjects = new ArrayList<>();
     }
 
@@ -47,6 +50,7 @@ public class Window extends Canvas implements Renderer {
         this.frame.setLocationRelativeTo(null);
         this.frame.add(this);
         this.frame.setVisible(true);
+        this.addKeyListener(inputController);
         this.createBufferStrategy(2); // Create double buffering
         this.bufferStrategy = this.getBufferStrategy();
     }
@@ -128,6 +132,22 @@ public class Window extends Canvas implements Renderer {
     @Override
     public int getHeight() {
         return this.height * this.scale;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addInputController(final InputController inputController) {
+        this.addKeyListener(inputController);
+    }
+
+    /**
+     * Get the input controller.
+     * @return the input controller.
+     */
+    public InputController getInputController() {
+        return this.inputController;
     }
 
     private void setGraphics() {

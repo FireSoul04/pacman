@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.List;
 
 import com.firesoul.pacman.api.GameObject;
+import com.firesoul.pacman.impl.controller.InputController;
 
 public interface Renderer {
 
@@ -46,6 +47,12 @@ public interface Renderer {
      * @param scale
      */
     void setScale(int scale);
+
+    /**
+     * Add input controller to the game.
+     * @param inputController Input controller.
+     */
+    void addInputController(InputController inputController);
 
     /**
      * @return Screen width.

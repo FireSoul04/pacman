@@ -19,7 +19,6 @@ public class Player extends GameObject2D implements Movable, Collidable {
     //     DEAD
     // }
 
-    private static final long serialVersionUID = 1L;
     // private static final long MAX_EATING_TIME = Timer.secondsToMillis(5);
     // private static final int MAX_LIVES = 3;
     private static final Vector2D SIZE = new Vector2D(16, 16);

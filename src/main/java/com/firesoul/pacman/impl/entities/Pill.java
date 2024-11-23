@@ -17,7 +17,7 @@ public class Pill extends GameObject2D implements Collidable {
      */
     public Pill(final Vector2D position) {
         super(position, Vector2D.zero(), new Sprite2D("pill"));
-        this.collider = new BoxCollider2D(this, new Vector2D(8, 8));
+        this.collider = new BoxCollider2D(this, new Vector2D(2, 2));
     }
 
     /**

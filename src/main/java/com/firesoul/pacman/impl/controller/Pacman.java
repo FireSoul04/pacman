@@ -1,5 +1,6 @@
 package com.firesoul.pacman.impl.controller;
 
+import java.awt.event.KeyEvent;
 import java.io.PrintStream;
 
 import com.firesoul.pacman.api.controller.Game;
@@ -24,11 +25,14 @@ public class Pacman implements Game {
     private static Room2D room;
 
     private final Renderer renderer;
+    private final InputController inputController;
     private State state;
     private int level;
 
     public Pacman() {
         this.renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
+        this.inputController = new InputController();
+        this.renderer.addInputController(this.inputController);
         //Pacman.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
         Pacman.room = new Room2D(WIDTH, HEIGHT);
         Pacman.room.addGameObject(new Player(Vector2D.zero(), new Vector2D(1, 0)));
@@ -76,6 +80,13 @@ public class Pacman implements Game {
      */
     @Override
     public void update(final double deltaTime) {
+        if (this.inputController.isKeyPressed(KeyEvent.VK_ESCAPE)) {
+            if (this.isRunning()) {
+                this.pause();
+            } else if (this.isPaused()) {
+                this.start();
+            }
+        }
         Pacman.room.updateAll(deltaTime);
     }
 
