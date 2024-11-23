@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.firesoul.pacman.api.Block;
-import com.firesoul.pacman.api.Entity;
 import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.model.Map;
 import com.firesoul.pacman.impl.util.Vector2D;
@@ -40,7 +38,7 @@ public class Map2D implements Map {
      * {@inheritDoc}
      */
     @Override
-    public List<Entity> getEntityMap() {
+    public List<GameObject> getEntityMap() {
         return this.getMap(this.entityMapPath);
     }
 
@@ -48,7 +46,7 @@ public class Map2D implements Map {
      * {@inheritDoc}
      */
     @Override
-    public List<Block> getBlockMap() {
+    public List<GameObject> getBlockMap() {
         return this.getMap(this.blockMapPath);
     }
 
@@ -71,8 +69,8 @@ public class Map2D implements Map {
     }
     
     @SuppressWarnings("unchecked")
-    private <T> List<T> getMap(final String mapPath) {
-        final List<T> map = Collections.emptyList();
+    private List<GameObject> getMap(final String mapPath) {
+        final List<GameObject> map = Collections.emptyList();
         try (
             final ObjectInputStream reader = new ObjectInputStream(
                 new BufferedInputStream(
@@ -81,7 +79,7 @@ public class Map2D implements Map {
             )
         ) {
             this.bounds = (Vector2D) reader.readObject();
-            map.addAll((List<T>) reader.readObject());
+            map.addAll((List<GameObject>) reader.readObject());
         } catch (final IOException | ClassNotFoundException e) {
             e.printStackTrace();
             System.exit(1);

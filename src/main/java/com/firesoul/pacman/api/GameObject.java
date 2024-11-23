@@ -2,17 +2,28 @@ package com.firesoul.pacman.api;
 
 import java.io.Serializable;
 
+import com.firesoul.pacman.api.entities.Drawable;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public interface GameObject extends Serializable {
 
     /**
-     * @return Entity's current position
+     * @return Game object's current position
      */
     Vector2D getPosition();
 
     /**
-     * @return Entity's speed
+     * @return Game object's speed
      */
     Vector2D getSpeed();
+
+    /**
+     * @return Game object's drawable representation.
+     */
+    Drawable getDrawable();
+
+    /**
+     * @return Game object's visibility.
+     */
+    boolean isVisible();
 }

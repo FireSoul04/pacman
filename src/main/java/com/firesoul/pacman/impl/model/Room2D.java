@@ -3,13 +3,11 @@ package com.firesoul.pacman.impl.model;
 import java.util.List;
 import java.util.ArrayList;
 
-import com.firesoul.pacman.api.Block;
 import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.api.model.Room;
 import com.firesoul.pacman.api.util.Timer;
-import com.firesoul.pacman.impl.entities.bases.Entity2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 
@@ -91,34 +89,10 @@ public class Room2D implements Room {
     }
 
     /**
-     * @return the blocks in the room.
-     */
-    public List<Block> getBlocks() {
-        return filterGameObject(Block.class);
-    }
-
-    /**
-     * @return the entities in the room.
-     */
-    public List<Entity2D> getEntities() {
-        return filterGameObject(Entity2D.class);
-    }
-
-    /**
      * @return the dimensions of the room.
      */
     public Vector2D getDimensions() {
         return this.map.getDimensions();
-    }
-
-    private <T> List<T> filterGameObject(final Class<T> clazz) {
-        final List<T> filtered = new ArrayList<T>();
-        for (final GameObject gameObject : this.gameObjects) {
-            if (clazz.isInstance(gameObject)) {
-                filtered.add(clazz.cast(gameObject));
-            }
-        }
-        return filtered;
     }
 
     private void checkCollisions() {

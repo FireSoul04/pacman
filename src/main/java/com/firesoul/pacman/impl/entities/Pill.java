@@ -2,10 +2,15 @@ package com.firesoul.pacman.impl.entities;
 
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
-import com.firesoul.pacman.impl.entities.bases.Entity2D;
+import com.firesoul.pacman.impl.entities.bases.GameObject2D;
+import com.firesoul.pacman.impl.entities.bases.Sprite2D;
+import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 
-public class Pill extends Entity2D implements Collidable {
+public class Pill extends GameObject2D implements Collidable {
+
+    private final Collider collider;
+    private final Sprite2D sprite;
 
     /**
      * Create a little pill that is required to conclude the current level
@@ -13,17 +18,19 @@ public class Pill extends Entity2D implements Collidable {
      */
     public Pill(final Vector2D position) {
         super(position, Vector2D.zero());
+        this.sprite = new Sprite2D("pill");
+        this.collider = new BoxCollider2D(this, new Vector2D(8, 8));
     }
 
     @Override
     public void onCollide(final Collidable other) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onCollide'");
+        if (other instanceof Player) {
+            System.out.println("Eaten");
+        }
     }
 
     @Override
     public Collider getCollider() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCollider'");
+        return this.collider;
     }
 }

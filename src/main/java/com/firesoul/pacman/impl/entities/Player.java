@@ -1,26 +1,17 @@
 package com.firesoul.pacman.impl.entities;
 
-import java.awt.Image;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.imageio.ImageIO;
-
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
-import com.firesoul.pacman.api.entities.Drawable;
 import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.Pacman;
-import com.firesoul.pacman.impl.entities.bases.Entity2D;
+import com.firesoul.pacman.impl.entities.bases.Animation2D;
+import com.firesoul.pacman.impl.entities.bases.GameObject2D;
 import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
-import com.firesoul.pacman.impl.util.TimerImpl;
 // import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 
-public class Player extends Entity2D implements Movable, Collidable, Drawable {
+public class Player extends GameObject2D implements Movable, Collidable {
 
     // private enum State {
     //     IDLE,
@@ -28,16 +19,13 @@ public class Player extends Entity2D implements Movable, Collidable, Drawable {
     //     DEAD
     // }
 
-    private static final String PATH_TO_SPRITES = "src/main/resources/sprites/pacman/";
     // private static final long MAX_EATING_TIME = Timer.secondsToMillis(5);
     // private static final int MAX_LIVES = 3;
 
-    private final Timer animationTimer;
     private final Collider collider;
-    private final List<Image> frames;
+    private final Animation2D animation;
     // private final Timer eatTimer;
     // private State state;
-    private int animationFrame;
     // private int lives;
     // private boolean canEat;
 
@@ -46,19 +34,9 @@ public class Player extends Entity2D implements Movable, Collidable, Drawable {
         // this.state = State.IDLE;
         // this.lives = MAX_LIVES;
         // this.canEat = false;
-        this.animationFrame = 0;
         // this.eatTimer = new TimerImpl(MAX_EATING_TIME);
         this.collider = new BoxCollider2D(this, new Vector2D(8, 8)); // For debugging purposes 8 pxs
-        this.frames = new ArrayList<>();
-        this.animationTimer = new TimerImpl(Timer.secondsToMillis(0.2));
-        this.animationTimer.start();
-        try {
-            this.frames.add(ImageIO.read(new File(PATH_TO_SPRITES + "pacman_0.png")));
-            this.frames.add(ImageIO.read(new File(PATH_TO_SPRITES + "pacman_1.png")));
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+        this.animation = new Animation2D("pacman", Timer.secondsToMillis(0.2));
     }
 
     /**
@@ -77,19 +55,10 @@ public class Player extends Entity2D implements Movable, Collidable, Drawable {
         // TODO
 
         //TESTING PURPOSE
-        this.animationTimer.stopAtTimerEnd();
-        if (this.animationTimer.isStopped()) {
-            this.animationFrame = (this.animationFrame + 1) % this.frames.size();
-            this.animationTimer.restart();
-        }
-
-        final Vector2D imageSize = new Vector2D(
-            this.getImage().getWidth(null), 
-            this.getImage().getHeight(null)
-        );
         this.setPosition(this.getPosition()
             .add(this.getSpeed().dot(deltaTime))
-            .wrap(Vector2D.zero().sub(imageSize), Pacman.getRoomDimensions()));
+            .wrap(this.animation.getImageSize().invert(), Pacman.getRoomDimensions())
+        );
         //
     }
 
@@ -99,14 +68,6 @@ public class Player extends Entity2D implements Movable, Collidable, Drawable {
     @Override
     public Collider getCollider() {
         return this.collider;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Image getImage() {
-        return this.frames.get(this.animationFrame);
     }
 
     // /**

@@ -4,6 +4,7 @@ import java.io.PrintStream;
 
 import com.firesoul.pacman.api.controller.Game;
 import com.firesoul.pacman.api.view.Renderer;
+import com.firesoul.pacman.impl.entities.Pill;
 import com.firesoul.pacman.impl.entities.Player;
 import com.firesoul.pacman.impl.model.Room2D;
 import com.firesoul.pacman.impl.util.Vector2D;
@@ -31,7 +32,7 @@ public class Pacman implements Game {
         //Pacman.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
         Pacman.room = new Room2D(WIDTH, HEIGHT);
         Pacman.room.addGameObject(new Player(Vector2D.zero(), new Vector2D(2, 0)));
-        Pacman.room.addGameObject(new Player(new Vector2D(100, 0), new Vector2D(0, 0)));
+        Pacman.room.addGameObject(new Pill(new Vector2D(100, 0)));
     }
 
     /**
