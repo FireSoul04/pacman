@@ -22,6 +22,9 @@ public class Pill extends GameObject2D implements Collidable {
         this.collider = new BoxCollider2D(this, new Vector2D(8, 8));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onCollide(final Collidable other) {
         if (other instanceof Player) {
@@ -29,6 +32,9 @@ public class Pill extends GameObject2D implements Collidable {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collider getCollider() {
         return this.collider;

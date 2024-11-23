@@ -127,6 +127,13 @@ public class Pacman implements Game {
     }
 
     /**
+     * @return the current game level.
+     */
+    public int getLevel() {
+        return this.level;
+    }
+
+    /**
      * @return the current game level room.
      */
     public static Room2D getRoom() {
