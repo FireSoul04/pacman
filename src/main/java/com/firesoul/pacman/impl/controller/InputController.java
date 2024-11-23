@@ -43,7 +43,7 @@ public class InputController implements KeyListener {
     public void keyReleased(final KeyEvent e) {
         keys.put(e.getKeyCode(), false);
     }
-
+    
     /**
      * Check if a key is pressed.
      * @param keyCode the key code.
@@ -51,5 +51,18 @@ public class InputController implements KeyListener {
      */
     public boolean isKeyPressed(final int keyCode) {
         return keys.get(keyCode);
+    }
+
+    /**
+     * Check if a key is pressed.
+     * @param keyCode the key code.
+     * @return true if the key is pressed.
+     */
+    public boolean isKeyPressedOnce(final int keyCode) {
+        if (keys.get(keyCode)) {
+            keys.put(keyCode, false);
+            return true;
+        }
+        return false;
     }
 }

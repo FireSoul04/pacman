@@ -92,7 +92,6 @@ public interface Game {
             if (this.isPaused()) {
                 timer.pause();
                 this.onPause();
-                this.update(0);
             } else if (!timer.isCounting()) {
                 timer.start();
                 lastTime = System.nanoTime();

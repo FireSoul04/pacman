@@ -80,12 +80,8 @@ public class Pacman implements Game {
      */
     @Override
     public void update(final double deltaTime) {
-        if (this.inputController.isKeyPressed(KeyEvent.VK_ESCAPE)) {
-            if (this.isRunning()) {
-                this.pause();
-            } else if (this.isPaused()) {
-                this.start();
-            }
+        if (this.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
+            this.pause();
         }
         Pacman.room.updateAll(deltaTime);
     }
@@ -95,7 +91,9 @@ public class Pacman implements Game {
      */
     @Override
     public void onPause() {
-        // TODO
+        if (this.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
+            this.start();
+        }
     }
 
     /**
