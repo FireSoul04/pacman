@@ -60,7 +60,7 @@ public class GameTest implements Game {
 
     @Override
     public void update(final double deltaTime) {
-        room.getEntities().forEach(g -> {
+        room.getGameObjects().forEach(g -> {
             if (g instanceof Movable) {
                 ((Movable)g).update(deltaTime);
             }

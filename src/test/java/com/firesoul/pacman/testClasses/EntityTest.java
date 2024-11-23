@@ -5,11 +5,11 @@ import java.util.function.BiConsumer;
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
 import com.firesoul.pacman.api.entities.Movable;
-import com.firesoul.pacman.impl.entities.bases.Entity2D;
+import com.firesoul.pacman.impl.entities.bases.GameObject2D;
 import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 
-public class EntityTest extends Entity2D implements Movable, Collidable {
+public class EntityTest extends GameObject2D implements Movable, Collidable {
 
     private static final Vector2D HITBOX_SIZE = new Vector2D(8, 8);
 
