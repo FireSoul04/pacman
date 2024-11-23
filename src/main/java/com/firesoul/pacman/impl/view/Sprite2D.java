@@ -1,8 +1,8 @@
-package com.firesoul.pacman.impl.entities.bases;
+package com.firesoul.pacman.impl.view;
 
 import java.awt.Image;
 
-import com.firesoul.pacman.api.entities.Drawable;
+import com.firesoul.pacman.api.view.Drawable;
 
 public class Sprite2D implements Drawable {
 

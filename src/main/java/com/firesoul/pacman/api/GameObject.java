@@ -2,7 +2,7 @@ package com.firesoul.pacman.api;
 
 import java.io.Serializable;
 
-import com.firesoul.pacman.api.entities.Drawable;
+import com.firesoul.pacman.api.view.Drawable;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public interface GameObject extends Serializable {

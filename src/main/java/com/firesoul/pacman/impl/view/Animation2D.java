@@ -1,10 +1,10 @@
-package com.firesoul.pacman.impl.entities.bases;
+package com.firesoul.pacman.impl.view;
 
 import java.awt.Image;
 import java.util.List;
 
-import com.firesoul.pacman.api.entities.Drawable;
 import com.firesoul.pacman.api.util.Timer;
+import com.firesoul.pacman.api.view.Drawable;
 import com.firesoul.pacman.impl.util.TimerImpl;
 
 public class Animation2D implements Drawable {

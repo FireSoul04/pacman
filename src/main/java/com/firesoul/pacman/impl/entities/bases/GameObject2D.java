@@ -1,7 +1,7 @@
 package com.firesoul.pacman.impl.entities.bases;
 
 import com.firesoul.pacman.api.GameObject;
-import com.firesoul.pacman.api.entities.Drawable;
+import com.firesoul.pacman.api.view.Drawable;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class GameObject2D implements GameObject {

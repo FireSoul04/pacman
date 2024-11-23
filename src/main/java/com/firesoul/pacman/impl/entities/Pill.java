@@ -3,9 +3,9 @@ package com.firesoul.pacman.impl.entities;
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
 import com.firesoul.pacman.impl.entities.bases.GameObject2D;
-import com.firesoul.pacman.impl.entities.bases.Sprite2D;
 import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.Vector2D;
+import com.firesoul.pacman.impl.view.Sprite2D;
 
 public class Pill extends GameObject2D implements Collidable {
 
