@@ -1,5 +1,7 @@
 package com.firesoul.pacman.impl.entities;
 
+import java.awt.event.KeyEvent;
+
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
 import com.firesoul.pacman.api.entities.Movable;
@@ -51,15 +53,28 @@ public class Player extends GameObject2D implements Movable, Collidable {
      */
     @Override
     public void update(final double deltaTime) {
-        // TODO
-
-        //TESTING PURPOSE
-        this.setPosition(this.getPosition()
-            .add(this.getSpeed().dot(deltaTime))
-            .wrap(this.getDrawable().getImageSize().invert(), Pacman.getRoomDimensions())
+        Vector2D direction = Vector2D.zero();
+        if (Pacman.getInputController().isKeyPressed(KeyEvent.VK_W)) {
+            direction = direction.add(new Vector2D(0, -1 * this.getSpeed().getY()));
+        }
+        if (Pacman.getInputController().isKeyPressed(KeyEvent.VK_S)) {
+            direction = direction.add(new Vector2D(0, 1 * this.getSpeed().getY()));
+        }
+        if (Pacman.getInputController().isKeyPressed(KeyEvent.VK_A)) {
+            direction = direction.add(new Vector2D(-1 * this.getSpeed().getX(), 0));
+        }
+        if (Pacman.getInputController().isKeyPressed(KeyEvent.VK_D)) {
+            direction = direction.add(new Vector2D(1 * this.getSpeed().getX(), 0));
+        }
+        if (direction.getX() != 0 && direction.getY() != 0) {
+            direction = new Vector2D(direction.getX(), 0);
+        }
+        this.setPosition(
+            this.getPosition()
+                .add(direction.dot(deltaTime))
+                .wrap(this.getDrawable().getImageSize().invert(), Pacman.getRoomDimensions())
         );
         ((Animation2D)this.getDrawable()).update();
-        //
     }
 
     /**

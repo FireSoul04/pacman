@@ -51,7 +51,7 @@ public class Room2D implements Room {
      * {@inheritDoc}
      */
     @Override
-    public void updateAll(final InputController inputController, final double deltaTime) {
+    public void updateAll(final double deltaTime) {
         for (final GameObject gameObject : this.gameObjects) {
             if (gameObject instanceof Movable) {
                 ((Movable) gameObject).update(deltaTime);

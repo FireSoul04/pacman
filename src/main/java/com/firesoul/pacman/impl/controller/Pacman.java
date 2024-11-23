@@ -22,21 +22,20 @@ public class Pacman implements Game {
     private static final int SCALE = 3;
     
     private static final PrintStream logger = System.out;
+    private static InputController inputController = new InputController();
     private static Vector2D dimensions;
 
     private final Renderer renderer;
-    private final InputController inputController;
     private Room2D room;
     private State state;
     private int level;
 
     public Pacman() {
         this.renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
-        this.inputController = new InputController();
-        this.renderer.addInputController(this.inputController);
+        this.renderer.addInputController(Pacman.inputController);
         //Pacman.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
         this.room = new Room2D(WIDTH, HEIGHT);
-        this.room.addGameObject(new Player(Vector2D.zero(), new Vector2D(1, 0)));
+        this.room.addGameObject(new Player(Vector2D.zero(), new Vector2D(1, 1)));
         for (int i = 0; i < 10; i++) {
             this.room.addGameObject(new Pill(new Vector2D(100 + i * 16, 0)));
         }
@@ -82,10 +81,10 @@ public class Pacman implements Game {
      */
     @Override
     public void update(final double deltaTime) {
-        if (this.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
+        if (Pacman.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
             this.pause();
         }
-        this.room.updateAll(this.inputController, deltaTime);
+        this.room.updateAll(deltaTime);
     }
 
     /**
@@ -93,7 +92,7 @@ public class Pacman implements Game {
      */
     @Override
     public void onPause() {
-        if (this.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
+        if (Pacman.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
             this.start();
         }
     }
@@ -150,6 +149,13 @@ public class Pacman implements Game {
      */
     public static Vector2D getRoomDimensions() {
         return Pacman.dimensions;
+    }
+
+    /**
+     * @return the key controller.
+     */
+    public static InputController getInputController() {
+        return Pacman.inputController;
     }
 
     /**
