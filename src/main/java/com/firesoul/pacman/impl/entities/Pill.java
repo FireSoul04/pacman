@@ -26,7 +26,7 @@ public class Pill extends GameObject2D implements Collidable {
     @Override
     public void onCollide(final Collidable other) {
         if (other instanceof Player) {
-            System.out.println("Eaten");
+            this.disable();
         }
     }
 

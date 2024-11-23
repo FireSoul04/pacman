@@ -23,6 +23,21 @@ public interface GameObject extends Serializable {
     Drawable getDrawable();
 
     /**
+     * Disable the game object.
+     */
+    void disable();
+
+    /**
+     * Enable the game object.
+     */
+    void enable();
+
+    /**
+     * @return Game object's activity.
+     */
+    boolean isActive();
+
+    /**
      * @return Game object's visibility.
      */
     boolean isVisible();

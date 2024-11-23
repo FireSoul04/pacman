@@ -2,6 +2,7 @@ package com.firesoul.pacman.impl.model;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.entities.Collidable;
@@ -50,8 +51,12 @@ public class Room2D implements Room {
      */
     @Override
     public void updateAll(final double deltaTime) {
-        for (final GameObject gameObject : this.gameObjects) {
-            if (gameObject instanceof Movable) {
+        final Iterator<GameObject> it = this.gameObjects.iterator();
+        while (it.hasNext()) {
+            final GameObject gameObject = it.next();
+            if (!gameObject.isActive()) {
+                removeGameObject(it, gameObject);
+            } else if (gameObject instanceof Movable) {
                 ((Movable) gameObject).update(deltaTime);
             }
         }
@@ -75,6 +80,18 @@ public class Room2D implements Room {
     @Override
     public void removeGameObject(final GameObject gameObject) {
         this.gameObjects.remove(gameObject);
+        if (gameObject instanceof Collidable) {
+            this.cachedCollidables.remove((Collidable) gameObject);
+        }
+    }
+
+    /**
+     * Remove a game object from the room.
+     * @param it the iterator to remove the game object from.
+     * @param gameObject the game object to remove.
+     */
+    public void removeGameObject(final Iterator<GameObject> it, final GameObject gameObject) {
+        it.remove();
         if (gameObject instanceof Collidable) {
             this.cachedCollidables.remove((Collidable) gameObject);
         }

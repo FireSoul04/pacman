@@ -12,6 +12,7 @@ public class GameObject2D implements GameObject {
     private Vector2D speed;
     private Drawable drawable;
     private boolean visible;
+    private boolean active;
 
     /**
      * Create a new GameObject2D with a method to render it.
@@ -24,6 +25,7 @@ public class GameObject2D implements GameObject {
         this.position = position;
         this.speed = speed;
         this.visible = true;
+        this.active = true;
     }
 
     /**
@@ -57,6 +59,30 @@ public class GameObject2D implements GameObject {
     @Override
     public Drawable getDrawable() {
         return this.drawable;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void disable() {
+        this.active = false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void enable() {
+        this.active = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isActive() {
+        return this.active;
     }
 
     /**
