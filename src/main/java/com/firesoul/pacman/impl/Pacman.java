@@ -4,6 +4,8 @@ import java.io.PrintStream;
 
 import com.firesoul.pacman.api.Game;
 import com.firesoul.pacman.api.Renderer;
+import com.firesoul.pacman.api.Room;
+import com.firesoul.pacman.impl.entities.Room2D;
 
 public class Pacman implements Game {
 
@@ -17,12 +19,14 @@ public class Pacman implements Game {
     
     private PrintStream logger;
     private Renderer renderer;
+    private Room room;
     private State state;
     private int level;
 
     public Pacman() {
         this.logger = System.out;
         this.renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
+        this.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
     }
 
     /**
@@ -64,7 +68,10 @@ public class Pacman implements Game {
      */
     @Override
     public void update(final double deltaTime) {
-        // TODO
+        this.room.updateAll(deltaTime);
+        // this.room.getGameObjects().forEach(e -> {
+        //     e.get
+        // });
     }
 
     /**

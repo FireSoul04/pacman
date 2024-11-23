@@ -1,4 +1,4 @@
-package com.firesoul.pacman.api.entities;
+package com.firesoul.pacman.api;
 
 import java.io.Serializable;
 

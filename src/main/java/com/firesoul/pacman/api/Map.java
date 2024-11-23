@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import com.firesoul.pacman.api.entities.Entity;
-import com.firesoul.pacman.api.entities.GameObject;
 
 public interface Map {
 

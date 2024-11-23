@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.firesoul.pacman.api.Block;
+import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.Map;
 import com.firesoul.pacman.api.entities.Entity;
-import com.firesoul.pacman.api.entities.GameObject;
 
 public class Map2D implements Map {
 
