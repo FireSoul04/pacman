@@ -15,19 +15,14 @@ public interface Renderer {
 
     /**
      * Draw the game to the screen.
+     * @param gameObjects List of game objects to draw.
      */
-    void draw();
+    void draw(List<GameObject> gameObjects);
 
     /**
      * Clears game's screen.
      */
     void clear();
-
-    /**
-     * Load game objects to render them to the screen.
-     * @param gameObjects
-     */
-    void load(List<GameObject> gameObjects);
 
     /**
      * Set render color.

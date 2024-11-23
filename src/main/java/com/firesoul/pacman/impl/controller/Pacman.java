@@ -103,8 +103,7 @@ public class Pacman implements Game {
      */
     @Override
     public void render() {
-        this.renderer.load(this.room.getGameObjects());
-        this.renderer.draw();
+        this.renderer.draw(this.room.getGameObjects());
     }
 
     /**

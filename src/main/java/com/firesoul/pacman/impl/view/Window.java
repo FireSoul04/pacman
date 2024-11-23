@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferStrategy;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -19,7 +18,6 @@ public class Window extends Canvas implements Renderer {
     
     private final JFrame frame;
     private final InputController inputController;
-    private List<GameObject> gameObjects;
     private BufferStrategy bufferStrategy;
     private Graphics graphics;
     private int width;
@@ -37,7 +35,6 @@ public class Window extends Canvas implements Renderer {
         this.scale = scale;
         this.frame = new JFrame(title);
         this.inputController = new InputController();
-        this.gameObjects = new ArrayList<>();
     }
 
     /**
@@ -59,10 +56,10 @@ public class Window extends Canvas implements Renderer {
      * {@inheritDoc}
      */
     @Override
-    public void draw() {
+    public void draw(final List<GameObject> gameObjects) {
         this.setGraphics();
         this.clear();
-        for (final GameObject gameObject : this.gameObjects) {
+        for (final GameObject gameObject : gameObjects) {
             if (gameObject.isVisible()) {
                 final Image image = gameObject.getDrawable().getImage();
                 this.graphics.drawImage(
@@ -77,11 +74,6 @@ public class Window extends Canvas implements Renderer {
         }
         this.graphics.dispose();
         this.bufferStrategy.show();
-    }
-
-    @Override
-    public void load(final List<GameObject> gameObjects) {
-        this.gameObjects = gameObjects;
     }
 
     /**
