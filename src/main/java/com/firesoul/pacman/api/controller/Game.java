@@ -92,7 +92,7 @@ public interface Game {
             if (this.isPaused()) {
                 timer.pause();
                 this.onPause();
-            } else if (!timer.isCounting()) {
+            } else if (!timer.isRunning()) {
                 timer.start();
                 lastTime = System.nanoTime();
             } else if (this.isRunning()) {
@@ -106,8 +106,8 @@ public interface Game {
                 }
                 this.render();
                 frames++;
-                timer.stopAtTimerEnd();
-                if (timer.isStopped()) {
+                timer.update();
+                if (timer.isExpired()) {
                     System.out.println(updates + " ups, " + frames + " fps");
                     updates = 0;
                     frames = 0;

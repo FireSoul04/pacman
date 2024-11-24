@@ -60,7 +60,7 @@ public class TimerImpl implements Timer {
      * {@inheritDoc}
      */
     @Override
-    public void stopAtTimerEnd() {
+    public void update() {
         if (this.getCurrentTime() >= this.endTime) {
             this.isStopped = true;
             this.isCounting = false;
@@ -92,6 +92,7 @@ public class TimerImpl implements Timer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getEndTime() {
         return this.endTime;
     }
@@ -99,6 +100,7 @@ public class TimerImpl implements Timer {
     /**
      * {@inheritDoc}
      */
+    @Override
     public long getCurrentTime() {
         return this.isCounting ?
             Timer.getTime(this.pauseTime) :
@@ -108,14 +110,16 @@ public class TimerImpl implements Timer {
     /**
      * {@inheritDoc}
      */
-    public boolean isCounting() {
+    @Override
+    public boolean isRunning() {
         return this.isCounting;
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean isStopped() {
+    @Override
+    public boolean isExpired() {
         return this.isStopped;
     }
 }

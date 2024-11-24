@@ -62,8 +62,8 @@ public class TestCollisions {
             if (outOfBoundsCondition.apply(newPos)) {
                 Assertions.fail("Entity's y coordinate is out of bounds");
             }
-            timer.stopAtTimerEnd();
-            if (timer.isStopped()) {
+            timer.update();
+            if (timer.isExpired()) {
                 game.gameOver();
             }
         });
@@ -111,8 +111,8 @@ public class TestCollisions {
             game.gameOver();
         }
         move(e, dt);
-        timer.stopAtTimerEnd();
-        if (timer.isStopped()) {
+        timer.update();
+        if (timer.isExpired()) {
             Assertions.fail("Entity did not collide with other entity");
         }
     }

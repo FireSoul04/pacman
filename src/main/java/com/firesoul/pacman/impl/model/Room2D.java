@@ -115,8 +115,8 @@ public class Room2D implements Room {
     }
 
     private void checkCollisions() {
-        this.collisionTimer.stopAtTimerEnd();
-        if (this.collisionTimer.isStopped()) {
+        this.collisionTimer.update();
+        if (this.collisionTimer.isExpired()) {
             for (final Collidable c1 : this.cachedCollidables) {
                 for (final Collidable c2 : this.cachedCollidables) {
                     if (c1 != c2 && c1.isColliding(c2)) {

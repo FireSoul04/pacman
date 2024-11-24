@@ -27,7 +27,7 @@ public class TestTimer {
     @Test
     void testSetup() {
         assertEquals(Timer.secondsToMillis(TIMER_TIME), timer.getEndTime());
-        assertFalse(timer.isCounting());
+        assertFalse(timer.isRunning());
     }
 
     @Test
@@ -43,11 +43,11 @@ public class TestTimer {
     void testStopAtEnd() throws InterruptedException {
         timer.start();
         assertEquals(Timer.secondsToMillis(TIMER_TIME), timer.getEndTime());
-        assertTrue(timer.isCounting());
+        assertTrue(timer.isRunning());
 
         long infiniteLoopCount = System.currentTimeMillis();
-        while (timer.isCounting()) {
-            timer.stopAtTimerEnd();
+        while (timer.isRunning()) {
+            timer.update();
 
             if (System.currentTimeMillis() - infiniteLoopCount >= Timer.secondsToMillis(TIMER_TIME * 5)) {
                 Assertions.fail("Infinite loop detected");
@@ -76,9 +76,9 @@ public class TestTimer {
     @Test
     void testStop() throws InterruptedException {
         timer.start();
-        assertTrue(timer.isCounting());
+        assertTrue(timer.isRunning());
         timer.stop();
-        assertFalse(timer.isCounting());
+        assertFalse(timer.isRunning());
         final long stopTime = timer.getCurrentTime();
         timer.start();
         Thread.sleep(WAIT_TIME);
@@ -89,19 +89,19 @@ public class TestTimer {
     void testRestart() throws InterruptedException {
         timer.start();
         final long startTime = timer.getCurrentTime();
-        while (timer.isCounting()) {
-            timer.stopAtTimerEnd();
+        while (timer.isRunning()) {
+            timer.update();
         }
         timer.stop();
-        assertTrue(timer.isStopped());
+        assertTrue(timer.isExpired());
         Thread.sleep(WAIT_TIME);
         timer.restart();
-        assertFalse(timer.isStopped());
+        assertFalse(timer.isExpired());
         assertEquals(startTime, timer.getCurrentTime());
-        assertTrue(timer.isCounting());
-        while (timer.isCounting()) {
-            timer.stopAtTimerEnd();
+        assertTrue(timer.isRunning());
+        while (timer.isRunning()) {
+            timer.update();
         }
-        assertTrue(timer.isStopped());
+        assertTrue(timer.isExpired());
     }
 }

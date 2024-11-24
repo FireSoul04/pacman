@@ -43,12 +43,12 @@ public class TestPause {
     void onPause() {
         count.start();
         interval.start();
-        count.stopAtTimerEnd();
-        if (count.isStopped()) {
+        count.update();
+        if (count.isExpired()) {
             game.gameOver();
         }
-        interval.stopAtTimerEnd();
-        if (interval.isStopped()) {
+        interval.update();
+        if (interval.isExpired()) {
             interval.restart();
             if (game.isPaused()) {
                 Assertions.assertEquals(expected, entity.getPosition());

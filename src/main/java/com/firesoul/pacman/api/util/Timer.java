@@ -17,7 +17,7 @@ public interface Timer {
     /**
      * Stop when the time count reach the end
      */
-    void stopAtTimerEnd();
+    void update();
 
     /**
      * Stop the timer manually
@@ -42,12 +42,12 @@ public interface Timer {
     /**
      * @return If the timer is counting
      */
-    boolean isCounting();
+    boolean isRunning();
 
     /**
      * @return If the timer can count or it's stopped
      */
-    boolean isStopped();
+    boolean isExpired();
 
     /**
      * Convert from millis to seconds

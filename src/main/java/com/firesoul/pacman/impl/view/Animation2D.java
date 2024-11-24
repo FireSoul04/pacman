@@ -32,8 +32,8 @@ public class Animation2D implements Drawable {
      * Update the animation.
      */
     public void update() {
-        this.animationTimer.stopAtTimerEnd();
-        if (this.animationTimer.isStopped()) {
+        this.animationTimer.update();
+        if (this.animationTimer.isExpired()) {
             this.animationFrame = (this.animationFrame + 1) % this.frames.size();
             this.animationTimer.restart();
         }
