@@ -2,26 +2,11 @@ package com.firesoul.pacman.impl.entities.ghosts;
 
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
-import com.firesoul.pacman.api.util.Timer;
+import com.firesoul.pacman.impl.view.DirectionalAnimation2D.Directions;
 import com.firesoul.pacman.impl.controller.Pacman;
 import com.firesoul.pacman.impl.entities.Ghost;
 
 public class Blinky extends Ghost {
-
-    private enum Animations {
-        UP,
-        DOWN,
-        LEFT,
-        RIGHT;
-
-        private final Animation2D animation;
-
-        private Animations() {
-            this.animation = new Animation2D("blinky", "blinky_" + this.name().toLowerCase(), Timer.secondsToMillis(ANIMATION_SPEED));
-        }
-    }
-
-    private static final double ANIMATION_SPEED = 0.1;
 
     /**
      * Creates Blinky, the red ghost.
@@ -29,8 +14,7 @@ public class Blinky extends Ghost {
      * @param speed
      */
     public Blinky(final Vector2D position, final Vector2D speed) {
-        super(position, speed);
-        this.setDrawable(Animations.RIGHT.animation);
+        super(position, speed, "blinky");
     }
 
     /**
@@ -60,13 +44,13 @@ public class Blinky extends Ghost {
 
     private void changeVariant(final Vector2D direction) {
         if (direction.equals(Vector2D.up())) {
-            this.setDrawable(Animations.UP.animation);
+            this.setDrawable(this.getAnimation(Directions.UP));
         } else if (direction.equals(Vector2D.down())) {
-            this.setDrawable(Animations.DOWN.animation);
+            this.setDrawable(this.getAnimation(Directions.DOWN));
         } else if (direction.equals(Vector2D.left())) {
-            this.setDrawable(Animations.LEFT.animation);
+            this.setDrawable(this.getAnimation(Directions.LEFT));
         } else if (direction.equals(Vector2D.right())) {
-            this.setDrawable(Animations.RIGHT.animation);
+            this.setDrawable(this.getAnimation(Directions.RIGHT));
         }
     }
 }

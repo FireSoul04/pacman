@@ -12,6 +12,8 @@ import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
 // import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
+import com.firesoul.pacman.impl.view.DirectionalAnimation2D;
+import com.firesoul.pacman.impl.view.DirectionalAnimation2D.Directions;
 
 public class Player extends GameObject2D implements Movable, Collidable {
 
@@ -21,37 +23,25 @@ public class Player extends GameObject2D implements Movable, Collidable {
     //     DEAD
     // }
 
-    private enum Animations {
-        UP,
-        DOWN,
-        LEFT,
-        RIGHT;
-
-        private final Animation2D animation;
-
-        private Animations() {
-            this.animation = new Animation2D("pacman", "pacman_" + this.name().toLowerCase(), Timer.secondsToMillis(ANIMATON_SPEED));
-        }
-    }
-
     // private static final long MAX_EATING_TIME = Timer.secondsToMillis(5);
     // private static final int MAX_LIVES = 3;
     private static final Vector2D SIZE = new Vector2D(8, 8);
-    private static final double ANIMATON_SPEED = 0.1;
+    private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.1);
 
+    private final DirectionalAnimation2D animations;
     private final Collider collider;
-    // private final Timer eatTimer;
     // private State state;
     // private int lives;
-    private boolean canEat;
+    private boolean dead;
 
     public Player(final Vector2D position, final Vector2D speed) {
-        super(position, speed, Animations.RIGHT.animation);
+        super(position, speed);
         // this.state = State.IDLE;
         // this.lives = MAX_LIVES;
-        this.canEat = false;
-        // this.eatTimer = new TimerImpl(MAX_EATING_TIME);
+        this.dead = false;
         this.collider = new BoxCollider2D(this, Player.SIZE);
+        this.animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
+        this.setDrawable(this.getAnimation(Directions.RIGHT));
     }
 
     /**
@@ -105,17 +95,21 @@ public class Player extends GameObject2D implements Movable, Collidable {
             animation.update();
         }
     }
-    
+
     private void changeVariant(final Vector2D direction) {
         if (direction.equals(Vector2D.up())) {
-            this.setDrawable(Animations.UP.animation);
+            this.setDrawable(this.getAnimation(Directions.UP));
         } else if (direction.equals(Vector2D.down())) {
-            this.setDrawable(Animations.DOWN.animation);
+            this.setDrawable(this.getAnimation(Directions.DOWN));
         } else if (direction.equals(Vector2D.left())) {
-            this.setDrawable(Animations.LEFT.animation);
+            this.setDrawable(this.getAnimation(Directions.LEFT));
         } else if (direction.equals(Vector2D.right())) {
-            this.setDrawable(Animations.RIGHT.animation);
+            this.setDrawable(this.getAnimation(Directions.RIGHT));
         }
+    }
+    
+    private Animation2D getAnimation(final Directions direction) {
+        return this.animations.getAnimation(direction);
     }
 
     /**
@@ -132,23 +126,21 @@ public class Player extends GameObject2D implements Movable, Collidable {
     public void reset() {
         ((Animation2D)this.getDrawable()).reset();
         this.setPosition(Vector2D.zero());
-        this.canEat = false;
         // this.eatTimer.stop();
         // this.state = State.IDLE;
     }
 
     /**
-     * @return If pacman can eat ghosts
+     * The player dies.
      */
-    public boolean canEat() {
-        return this.canEat;
+    public void die() {
+        this.dead = true;
     }
 
-    // /**
-    //  * Start the timer for pacman to eat ghosts
-    //  */
-    // public void startEating() {
-    //     this.eatTimer.start();
-    //     this.canEat = true;
-    // }
+    /**
+     * @return if the player is dead.
+     */
+    public boolean isDead() {
+        return this.dead;
+    }
 }

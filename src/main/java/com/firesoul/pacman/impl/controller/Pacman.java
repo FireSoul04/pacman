@@ -96,6 +96,9 @@ public class Pacman implements Game {
         if (!this.isWaitingNextLevel()) {
             this.pauseOnKeyPressed(KeyEvent.VK_ESCAPE);
             this.checkNextLevel();
+            if (this.isPlayerDead()) {
+                this.gameOver();
+            }
             this.room.updateAll(deltaTime);
         }
         this.nextLevelTimer.update();
@@ -120,7 +123,15 @@ public class Pacman implements Game {
     }
 
     private boolean isLevelCompleted() {
-        return this.room.getGameObjects().stream().noneMatch(gameObject -> gameObject instanceof Pill);
+        return howManyInstancesOf(Pill.class) == 0;
+    }
+
+    private boolean isPlayerDead() {
+        return howManyInstancesOf(Player.class) == 0;
+    }
+
+    private long howManyInstancesOf(Class<?> clazz) {
+        return this.room.getGameObjects().stream().filter(gameObject -> gameObject.getClass().equals(clazz)).count();
     }
 
     private void resetRoom() {

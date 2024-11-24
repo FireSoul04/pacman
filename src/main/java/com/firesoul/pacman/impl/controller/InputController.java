@@ -50,7 +50,7 @@ public class InputController implements KeyListener {
      * @return true if the key is pressed.
      */
     public boolean isKeyPressed(final int keyCode) {
-        return keys.get(keyCode);
+        return keys.getOrDefault(keyCode, false);
     }
 
     /**
@@ -59,7 +59,7 @@ public class InputController implements KeyListener {
      * @return true if the key is pressed once.
      */
     public boolean isKeyPressedOnce(final int keyCode) {
-        if (keys.get(keyCode)) {
+        if (this.isKeyPressed(keyCode)) {
             keys.put(keyCode, false);
             return true;
         }
