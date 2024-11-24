@@ -40,6 +40,27 @@ public class Animation2D implements Drawable {
     }
 
     /**
+     * Start the animation.
+     */
+    public void start() {
+        this.animationTimer.start();
+    }
+
+    /**
+     * Stop the animation.
+     */
+    public void stop() {
+        this.animationTimer.stop();
+    }
+
+    /**
+     * Reset the animation.
+     */
+    public void reset() {
+        this.animationFrame = 0;
+    }
+
+    /**
      * Get the current frame of the animation.
      * @return The current frame.
      */

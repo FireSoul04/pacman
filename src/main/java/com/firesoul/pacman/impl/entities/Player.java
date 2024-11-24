@@ -57,7 +57,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
         final Vector2D imageSize = this.getDrawable().getImageSize();
         final Vector2D newPosition = this.getPosition().add(direction.dot(deltaTime));
         this.setPosition(newPosition.wrap(imageSize.invert(), Pacman.getRoomDimensions()));
-        ((Animation2D)this.getDrawable()).update();
+        this.animate(direction);
     }
 
     private Vector2D readInput() {
@@ -78,6 +78,17 @@ public class Player extends GameObject2D implements Movable, Collidable {
             direction = new Vector2D(direction.getX(), 0);
         }
         return direction;
+    }
+
+    private void animate(final Vector2D direction) {
+        final Animation2D animation = (Animation2D)this.getDrawable();
+        if (direction.equals(Vector2D.zero())) {
+            animation.stop();
+            animation.reset();
+        } else {
+            animation.start();
+            animation.update();
+        }
     }
 
     /**
