@@ -36,7 +36,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
 
     // private static final long MAX_EATING_TIME = Timer.secondsToMillis(5);
     // private static final int MAX_LIVES = 3;
-    private static final Vector2D SIZE = new Vector2D(16, 16);
+    private static final Vector2D SIZE = new Vector2D(8, 8);
     private static final double ANIMATON_SPEED = 0.1;
 
     private final Collider collider;
@@ -124,6 +124,17 @@ public class Player extends GameObject2D implements Movable, Collidable {
     @Override
     public Collider getCollider() {
         return this.collider;
+    }
+
+    /**
+     * Reset the player.
+     */
+    public void reset() {
+        ((Animation2D)this.getDrawable()).reset();
+        this.setPosition(Vector2D.zero());
+        this.canEat = false;
+        // this.eatTimer.stop();
+        // this.state = State.IDLE;
     }
 
     /**

@@ -2,12 +2,17 @@ package com.firesoul.pacman.impl.controller;
 
 import java.awt.event.KeyEvent;
 import java.io.PrintStream;
+import java.util.List;
 
 import com.firesoul.pacman.api.controller.Game;
+import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.api.view.Renderer;
+import com.firesoul.pacman.impl.entities.Ghost;
 import com.firesoul.pacman.impl.entities.Pill;
 import com.firesoul.pacman.impl.entities.Player;
+import com.firesoul.pacman.impl.entities.ghosts.Blinky;
 import com.firesoul.pacman.impl.model.Room2D;
+import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Window;
 
@@ -25,21 +30,21 @@ public class Pacman implements Game {
     private static InputController inputController = new InputController();
     private static Vector2D dimensions;
 
-    private final Renderer renderer;
+    // Meanwhile we don't have a proper way to load the ghosts from a file
+    private final List<Ghost> ghosts = List.of(
+        new Blinky(new Vector2D(0, 16), new Vector2D(1, 1))
+    );
+
+    private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
+    private final Player player = new Player(Vector2D.zero(), new Vector2D(1, 1));
+    private final Renderer renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
     private Room2D room;
     private State state;
     private int level;
 
     public Pacman() {
-        this.renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
         this.renderer.addInputController(Pacman.inputController);
-        //Pacman.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
-        this.room = new Room2D(WIDTH, HEIGHT);
-        this.room.addGameObject(new Player(Vector2D.zero(), new Vector2D(1, 1)));
-        for (int i = 0; i < 10; i++) {
-            this.room.addGameObject(new Pill(new Vector2D(100 + i * 16, 0)));
-        }
-        Pacman.dimensions = this.room.getDimensions();
+        this.resetRoom();
     }
 
     /**
@@ -74,6 +79,13 @@ public class Pacman implements Game {
     @Override
     public void gameOver() {
         this.state = State.GAME_OVER;
+
+        System.out.println("Game Over!");
+        try {
+            Thread.sleep(Timer.secondsToMillis(1));
+        } catch (final InterruptedException e) {
+        }
+        System.exit(0);
     }
 
     /**
@@ -81,10 +93,51 @@ public class Pacman implements Game {
      */
     @Override
     public void update(final double deltaTime) {
-        if (Pacman.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
+        if (!this.isWaitingNextLevel()) {
+            this.pauseOnKeyPressed(KeyEvent.VK_ESCAPE);
+            this.checkNextLevel();
+            this.room.updateAll(deltaTime);
+        }
+        this.nextLevelTimer.update();
+    }
+
+    private boolean isWaitingNextLevel() {
+        return this.nextLevelTimer.isRunning();
+    }
+
+    private void pauseOnKeyPressed(final int key) {
+        if (Pacman.inputController.isKeyPressedOnce(key)) {
             this.pause();
         }
-        this.room.updateAll(deltaTime);
+    }
+
+    private void checkNextLevel() {
+        if (this.isLevelCompleted()) {
+            Pacman.logger.println("Level " + this.level + " completed!");
+            this.level++;
+            this.resetRoom();
+        }
+    }
+
+    private boolean isLevelCompleted() {
+        return this.room.getGameObjects().stream().noneMatch(gameObject -> gameObject instanceof Pill);
+    }
+
+    private void resetRoom() {
+        // When we have a proper way to load a level from a file
+        //this.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
+        this.room = new Room2D(WIDTH, HEIGHT);
+        this.player.reset();
+        this.room.addGameObject(this.player);
+        for (final Ghost ghost : this.ghosts) {
+            ghost.reset();
+            this.room.addGameObject(ghost);
+        }
+        for (int i = 0; i < 10; i++) {
+            this.room.addGameObject(new Pill(new Vector2D(100 + i * 16, 0)));
+        }
+        this.nextLevelTimer.restart();
+        Pacman.dimensions = this.room.getDimensions();
     }
 
     /**
