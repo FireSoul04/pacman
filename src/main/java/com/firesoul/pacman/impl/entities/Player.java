@@ -9,7 +9,6 @@ import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.Pacman;
 import com.firesoul.pacman.impl.entities.bases.GameObject2D;
 import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
-// import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
 import com.firesoul.pacman.impl.view.DirectionalAnimation2D;
@@ -17,27 +16,18 @@ import com.firesoul.pacman.impl.view.DirectionalAnimation2D.Directions;
 
 public class Player extends GameObject2D implements Movable, Collidable {
 
-    // private enum State {
-    //     IDLE,
-    //     MOVING,
-    //     DEAD
-    // }
-
-    // private static final long MAX_EATING_TIME = Timer.secondsToMillis(5);
-    // private static final int MAX_LIVES = 3;
+    private static final int MAX_LIVES = 3;
     private static final Vector2D SIZE = new Vector2D(8, 8);
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.1);
 
     private final DirectionalAnimation2D animations;
     private final Collider collider;
-    // private State state;
-    // private int lives;
     private boolean dead;
+    private int lives;
 
     public Player(final Vector2D position, final Vector2D speed) {
         super(position, speed);
-        // this.state = State.IDLE;
-        // this.lives = MAX_LIVES;
+        this.lives = MAX_LIVES;
         this.dead = false;
         this.collider = new BoxCollider2D(this, Player.SIZE);
         this.animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
@@ -126,8 +116,6 @@ public class Player extends GameObject2D implements Movable, Collidable {
     public void reset() {
         ((Animation2D)this.getDrawable()).reset();
         this.setPosition(Vector2D.zero());
-        // this.eatTimer.stop();
-        // this.state = State.IDLE;
     }
 
     /**
@@ -135,6 +123,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
      */
     public void die() {
         this.dead = true;
+        this.lives--;
     }
 
     /**
@@ -142,5 +131,12 @@ public class Player extends GameObject2D implements Movable, Collidable {
      */
     public boolean isDead() {
         return this.dead;
+    }
+
+    /**
+     * @return player's lives.
+     */
+    public int getLives() {
+        return this.lives;
     }
 }

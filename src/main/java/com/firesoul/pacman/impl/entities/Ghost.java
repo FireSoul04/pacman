@@ -4,8 +4,10 @@ import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
 import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
+import com.firesoul.pacman.impl.controller.Pacman;
 import com.firesoul.pacman.impl.entities.bases.GameObject2D;
 import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
+import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
 import com.firesoul.pacman.impl.view.DirectionalAnimation2D;
@@ -13,17 +15,18 @@ import com.firesoul.pacman.impl.view.DirectionalAnimation2D.Directions;
 
 public abstract class Ghost extends GameObject2D implements Movable, Collidable {
 
+    private static final long VULNERABILITY_TIME = Timer.secondsToMillis(5);
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.2);
     private static final Vector2D SIZE = new Vector2D(8, 8);
 
     private final DirectionalAnimation2D animations;
-    private Collider collider;
+    private final Timer vulnerabiltyTimer;
+    private final Collider collider;
     private boolean dead;
     private boolean vulnerable;
-    // private final Timer eatTimer;
 
     /**
-     * Create a ghost
+     * Create a ghost.
      * @param position
      * @param speed
      */
@@ -31,14 +34,28 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         super(position, speed);
         this.dead = false;
         this.vulnerable = false;
-        // this.eatTimer = new TimerImpl(MAX_EATING_TIME);
         this.collider = new BoxCollider2D(this, Ghost.SIZE);
+        this.vulnerabiltyTimer = new TimerImpl(VULNERABILITY_TIME);
         this.animations = new DirectionalAnimation2D(name, ANIMATION_SPEED);
         this.setDrawable(this.animations.getAnimation(Directions.RIGHT));
     }
 
     /**
-     * If the ghost is colliding with the player,
+     * {@inheritDoc}
+     */
+    @Override
+    public void update(final double deltaTime) {
+        this.move();
+        // TODO
+        final Vector2D direction = Vector2D.right();
+        final Vector2D imageSize = this.getDrawable().getImageSize();
+        final Vector2D newPosition = this.getPosition().add(direction.dot(deltaTime));
+        this.setPosition(newPosition.wrap(imageSize.invert(), Pacman.getRoomDimensions()));
+        this.animate(direction);
+    }
+
+    /**
+     * If the ghost is colliding with the player, based on the vulnerability of the ghost, the player or the ghost dies.
      */
     @Override
     public void onCollide(final Collidable other) {
@@ -61,27 +78,19 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
     }
 
     /**
-     * Reset the ghost position.
-     */
-    public void reset() {
-        ((Animation2D)this.getDrawable()).reset();
-        this.setPosition(new Vector2D(0, 16));
-    }
-
-    /**
-     * @return If pacman can eat ghosts
+     * @return If pacman can eat ghosts.
      */
     public boolean isVulnerable() {
         return this.vulnerable;
     }
 
-    // /**
-    //  * Start the timer for pacman to eat ghosts
-    //  */
-    // public void startEating() {
-    //     this.eatTimer.start();
-    //     this.canEat = true;
-    // }
+    /**
+     * Start the timer for the ghost to be vulnerable to pacman.
+     */
+    public void setVulnerable() {
+        this.vulnerabiltyTimer.start();
+        this.vulnerable = true;
+    }
 
     /**
      * The ghost dies.
@@ -106,6 +115,10 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         return this.animations.getAnimation(direction);
     }
 
+    /**
+     * Animate based on the direction where the ghost is going.
+     * @param direction where the ghost is going.
+     */
     protected void animate(final Vector2D direction) {
         final Animation2D animation = (Animation2D)this.getDrawable();
         if (direction.equals(Vector2D.zero())) {
@@ -129,4 +142,14 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
             this.setDrawable(this.getAnimation(Directions.RIGHT));
         }
     }
+
+    /**
+     * Reset the ghost position.
+     */
+    public abstract void reset();
+
+    /**
+     * Move based on specific ghost.
+     */
+    protected abstract void move();
 }

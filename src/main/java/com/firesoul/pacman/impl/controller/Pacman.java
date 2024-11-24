@@ -143,6 +143,7 @@ public class Pacman implements Game {
         this.player.reset();
         this.room.addGameObject(this.player);
         for (final Ghost ghost : this.ghosts) {
+            ghost.reset();
             this.room.addGameObject(ghost);
         }
         for (int i = 0; i < 10; i++) {
