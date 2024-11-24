@@ -17,8 +17,8 @@ import com.firesoul.pacman.impl.view.DirectionalAnimation2D.Directions;
 public class Player extends GameObject2D implements Movable, Collidable {
 
     private static final int MAX_LIVES = 3;
-    private static final Vector2D SIZE = new Vector2D(8, 8);
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.1);
+    private static final Vector2D SIZE = new Vector2D(8, 8);
 
     private final DirectionalAnimation2D animations;
     private final Collider collider;
@@ -116,6 +116,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
     public void reset() {
         ((Animation2D)this.getDrawable()).reset();
         this.setPosition(Vector2D.zero());
+        this.dead = false;
     }
 
     /**

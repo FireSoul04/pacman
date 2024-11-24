@@ -63,7 +63,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
             Player player = (Player) other;
             if (this.isVulnerable()) {
                 this.die();
-            } else {
+            } else if (!player.isDead()) {
                 player.die();
             }
         }

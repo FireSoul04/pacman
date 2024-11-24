@@ -42,6 +42,7 @@ public class Pacman implements Game {
     );
 
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
+    private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Player player = new Player(Vector2D.zero(), new Vector2D(1, 1));
     private final Renderer renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
     private Room2D room;
@@ -51,6 +52,7 @@ public class Pacman implements Game {
     public Pacman() {
         this.renderer.addInputController(Pacman.inputController);
         this.resetRoom();
+        this.nextLevelTimer.start();
     }
 
     /**
@@ -99,19 +101,23 @@ public class Pacman implements Game {
      */
     @Override
     public void update(final double deltaTime) {
-        if (!this.isWaitingNextLevel()) {
+        if (!this.isWaitingNextLevel() && !this.isPlayerWaitingRespawn()) {
             this.pauseOnKeyPressed(KeyEvent.VK_ESCAPE);
             this.checkNextLevel();
-            if (this.player.isDead()) {
-                this.gameOver();
-            }
+            this.checkPlayerDeath();
+            this.checkGameOver();
             this.room.updateAll(deltaTime);
         }
         this.nextLevelTimer.update();
+        this.liveLostTimer.update();
     }
 
     private boolean isWaitingNextLevel() {
         return this.nextLevelTimer.isRunning();
+    }
+
+    private boolean isPlayerWaitingRespawn() {
+        return this.liveLostTimer.isRunning();
     }
 
     private void pauseOnKeyPressed(final int key) {
@@ -125,6 +131,21 @@ public class Pacman implements Game {
             Pacman.logger.println("Level " + this.level + " completed!");
             this.level++;
             this.resetRoom();
+            this.nextLevelTimer.restart();
+        }
+    }
+
+    private void checkPlayerDeath() {
+        if (this.player.isDead()) {
+            Pacman.logger.println(player.getLives());
+            this.resetRoom();
+            this.liveLostTimer.restart();
+        }
+    }
+
+    private void checkGameOver() {
+        if (this.player.getLives() <= 0) {
+            this.gameOver();
         }
     }
 
@@ -149,7 +170,7 @@ public class Pacman implements Game {
         for (int i = 0; i < 10; i++) {
             this.room.addGameObject(new Pill(new Vector2D(100 + i * 16, 0)));
         }
-        this.nextLevelTimer.restart();
+        //
         Pacman.dimensions = this.room.getDimensions();
     }
 
