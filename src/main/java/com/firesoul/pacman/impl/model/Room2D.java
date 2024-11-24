@@ -9,7 +9,6 @@ import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.api.model.Room;
 import com.firesoul.pacman.api.util.Timer;
-import com.firesoul.pacman.impl.controller.InputController;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 

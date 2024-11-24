@@ -181,4 +181,32 @@ public class Vector2D implements Vector {
     public static Vector2D zero() {
         return new Vector2D();
     }
+
+    /**
+     * @return A vector directed up.
+     */
+    public static Vector2D up() {
+        return new Vector2D(0, -1);
+    }
+
+    /**
+     * @return A vector directed down.
+     */
+    public static Vector2D down() {
+        return new Vector2D(0, 1);
+    }
+
+    /**
+     * @return A vector directed left.
+     */
+    public static Vector2D left() {
+        return new Vector2D(-1, 0);
+    }
+
+    /**
+     * @return A vector directed right.
+     */
+    public static Vector2D right() {
+        return new Vector2D(1, 0);
+    }
 }

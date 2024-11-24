@@ -21,21 +21,35 @@ public class Player extends GameObject2D implements Movable, Collidable {
     //     DEAD
     // }
 
+    private enum Animations {
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT;
+
+        private final Animation2D animation;
+
+        private Animations() {
+            this.animation = new Animation2D("pacman", "pacman_" + this.name().toLowerCase(), Timer.secondsToMillis(ANIMATON_SPEED));
+        }
+    }
+
     // private static final long MAX_EATING_TIME = Timer.secondsToMillis(5);
     // private static final int MAX_LIVES = 3;
     private static final Vector2D SIZE = new Vector2D(16, 16);
+    private static final double ANIMATON_SPEED = 0.1;
 
     private final Collider collider;
     // private final Timer eatTimer;
     // private State state;
     // private int lives;
-    // private boolean canEat;
+    private boolean canEat;
 
     public Player(final Vector2D position, final Vector2D speed) {
-        super(position, speed, new Animation2D("pacman", Timer.secondsToMillis(0.2)));
+        super(position, speed, Animations.RIGHT.animation);
         // this.state = State.IDLE;
         // this.lives = MAX_LIVES;
-        // this.canEat = false;
+        this.canEat = false;
         // this.eatTimer = new TimerImpl(MAX_EATING_TIME);
         this.collider = new BoxCollider2D(this, Player.SIZE);
     }
@@ -63,16 +77,16 @@ public class Player extends GameObject2D implements Movable, Collidable {
     private Vector2D readInput() {
         Vector2D direction = Vector2D.zero();
         if (Pacman.getInputController().isKeyPressed(KeyEvent.VK_W)) {
-            direction = direction.add(new Vector2D(0, -1 * this.getSpeed().getY()));
+            direction = direction.add(Vector2D.up().dot(this.getSpeed().getY()));
         }
         if (Pacman.getInputController().isKeyPressed(KeyEvent.VK_S)) {
-            direction = direction.add(new Vector2D(0, 1 * this.getSpeed().getY()));
+            direction = direction.add(Vector2D.down().dot(this.getSpeed().getY()));
         }
         if (Pacman.getInputController().isKeyPressed(KeyEvent.VK_A)) {
-            direction = direction.add(new Vector2D(-1 * this.getSpeed().getX(), 0));
+            direction = direction.add(Vector2D.left().dot(this.getSpeed().getX()));
         }
         if (Pacman.getInputController().isKeyPressed(KeyEvent.VK_D)) {
-            direction = direction.add(new Vector2D(1 * this.getSpeed().getX(), 0));
+            direction = direction.add(Vector2D.right().dot(this.getSpeed().getX()));
         }
         if (direction.getX() != 0 && direction.getY() != 0) {
             direction = new Vector2D(direction.getX(), 0);
@@ -86,8 +100,21 @@ public class Player extends GameObject2D implements Movable, Collidable {
             animation.stop();
             animation.reset();
         } else {
+            this.changeVariant(direction);
             animation.start();
             animation.update();
+        }
+    }
+    
+    private void changeVariant(final Vector2D direction) {
+        if (direction.equals(Vector2D.up())) {
+            this.setDrawable(Animations.UP.animation);
+        } else if (direction.equals(Vector2D.down())) {
+            this.setDrawable(Animations.DOWN.animation);
+        } else if (direction.equals(Vector2D.left())) {
+            this.setDrawable(Animations.LEFT.animation);
+        } else if (direction.equals(Vector2D.right())) {
+            this.setDrawable(Animations.RIGHT.animation);
         }
     }
 
@@ -99,12 +126,12 @@ public class Player extends GameObject2D implements Movable, Collidable {
         return this.collider;
     }
 
-    // /**
-    //  * @return If pacman can eat ghosts
-    //  */
-    // public boolean canEat() {
-    //     return this.canEat;
-    // }
+    /**
+     * @return If pacman can eat ghosts
+     */
+    public boolean canEat() {
+        return this.canEat;
+    }
 
     // /**
     //  * Start the timer for pacman to eat ghosts

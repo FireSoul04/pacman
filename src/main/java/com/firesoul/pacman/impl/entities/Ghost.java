@@ -1,11 +1,15 @@
 package com.firesoul.pacman.impl.entities;
 
 import com.firesoul.pacman.api.entities.Collidable;
+import com.firesoul.pacman.api.entities.Collider;
 import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.impl.entities.bases.GameObject2D;
+import com.firesoul.pacman.impl.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public abstract class Ghost extends GameObject2D implements Movable, Collidable {
+
+    private Collider collider;
 
     /**
      * Create a ghost
@@ -14,15 +18,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
      */
     public Ghost(final Vector2D position, final Vector2D speed) {
         super(position, speed);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isColliding(final Collidable other) {
-        // TODO
-        return true;
+        collider = new BoxCollider2D(this, new Vector2D(16, 16));
     }
 
     /**
@@ -30,14 +26,21 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
      */
     @Override
     public void onCollide(final Collidable other) {
-        // TODO
+        if (other instanceof Player) {
+            Player player = (Player) other;
+            if (player.canEat()) {
+                this.disable();
+            } else {
+                player.disable();
+            }
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void update(final double deltaTime) {
-        // TODO
+    public Collider getCollider() {
+        return this.collider;
     }
 }

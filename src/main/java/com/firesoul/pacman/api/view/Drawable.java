@@ -51,9 +51,10 @@ public interface Drawable {
     /**
      * Load the images of the drawable object.
      * @param name The name of the images.
+     * @param variant The variant of the images.
      * @return The images of the drawable object.
      */
-    static List<Image> loadImages(final String name) {
+    static List<Image> loadImages(final String name, final String variant) {
         final List<Image> images = new ArrayList<>();
         final File dir = new File(PATH_TO_SPRITES + name);
         if (!dir.exists() || !dir.isDirectory()) {
@@ -62,10 +63,12 @@ public interface Drawable {
         }
         try {
             for (final File file : dir.listFiles()) {
-                images.add(ImageIO.read(file));
+                if (file.getName().startsWith(variant)) {
+                    images.add(ImageIO.read(file));
+                }
             }
         } catch (IOException e) {
-            System.err.println("Error loading " + name + " sprites");
+            System.err.println("Error loading " + name + " variant " + variant + " sprites");
             System.exit(1);
         }
         return images;
