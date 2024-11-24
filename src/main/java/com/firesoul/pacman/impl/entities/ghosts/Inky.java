@@ -4,15 +4,15 @@ import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.controller.Pacman;
 import com.firesoul.pacman.impl.entities.Ghost;
 
-public class Blinky extends Ghost {
+public class Inky extends Ghost {
 
     /**
-     * Creates Blinky, the red ghost.
+     * Creates Inky, the cyan ghost.
      * @param position
      * @param speed
      */
-    public Blinky(final Vector2D position, final Vector2D speed) {
-        super(position, speed, "blinky");
+    public Inky(final Vector2D position, final Vector2D speed) {
+        super(position, speed, "inky");
     }
 
     /**

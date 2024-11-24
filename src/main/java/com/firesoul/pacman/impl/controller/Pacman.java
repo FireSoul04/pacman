@@ -11,6 +11,9 @@ import com.firesoul.pacman.impl.entities.Ghost;
 import com.firesoul.pacman.impl.entities.Pill;
 import com.firesoul.pacman.impl.entities.Player;
 import com.firesoul.pacman.impl.entities.ghosts.Blinky;
+import com.firesoul.pacman.impl.entities.ghosts.Clyde;
+import com.firesoul.pacman.impl.entities.ghosts.Inky;
+import com.firesoul.pacman.impl.entities.ghosts.Pinky;
 import com.firesoul.pacman.impl.model.Room2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
@@ -32,7 +35,10 @@ public class Pacman implements Game {
 
     // Meanwhile we don't have a proper way to load the ghosts from a file
     private final List<Ghost> ghosts = List.of(
-        new Blinky(new Vector2D(0, 16), new Vector2D(1, 1))
+        new Blinky(new Vector2D(0, 16), new Vector2D(1, 1)),
+        new Inky(new Vector2D(0, 32), new Vector2D(1, 1)),
+        new Pinky(new Vector2D(0, 48), new Vector2D(1, 1)),
+        new Clyde(new Vector2D(0, 64), new Vector2D(1, 1))
     );
 
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
@@ -96,7 +102,7 @@ public class Pacman implements Game {
         if (!this.isWaitingNextLevel()) {
             this.pauseOnKeyPressed(KeyEvent.VK_ESCAPE);
             this.checkNextLevel();
-            if (this.isPlayerDead()) {
+            if (this.player.isDead()) {
                 this.gameOver();
             }
             this.room.updateAll(deltaTime);
@@ -123,14 +129,10 @@ public class Pacman implements Game {
     }
 
     private boolean isLevelCompleted() {
-        return howManyInstancesOf(Pill.class) == 0;
+        return this.howManyInstancesOf(Pill.class) == 0;
     }
 
-    private boolean isPlayerDead() {
-        return howManyInstancesOf(Player.class) == 0;
-    }
-
-    private long howManyInstancesOf(Class<?> clazz) {
+    private long howManyInstancesOf(final Class<?> clazz) {
         return this.room.getGameObjects().stream().filter(gameObject -> gameObject.getClass().equals(clazz)).count();
     }
 
@@ -141,7 +143,6 @@ public class Pacman implements Game {
         this.player.reset();
         this.room.addGameObject(this.player);
         for (final Ghost ghost : this.ghosts) {
-            ghost.reset();
             this.room.addGameObject(ghost);
         }
         for (int i = 0; i < 10; i++) {

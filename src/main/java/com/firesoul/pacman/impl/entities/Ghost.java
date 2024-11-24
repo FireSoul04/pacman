@@ -105,4 +105,28 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
     protected Animation2D getAnimation(final Directions direction) {
         return this.animations.getAnimation(direction);
     }
+
+    protected void animate(final Vector2D direction) {
+        final Animation2D animation = (Animation2D)this.getDrawable();
+        if (direction.equals(Vector2D.zero())) {
+            animation.stop();
+            animation.reset();
+        } else {
+            this.changeVariant(direction);
+            animation.start();
+            animation.update();
+        }
+    }
+
+    private void changeVariant(final Vector2D direction) {
+        if (direction.equals(Vector2D.up())) {
+            this.setDrawable(this.getAnimation(Directions.UP));
+        } else if (direction.equals(Vector2D.down())) {
+            this.setDrawable(this.getAnimation(Directions.DOWN));
+        } else if (direction.equals(Vector2D.left())) {
+            this.setDrawable(this.getAnimation(Directions.LEFT));
+        } else if (direction.equals(Vector2D.right())) {
+            this.setDrawable(this.getAnimation(Directions.RIGHT));
+        }
+    }
 }
