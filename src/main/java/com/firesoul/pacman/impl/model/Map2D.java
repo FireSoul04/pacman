@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.firesoul.pacman.api.GameObject;
+import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Map;
 import com.firesoul.pacman.impl.util.Vector2D;
 

@@ -1,6 +1,6 @@
-package com.firesoul.pacman.impl.model.entities.bases;
+package com.firesoul.pacman.impl.model;
 
-import com.firesoul.pacman.api.GameObject;
+import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.view.Drawable;
 import com.firesoul.pacman.impl.util.Vector2D;
 

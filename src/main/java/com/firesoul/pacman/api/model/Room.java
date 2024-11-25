@@ -2,8 +2,6 @@ package com.firesoul.pacman.api.model;
 
 import java.util.List;
 
-import com.firesoul.pacman.api.GameObject;
-
 public interface Room {
 
     /**

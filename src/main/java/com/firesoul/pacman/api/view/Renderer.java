@@ -3,7 +3,7 @@ package com.firesoul.pacman.api.view;
 import java.awt.Color;
 import java.util.List;
 
-import com.firesoul.pacman.api.GameObject;
+import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.impl.controller.InputController;
 
 public interface Renderer {

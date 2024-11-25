@@ -2,7 +2,6 @@ package com.firesoul.pacman.api.model;
 
 import java.util.List;
 
-import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.util.Vector;
 
 public interface Map {

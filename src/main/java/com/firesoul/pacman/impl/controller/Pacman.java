@@ -4,8 +4,8 @@ import java.awt.event.KeyEvent;
 import java.io.PrintStream;
 import java.util.List;
 
-import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.controller.Game;
+import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.model.Room2D;

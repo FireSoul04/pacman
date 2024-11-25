@@ -10,7 +10,7 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
-import com.firesoul.pacman.api.GameObject;
+import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.controller.InputController;
 

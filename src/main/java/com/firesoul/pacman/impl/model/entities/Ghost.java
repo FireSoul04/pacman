@@ -5,7 +5,7 @@ import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.Pacman;
-import com.firesoul.pacman.impl.model.entities.bases.GameObject2D;
+import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;

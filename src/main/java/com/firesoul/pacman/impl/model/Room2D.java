@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.firesoul.pacman.api.GameObject;
+import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Room;
 import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Movable;
