@@ -1,7 +1,5 @@
 package com.firesoul.pacman.impl.entities;
 
-import java.awt.event.KeyEvent;
-
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
 import com.firesoul.pacman.api.entities.Movable;
@@ -60,10 +58,6 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         final Vector2D newPosition = this.getPosition().add(direction.dot(deltaTime));
         this.setPosition(newPosition.wrap(imageSize.invert(), Pacman.getRoomDimensions()));
         //
-        
-        if (Pacman.isKeyPressed(KeyEvent.VK_D)) {
-            this.setVulnerable();
-        }
 
         this.vulnerabiltyTimer.update();
         if (this.vulnerabiltyTimer.isExpired()) {

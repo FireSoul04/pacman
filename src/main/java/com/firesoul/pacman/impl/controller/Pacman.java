@@ -4,12 +4,14 @@ import java.awt.event.KeyEvent;
 import java.io.PrintStream;
 import java.util.List;
 
+import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.controller.Game;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.entities.Ghost;
 import com.firesoul.pacman.impl.entities.Pill;
 import com.firesoul.pacman.impl.entities.Player;
+import com.firesoul.pacman.impl.entities.PowerPill;
 import com.firesoul.pacman.impl.entities.ghosts.Blinky;
 import com.firesoul.pacman.impl.entities.ghosts.Clyde;
 import com.firesoul.pacman.impl.entities.ghosts.Inky;
@@ -31,6 +33,7 @@ public class Pacman implements Game {
     
     private static final PrintStream logger = System.out;
     private static InputController inputController = new InputController();
+    private static Room2D room;
     private static Vector2D dimensions;
 
     // Meanwhile we don't have a proper way to load the ghosts from a file
@@ -45,7 +48,6 @@ public class Pacman implements Game {
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Player player = new Player(Vector2D.zero(), new Vector2D(1, 1));
     private final Renderer renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
-    private Room2D room;
     private State state;
     private int level;
 
@@ -71,7 +73,7 @@ public class Pacman implements Game {
     @Override
     public void start() {
         this.state = State.RUNNING;
-        this.room.wakeAll();
+        Pacman.room.wakeAll();
     }
 
     /**
@@ -80,7 +82,7 @@ public class Pacman implements Game {
     @Override
     public void pause() {
         this.state = State.PAUSED;
-        this.room.pauseAll();
+        Pacman.room.pauseAll();
     }
 
     /**
@@ -100,8 +102,9 @@ public class Pacman implements Game {
             this.pauseOnKeyPressed(KeyEvent.VK_ESCAPE);
             this.checkNextLevel();
             this.checkPlayerDeath();
+            this.checkDeadGhosts();
             this.checkGameOver();
-            this.room.updateAll(deltaTime);
+            Pacman.room.updateAll(deltaTime);
         }
         this.nextLevelTimer.update();
         this.liveLostTimer.update();
@@ -157,24 +160,39 @@ public class Pacman implements Game {
     }
 
     private long howManyInstancesOf(final Class<?> clazz) {
-        return this.room.getGameObjects().stream().filter(gameObject -> gameObject.getClass().equals(clazz)).count();
+        int counter = 0;
+        for (final GameObject g : Pacman.room.getGameObjects()) {
+            if (g.getClass().equals(clazz)) {
+                counter++;
+            }
+        }
+        return counter;
+    }
+
+    private void checkDeadGhosts() {
+        for (final GameObject g : Pacman.room.getGameObjects()) {
+            if (g instanceof Ghost && ((Ghost) g).isDead()) {
+                g.disable();
+            }
+        }
     }
 
     private void resetRoom() {
         // When we have a proper way to load a level from a file
-        //this.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
-        this.room = new Room2D(WIDTH, HEIGHT);
+        //Pacman.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
+        Pacman.room = new Room2D(WIDTH, HEIGHT);
         this.player.reset();
-        this.room.addGameObject(this.player);
+        Pacman.room.addGameObject(this.player);
         for (final Ghost ghost : this.ghosts) {
             ghost.reset();
-            this.room.addGameObject(ghost);
+            Pacman.room.addGameObject(ghost);
         }
+        Pacman.room.addGameObject(new PowerPill(new Vector2D(60, 0)));
         for (int i = 0; i < 10; i++) {
-            this.room.addGameObject(new Pill(new Vector2D(100 + i * 16, 0)));
+            Pacman.room.addGameObject(new Pill(new Vector2D(100 + i * 16, 0)));
         }
         //
-        Pacman.dimensions = this.room.getDimensions();
+        Pacman.dimensions = Pacman.room.getDimensions();
     }
 
     /**
@@ -192,7 +210,7 @@ public class Pacman implements Game {
      */
     @Override
     public void render() {
-        this.renderer.draw(this.room.getGameObjects());
+        this.renderer.draw(Pacman.room.getGameObjects());
     }
 
     /**
@@ -232,6 +250,17 @@ public class Pacman implements Game {
      */
     public int getLevel() {
         return this.level;
+    }
+
+    /**
+     * Set all the ghosts vulnerable
+     */
+    public static void setGhostVulnerable() {
+        for (final GameObject g : Pacman.room.getGameObjects()) {
+            if (g instanceof Ghost) {
+                ((Ghost) g).setVulnerable();
+            }
+        }
     }
 
     /**
