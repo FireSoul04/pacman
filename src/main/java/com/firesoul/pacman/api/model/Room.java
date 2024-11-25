@@ -12,6 +12,16 @@ public interface Room {
     void updateAll(double deltaTime);
 
     /**
+     * Pause all game objects in the room.
+     */
+    void pauseAll();
+
+    /**
+     * Wake up all game objects in the room.
+     */
+    void wakeAll();
+
+    /**
      * Add a game object to the room.
      * @param gameObject to add.
      */

@@ -87,13 +87,6 @@ public class Pacman implements Game {
     @Override
     public void gameOver() {
         this.state = State.GAME_OVER;
-
-        System.out.println("Game Over!");
-        try {
-            Thread.sleep(Timer.secondsToMillis(1));
-        } catch (final InterruptedException e) {
-        }
-        System.exit(0);
     }
 
     /**
@@ -110,6 +103,14 @@ public class Pacman implements Game {
         }
         this.nextLevelTimer.update();
         this.liveLostTimer.update();
+        if (this.isOver()) {
+            System.out.println("Game Over!");
+            try {
+                Thread.sleep(Timer.secondsToMillis(1));
+            } catch (final InterruptedException e) {
+            }
+            System.exit(0);
+        }
     }
 
     private boolean isWaitingNextLevel() {
@@ -182,6 +183,7 @@ public class Pacman implements Game {
         if (Pacman.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
             this.start();
         }
+        this.room.pauseAll();
     }
 
     /**
@@ -241,8 +243,15 @@ public class Pacman implements Game {
     /**
      * @return the key controller.
      */
-    public static InputController getInputController() {
-        return Pacman.inputController;
+    public static boolean isKeyPressed(final int key) {
+        return Pacman.inputController.isKeyPressed(key);
+    }
+
+    /**
+     * @return the key controller.
+     */
+    public static boolean isKeyPressedOnce(final int key) {
+        return Pacman.inputController.isKeyPressedOnce(key);
     }
 
     /**

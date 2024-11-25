@@ -64,6 +64,26 @@ public class Room2D implements Room {
      * {@inheritDoc}
      */
     @Override
+    public void pauseAll() {
+        for (final GameObject gameObject : this.gameObjects) {
+            gameObject.pause();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void wakeAll() {
+        for (final GameObject gameObject : this.gameObjects) {
+            gameObject.wake();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addGameObject(final GameObject gameObject) {
         this.gameObjects.add(gameObject);
         if (gameObject instanceof Collidable) {

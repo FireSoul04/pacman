@@ -40,6 +40,11 @@ public interface Timer {
     long getCurrentTime();
 
     /**
+     * @return The timer's remaining time
+     */
+    long getRemainingTime();
+
+    /**
      * @return If the timer is counting
      */
     boolean isRunning();

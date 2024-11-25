@@ -111,6 +111,14 @@ public class TimerImpl implements Timer {
      * {@inheritDoc}
      */
     @Override
+    public long getRemainingTime() {
+        return this.endTime - this.getCurrentTime();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean isRunning() {
         return this.isCounting;
     }

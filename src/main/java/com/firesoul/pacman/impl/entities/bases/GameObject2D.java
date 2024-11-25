@@ -62,6 +62,22 @@ public class GameObject2D implements GameObject {
     }
 
     /**
+     * Default method doesn't do anything. Override to make use of this.
+     */
+    @Override
+    public void pause() {
+        
+    }
+
+    /**
+     * Default method doesn't do anything. Override to make use of this.
+     */
+    @Override
+    public void wake() {
+        
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override

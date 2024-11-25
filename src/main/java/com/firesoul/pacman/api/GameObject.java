@@ -23,6 +23,16 @@ public interface GameObject extends Serializable {
     Drawable getDrawable();
 
     /**
+     * Pause all the timers attached to this game object.
+     */
+    void pause();
+
+    /**
+     * Wake up all the timers attached to this game object.
+     */
+    void wake();
+
+    /**
      * Disable the game object.
      */
     void disable();

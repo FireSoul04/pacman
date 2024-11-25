@@ -56,16 +56,16 @@ public class Player extends GameObject2D implements Movable, Collidable {
 
     private Vector2D readInput() {
         Vector2D direction = Vector2D.zero();
-        if (Pacman.getInputController().isKeyPressed(KeyEvent.VK_W)) {
+        if (Pacman.isKeyPressed(KeyEvent.VK_W)) {
             direction = direction.add(Vector2D.up().dot(this.getSpeed().getY()));
         }
-        if (Pacman.getInputController().isKeyPressed(KeyEvent.VK_S)) {
+        if (Pacman.isKeyPressed(KeyEvent.VK_S)) {
             direction = direction.add(Vector2D.down().dot(this.getSpeed().getY()));
         }
-        if (Pacman.getInputController().isKeyPressed(KeyEvent.VK_A)) {
+        if (Pacman.isKeyPressed(KeyEvent.VK_A)) {
             direction = direction.add(Vector2D.left().dot(this.getSpeed().getX()));
         }
-        if (Pacman.getInputController().isKeyPressed(KeyEvent.VK_D)) {
+        if (Pacman.isKeyPressed(KeyEvent.VK_D)) {
             direction = direction.add(Vector2D.right().dot(this.getSpeed().getX()));
         }
         if (direction.getX() != 0 && direction.getY() != 0) {
@@ -108,6 +108,22 @@ public class Player extends GameObject2D implements Movable, Collidable {
     @Override
     public Collider getCollider() {
         return this.collider;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void pause() {
+        
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void wake() {
+        
     }
 
     /**

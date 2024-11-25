@@ -1,5 +1,7 @@
 package com.firesoul.pacman.impl.entities;
 
+import java.awt.event.KeyEvent;
+
 import com.firesoul.pacman.api.entities.Collidable;
 import com.firesoul.pacman.api.entities.Collider;
 import com.firesoul.pacman.api.entities.Movable;
@@ -15,11 +17,14 @@ import com.firesoul.pacman.impl.view.DirectionalAnimation2D.Directions;
 
 public abstract class Ghost extends GameObject2D implements Movable, Collidable {
 
+    private static final long VULNERABILITY_START_BLINKING_TIME = Timer.secondsToMillis(3);
     private static final long VULNERABILITY_TIME = Timer.secondsToMillis(5);
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.2);
     private static final Vector2D SIZE = new Vector2D(8, 8);
 
-    private final DirectionalAnimation2D animations;
+    private final DirectionalAnimation2D movementAnimations;
+    private final Animation2D vulnerableAnimation;
+    private final Animation2D vulnerableAnimationBlinking;
     private final Timer vulnerabiltyTimer;
     private final Collider collider;
     private boolean dead;
@@ -36,8 +41,10 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         this.vulnerable = false;
         this.collider = new BoxCollider2D(this, Ghost.SIZE);
         this.vulnerabiltyTimer = new TimerImpl(VULNERABILITY_TIME);
-        this.animations = new DirectionalAnimation2D(name, ANIMATION_SPEED);
-        this.setDrawable(this.animations.getAnimation(Directions.RIGHT));
+        this.movementAnimations = new DirectionalAnimation2D(name, ANIMATION_SPEED);
+        this.vulnerableAnimation = new Animation2D("vulnerable", ANIMATION_SPEED);
+        this.vulnerableAnimationBlinking = new Animation2D("vulnerable_blinking", ANIMATION_SPEED);
+        this.setDrawable(this.movementAnimations.getAnimation(Directions.RIGHT));
     }
 
     /**
@@ -46,11 +53,22 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
     @Override
     public void update(final double deltaTime) {
         this.move();
+
         // TODO
         final Vector2D direction = Vector2D.down();
         final Vector2D imageSize = this.getDrawable().getImageSize();
         final Vector2D newPosition = this.getPosition().add(direction.dot(deltaTime));
         this.setPosition(newPosition.wrap(imageSize.invert(), Pacman.getRoomDimensions()));
+        //
+        
+        if (Pacman.isKeyPressed(KeyEvent.VK_D)) {
+            this.setVulnerable();
+        }
+
+        this.vulnerabiltyTimer.update();
+        if (this.vulnerabiltyTimer.isExpired()) {
+            this.vulnerable = false;
+        }
         this.animate(direction);
     }
 
@@ -60,7 +78,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
     @Override
     public void onCollide(final Collidable other) {
         if (other instanceof Player) {
-            Player player = (Player) other;
+            final Player player = (Player) other;
             if (this.isVulnerable()) {
                 this.die();
             } else if (!player.isDead()) {
@@ -88,7 +106,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
      * Start the timer for the ghost to be vulnerable to pacman.
      */
     public void setVulnerable() {
-        this.vulnerabiltyTimer.start();
+        this.vulnerabiltyTimer.restart();
         this.vulnerable = true;
     }
 
@@ -112,7 +130,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
      * @return the animation in that direction.
      */
     protected Animation2D getAnimation(final Directions direction) {
-        return this.animations.getAnimation(direction);
+        return this.movementAnimations.getAnimation(direction);
     }
 
     /**
@@ -120,18 +138,25 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
      * @param direction where the ghost is going.
      */
     protected void animate(final Vector2D direction) {
-        final Animation2D animation = (Animation2D)this.getDrawable();
-        if (direction.equals(Vector2D.zero())) {
-            animation.stop();
-            animation.reset();
-        } else {
-            this.changeVariant(direction);
-            animation.start();
-            animation.update();
-        }
+        final Animation2D animation = (Animation2D) this.getDrawable();
+        this.changeVariant(direction);
+        animation.start();
+        animation.update();
     }
 
     private void changeVariant(final Vector2D direction) {
+        if (this.isVulnerable()) {
+            if (this.vulnerabiltyTimer.getRemainingTime() < VULNERABILITY_START_BLINKING_TIME) {
+                this.setDrawable(vulnerableAnimationBlinking);
+            } else {
+                this.setDrawable(vulnerableAnimation);
+            }
+        } else {
+            this.changeBasedOnDirection(direction);
+        }
+    }
+
+    private void changeBasedOnDirection(final Vector2D direction) {
         if (direction.equals(Vector2D.up())) {
             this.setDrawable(this.getAnimation(Directions.UP));
         } else if (direction.equals(Vector2D.down())) {
