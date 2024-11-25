@@ -1,14 +1,21 @@
 package com.firesoul.pacman.impl.model;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
+
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Map;
+import com.firesoul.pacman.api.view.Drawable;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Map2D implements Map {
@@ -85,5 +92,20 @@ public class Map2D implements Map {
             System.exit(1);
         }
         return map;
+    }
+
+    public static void createMap() {
+        final BufferedImage buf;
+        try {
+            buf = ImageIO.read(new File(Drawable.PATH_TO_SPRITES + "map/map_hitboxes.png"));
+            for (int y = 0; y < buf.getHeight(); y++) {
+                for (int x = 0; x < buf.getWidth(); x++) {
+                    System.out.print(buf.getRGB(x, y) == 0xff000000 ? "  " : "x ");
+                }
+                System.out.println();
+            }
+        } catch (IOException e) {
+            System.out.println(e);
+        }
     }
 }
