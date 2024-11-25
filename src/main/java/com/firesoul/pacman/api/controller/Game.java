@@ -89,30 +89,26 @@ public interface Game {
         this.init();
         timer.start();
         while (!this.isOver()) {
-            if (this.isPaused()) {
-                timer.pause();
-                this.onPause();
-            } else if (!timer.isRunning()) {
-                timer.start();
-                lastTime = System.nanoTime();
-            } else if (this.isRunning()) {
-                final long now = System.nanoTime();
-                deltaTime = deltaTime + ((now - lastTime) / ns);
-                lastTime = now;
-                while (deltaTime >= 1.0) {
+            final long now = System.nanoTime();
+            deltaTime = deltaTime + ((now - lastTime) / ns);
+            lastTime = now;
+            while (deltaTime >= 1.0) {
+                if (this.isRunning()) {
                     this.update(deltaTime);
-                    updates++;
-                    deltaTime--;
+                } else {
+                    this.onPause();
                 }
-                this.render();
-                frames++;
-                timer.update();
-                if (timer.isExpired()) {
-                    System.out.println(updates + " ups, " + frames + " fps");
-                    updates = 0;
-                    frames = 0;
-                    timer.restart();
-                }
+                updates++;
+                deltaTime--;
+            }
+            this.render();
+            frames++;
+            timer.update();
+            if (timer.isExpired()) {
+                System.out.println(updates + " ups, " + frames + " fps");
+                updates = 0;
+                frames = 0;
+                timer.restart();
             }
         }
     }

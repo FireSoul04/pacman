@@ -71,6 +71,7 @@ public class Pacman implements Game {
     @Override
     public void start() {
         this.state = State.RUNNING;
+        this.room.wakeAll();
     }
 
     /**
@@ -79,6 +80,7 @@ public class Pacman implements Game {
     @Override
     public void pause() {
         this.state = State.PAUSED;
+        this.room.pauseAll();
     }
 
     /**
@@ -183,7 +185,6 @@ public class Pacman implements Game {
         if (Pacman.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
             this.start();
         }
-        this.room.pauseAll();
     }
 
     /**

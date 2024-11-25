@@ -7,10 +7,10 @@ public class TimerImpl implements Timer {
     private static final int INFINITE_TIMER = -1;
 
     private final long endTime;
-    private long currentTime;
+    private long startTime;
+    private long pauseTime;
     private boolean isCounting;
     private boolean isStopped;
-    private long pauseTime;
 
     /**
      * Create a timer
@@ -18,10 +18,10 @@ public class TimerImpl implements Timer {
      */
     public TimerImpl(final long endTime) {
         this.endTime = endTime;
-        this.currentTime = 0;
+        this.startTime = 0;
+        this.pauseTime = 0;
         this.isCounting = false;
         this.isStopped = false;
-        this.pauseTime = System.currentTimeMillis();
     }
 
     /**
@@ -36,11 +36,11 @@ public class TimerImpl implements Timer {
      */
     @Override
     public void start() {
-        if (!this.isCounting && !this.isStopped) {
-            if (this.currentTime == 0) {
-                this.currentTime = System.currentTimeMillis();
-            }
+        if (this.pauseTime == 0) {
             this.pauseTime = System.currentTimeMillis();
+        }
+        if (!this.isCounting && !this.isStopped) {
+            this.startTime = System.currentTimeMillis() - Timer.getTime(this.pauseTime);
             this.isCounting = true;
         }
     }
@@ -50,8 +50,7 @@ public class TimerImpl implements Timer {
      */
     @Override
     public void restart() {
-        this.currentTime = 0;
-        this.isCounting = false;
+        this.pauseTime = 0;
         this.isStopped = false;
         this.start();
     }
@@ -61,7 +60,7 @@ public class TimerImpl implements Timer {
      */
     @Override
     public void update() {
-        if (this.getCurrentTime() >= this.endTime) {
+        if (this.getRemainingTime() <= 0) {
             this.isStopped = true;
             this.isCounting = false;
         }
@@ -102,9 +101,9 @@ public class TimerImpl implements Timer {
      */
     @Override
     public long getCurrentTime() {
-        return this.isCounting ?
-            Timer.getTime(this.pauseTime) :
-            Timer.differenceTime(this.currentTime, this.pauseTime);
+        return this.isCounting
+            ? Timer.getTime(this.startTime)
+            : Timer.differenceTime(this.startTime, this.pauseTime);
     }
 
     /**
@@ -112,7 +111,7 @@ public class TimerImpl implements Timer {
      */
     @Override
     public long getRemainingTime() {
-        return this.endTime - this.getCurrentTime();
+        return this.endTime - this.startTime;
     }
 
     /**

@@ -96,8 +96,8 @@ public interface Timer {
      * @return Difference between two times in milliseconds
      */
     public static long differenceTime(final long t1, final long t2) {
-        final long time1 = System.currentTimeMillis() - Math.max(t1, t2);
-        final long time2 = System.currentTimeMillis() - Math.min(t1, t2);
-        return time1 - time2;
+        final long time1 = System.currentTimeMillis() - t1;
+        final long time2 = System.currentTimeMillis() - t2;
+        return Math.max(time1, time2) - Math.min(time1, time2);
     }
 }

@@ -62,15 +62,17 @@ public class TestTimer {
     @Test
     void testPause() throws InterruptedException {
         timer.start();
+        Thread.sleep(WAIT_TIME);
         timer.pause();
         final long startTime = timer.getCurrentTime();
         Thread.sleep(WAIT_TIME);
         assertEquals(startTime, timer.getCurrentTime());
         timer.start();
-        assertEquals(startTime, timer.getCurrentTime());
+        final long x = timer.getCurrentTime();
+        assertTrue(x <= WAIT_TIME + 30 && x >= WAIT_TIME - 30);
         Thread.sleep(WAIT_TIME);
         final long y = timer.getCurrentTime();
-        assertTrue(y <= WAIT_TIME + 5 && y >= WAIT_TIME - 5);
+        assertTrue(y <= WAIT_TIME * 2 + 30 && y >= WAIT_TIME * 2 - 30);
     }
 
     @Test

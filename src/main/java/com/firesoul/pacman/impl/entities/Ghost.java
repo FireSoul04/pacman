@@ -96,6 +96,26 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
     }
 
     /**
+     * Stop the vulnerability timer on pause, if it's started.
+     */
+    @Override
+    public void pause() {
+        if (this.isVulnerable()) {
+            this.vulnerabiltyTimer.pause();
+        }
+    }
+
+    /**
+     * Restart the vulnerability timer on wake, if it's started.
+     */
+    @Override
+    public void wake() {
+        if (this.isVulnerable()) {
+            this.vulnerabiltyTimer.start();
+        }
+    }
+
+    /**
      * @return If pacman can eat ghosts.
      */
     public boolean isVulnerable() {
