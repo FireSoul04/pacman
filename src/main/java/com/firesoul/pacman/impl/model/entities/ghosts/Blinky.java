@@ -1,18 +1,18 @@
-package com.firesoul.pacman.impl.entities.ghosts;
+package com.firesoul.pacman.impl.model.entities.ghosts;
 
+import com.firesoul.pacman.impl.model.entities.Ghost;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.DirectionalAnimation2D.Directions;
-import com.firesoul.pacman.impl.entities.Ghost;
 
-public class Inky extends Ghost {
+public class Blinky extends Ghost {
 
     /**
-     * Creates Inky, the cyan ghost.
+     * Creates Blinky, the red ghost.
      * @param position
      * @param speed
      */
-    public Inky(final Vector2D position, final Vector2D speed) {
-        super(position, speed, "inky");
+    public Blinky(final Vector2D position, final Vector2D speed) {
+        super(position, speed, "blinky");
     }
 
     @Override
@@ -22,6 +22,6 @@ public class Inky extends Ghost {
     
     public void reset() {
         this.setDrawable(this.getAnimation(Directions.RIGHT));
-        this.setPosition(new Vector2D(0, 32));
+        this.setPosition(new Vector2D(0, 16));
     }
 }

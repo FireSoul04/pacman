@@ -1,4 +1,4 @@
-package com.firesoul.pacman.impl.entities.bases;
+package com.firesoul.pacman.impl.model.entities.bases;
 
 import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.view.Drawable;

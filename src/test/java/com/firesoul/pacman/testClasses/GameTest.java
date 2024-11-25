@@ -2,7 +2,7 @@ package com.firesoul.pacman.testClasses;
 
 import com.firesoul.pacman.api.GameObject;
 import com.firesoul.pacman.api.controller.Game;
-import com.firesoul.pacman.api.entities.Movable;
+import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.model.Room2D;
 

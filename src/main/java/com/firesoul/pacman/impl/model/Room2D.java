@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.firesoul.pacman.api.GameObject;
-import com.firesoul.pacman.api.entities.Collidable;
-import com.firesoul.pacman.api.entities.Movable;
 import com.firesoul.pacman.api.model.Room;
+import com.firesoul.pacman.api.model.entities.Collidable;
+import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
