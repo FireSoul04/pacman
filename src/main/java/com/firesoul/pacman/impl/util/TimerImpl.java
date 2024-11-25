@@ -36,11 +36,12 @@ public class TimerImpl implements Timer {
      */
     @Override
     public void start() {
+        final long temp = System.currentTimeMillis();
         if (this.pauseTime == 0) {
-            this.pauseTime = System.currentTimeMillis();
+            this.pauseTime = temp;
         }
         if (!this.isCounting && !this.isStopped) {
-            this.startTime = System.currentTimeMillis() - Timer.getTime(this.pauseTime);
+            this.startTime = temp - Timer.getTime(this.pauseTime);
             this.isCounting = true;
         }
     }
@@ -82,8 +83,9 @@ public class TimerImpl implements Timer {
      */
     @Override
     public void pause() {
+        final long temp = System.currentTimeMillis();
         if (this.isCounting) {
-            this.pauseTime = System.currentTimeMillis();
+            this.pauseTime = temp;
             this.isCounting = false;
         }
     }
@@ -111,7 +113,7 @@ public class TimerImpl implements Timer {
      */
     @Override
     public long getRemainingTime() {
-        return this.endTime - this.startTime;
+        return this.endTime - this.getCurrentTime();
     }
 
     /**
