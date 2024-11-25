@@ -114,7 +114,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
      * Reset the player.
      */
     public void reset() {
-        ((Animation2D)this.getDrawable()).reset();
+        this.setDrawable(this.getAnimation(Directions.RIGHT));
         this.setPosition(Vector2D.zero());
         this.dead = false;
     }

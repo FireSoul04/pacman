@@ -47,7 +47,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
     public void update(final double deltaTime) {
         this.move();
         // TODO
-        final Vector2D direction = Vector2D.right();
+        final Vector2D direction = Vector2D.down();
         final Vector2D imageSize = this.getDrawable().getImageSize();
         final Vector2D newPosition = this.getPosition().add(direction.dot(deltaTime));
         this.setPosition(newPosition.wrap(imageSize.invert(), Pacman.getRoomDimensions()));

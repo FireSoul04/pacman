@@ -1,7 +1,7 @@
 package com.firesoul.pacman.impl.entities.ghosts;
 
 import com.firesoul.pacman.impl.util.Vector2D;
-import com.firesoul.pacman.impl.view.Animation2D;
+import com.firesoul.pacman.impl.view.DirectionalAnimation2D.Directions;
 import com.firesoul.pacman.impl.entities.Ghost;
 
 public class Clyde extends Ghost {
@@ -21,7 +21,7 @@ public class Clyde extends Ghost {
     }
     
     public void reset() {
-        ((Animation2D)this.getDrawable()).reset();
+        this.setDrawable(this.getAnimation(Directions.RIGHT));
         this.setPosition(new Vector2D(0, 64));
     }
 }

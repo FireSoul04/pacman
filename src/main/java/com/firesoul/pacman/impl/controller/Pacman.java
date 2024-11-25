@@ -137,7 +137,7 @@ public class Pacman implements Game {
 
     private void checkPlayerDeath() {
         if (this.player.isDead()) {
-            Pacman.logger.println(player.getLives());
+            Pacman.logger.println("Player is dead, lives remaining: " + this.player.getLives());
             this.resetRoom();
             this.liveLostTimer.restart();
         }
