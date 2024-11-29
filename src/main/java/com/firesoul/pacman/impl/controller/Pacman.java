@@ -9,23 +9,14 @@ import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.model.Room2D;
-import com.firesoul.pacman.impl.model.entities.Ghost;
-import com.firesoul.pacman.impl.model.entities.Pill;
-import com.firesoul.pacman.impl.model.entities.Player;
-import com.firesoul.pacman.impl.model.entities.PowerPill;
-import com.firesoul.pacman.impl.model.entities.ghosts.Blinky;
-import com.firesoul.pacman.impl.model.entities.ghosts.Clyde;
-import com.firesoul.pacman.impl.model.entities.ghosts.Inky;
-import com.firesoul.pacman.impl.model.entities.ghosts.Pinky;
+import com.firesoul.pacman.impl.model.entities.*;
+import com.firesoul.pacman.impl.model.entities.ghosts.*;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Window;
 
 public class Pacman implements Game {
 
-    // private static final String MAP_PATH = "/map/";
-    // private static final String ENTITY_MAP_PATH = MAP_PATH + "entities.map";
-    // private static final String BLOCK_MAP_PATH = MAP_PATH + "blocks.map";
     private static final String TITLE = "Pacman";
     private static final int WIDTH = 400;
     private static final int HEIGHT = WIDTH * 3 / 4;
@@ -44,6 +35,7 @@ public class Pacman implements Game {
         new Clyde(new Vector2D(0, 64), new Vector2D(1, 1))
     );
 
+    private final Thread displayThread = new Thread(this, "Display");
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Player player = new Player(Vector2D.zero(), new Vector2D(1, 1));
@@ -57,45 +49,31 @@ public class Pacman implements Game {
         this.nextLevelTimer.start();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void init() {
+    public synchronized void init() {
         this.level = 1;
         this.start();
         this.renderer.init();
+        this.displayThread.start();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void start() {
         this.state = State.RUNNING;
         Pacman.room.wakeAll();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void pause() {
         this.state = State.PAUSED;
         Pacman.room.pauseAll();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void gameOver() {
         this.state = State.GAME_OVER;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(final double deltaTime) {
         if (!this.isWaitingNextLevel() && !this.isPlayerWaitingRespawn()) {
@@ -179,7 +157,6 @@ public class Pacman implements Game {
 
     private void resetRoom() {
         // When we have a proper way to load a level from a file
-        //Pacman.room = new Room2D(ENTITY_MAP_PATH, BLOCK_MAP_PATH);
         Pacman.room = new Room2D(WIDTH, HEIGHT);
         this.player.reset();
         Pacman.room.addGameObject(this.player);
@@ -195,9 +172,6 @@ public class Pacman implements Game {
         Pacman.dimensions = Pacman.room.getDimensions();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void onPause() {
         if (Pacman.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
@@ -205,41 +179,26 @@ public class Pacman implements Game {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void render() {
         this.renderer.draw(Pacman.room.getGameObjects());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isRunning() {
         return this.state == State.RUNNING;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isPaused() {
         return this.state == State.PAUSED;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isOver() {
         return this.state == State.GAME_OVER;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Renderer getRenderer() {
         return this.renderer;

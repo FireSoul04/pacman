@@ -7,8 +7,8 @@ import com.firesoul.pacman.impl.model.Map2D;
 public class Start {
 
 	public static void main(final String[] args) {
-		Map2D.createMap();
-		// final Game pacman = new Pacman();
-		// pacman.run();
+		//Map2D.createMap();
+		final Game pacman = new Pacman();
+		pacman.init();
 	}
 }

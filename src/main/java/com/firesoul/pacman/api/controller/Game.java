@@ -4,7 +4,7 @@ import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.util.TimerImpl;
 
-public interface Game {
+public interface Game extends Runnable {
 
     static enum State {
         RUNNING,
@@ -86,7 +86,6 @@ public interface Game {
         double deltaTime = 0.0;
         int updates = 0;
         int frames = 0;
-        this.init();
         timer.start();
         while (!this.isOver()) {
             final long now = System.nanoTime();

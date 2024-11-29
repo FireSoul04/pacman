@@ -16,6 +16,7 @@ import javax.imageio.stream.ImageInputStream;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Map;
 import com.firesoul.pacman.api.view.Drawable;
+import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Map2D implements Map {
@@ -97,12 +98,25 @@ public class Map2D implements Map {
     public static void createMap() {
         final BufferedImage buf;
         try {
+            int i = 0;
+            int ox = 0;
+            int oy = 0;
             buf = ImageIO.read(new File(Drawable.PATH_TO_SPRITES + "map/map_hitboxes.png"));
-            for (int y = 0; y < buf.getHeight(); y++) {
-                for (int x = 0; x < buf.getWidth(); x++) {
-                    System.out.print(buf.getRGB(x, y) == 0xff000000 ? "  " : "x ");
+            while (i < 5) {
+                for (int y = oy; y < buf.getHeight(); y++) {
+                    for (int x = ox; x < buf.getWidth(); x++) {
+                        if (buf.getRGB(x, y) != 0xffffffff) {
+                            ox = x;
+                            oy = y;
+                            y = buf.getHeight();
+                            x = buf.getWidth();
+                        } else {
+                            System.out.print("xx");
+                        }
+                    }
+                    System.out.println();
                 }
-                System.out.println();
+                i++;
             }
         } catch (IOException e) {
             System.out.println(e);
