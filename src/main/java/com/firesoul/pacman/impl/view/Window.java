@@ -41,14 +41,14 @@ public class Window extends Canvas implements Renderer {
      * {@inheritDoc}
      */
     @Override
-    public void init() {
+    public synchronized void init() {
         this.frame.setSize(new Dimension(this.width * this.scale, this.height * this.scale));
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.frame.setLocationRelativeTo(null);
         this.frame.add(this);
         this.frame.setVisible(true);
         this.addKeyListener(inputController);
-        this.createBufferStrategy(2); // Create double buffering
+        this.createBufferStrategy(3); // Create double buffering
         this.bufferStrategy = this.getBufferStrategy();
     }
 
@@ -56,7 +56,7 @@ public class Window extends Canvas implements Renderer {
      * {@inheritDoc}
      */
     @Override
-    public void draw(final List<GameObject> gameObjects) {
+    public synchronized void draw(final List<GameObject> gameObjects) {
         this.setGraphics();
         this.clear();
         for (final GameObject gameObject : gameObjects) {
@@ -76,61 +76,40 @@ public class Window extends Canvas implements Renderer {
         this.bufferStrategy.show();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void setColor(final Color color) {
+    public synchronized void setColor(final Color color) {
         this.graphics.setColor(color);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void clear() {
+    public synchronized void clear() {
         this.setColor(Color.BLACK);
         this.graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void resize(final int width, final int height) {
+    public synchronized void resize(final int width, final int height) {
         this.width = width;
         this.height = height;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void setScale(final int scale) {
+    public synchronized void setScale(final int scale) {
         this.scale = scale;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getWidth() {
         return this.width * this.scale;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getHeight() {
         return this.height * this.scale;
     }
-    
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
-    public void addInputController(final InputController inputController) {
+    public synchronized void addInputController(final InputController inputController) {
         this.addKeyListener(inputController);
     }
 
@@ -142,7 +121,7 @@ public class Window extends Canvas implements Renderer {
         return this.inputController;
     }
 
-    private void setGraphics() {
+    private synchronized void setGraphics() {
         this.graphics = this.bufferStrategy.getDrawGraphics();
     }
 }

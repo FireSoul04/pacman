@@ -82,12 +82,15 @@ public interface Game extends Runnable {
     default void run() {
         final Timer timer = new TimerImpl(Timer.secondsToMillis(1));
         final double ns = 1.0E9 / this.getMaxUpdates();
-        long lastTime = System.nanoTime();
         double deltaTime = 0.0;
         int updates = 0;
         int frames = 0;
+        long lastTime = System.nanoTime();
         timer.start();
         while (!this.isOver()) {
+            try {
+                Thread.sleep(frames - (long)(frames - 100 / 60));
+            } catch (InterruptedException e) {}
             final long now = System.nanoTime();
             deltaTime = deltaTime + ((now - lastTime) / ns);
             lastTime = now;
