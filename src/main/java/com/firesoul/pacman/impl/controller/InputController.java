@@ -20,25 +20,16 @@ public class InputController implements KeyListener {
         keys.put(KeyEvent.VK_ESCAPE, false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void keyTyped(final KeyEvent e) {
         
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void keyPressed(final KeyEvent e) {
         keys.put(e.getKeyCode(), true);
     }
-
-    /**
-     * {@inheritDoc}
-     */
+ 
     @Override
     public void keyReleased(final KeyEvent e) {
         keys.put(e.getKeyCode(), false);

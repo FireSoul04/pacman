@@ -18,6 +18,7 @@ import com.firesoul.pacman.impl.view.Window;
 public class Pacman implements Game {
 
     private static final String TITLE = "Pacman";
+    private static final String MAP_PATH = "src/main/resources/map/map.txt";
     private static final int WIDTH = 400;
     private static final int HEIGHT = WIDTH * 3 / 4;
     private static final int SCALE = 3;
@@ -156,8 +157,8 @@ public class Pacman implements Game {
     }
 
     private void resetRoom() {
-        // When we have a proper way to load a level from a file
-        Pacman.room = new Room2D(WIDTH, HEIGHT);
+        Pacman.room = new Room2D(Pacman.MAP_PATH);
+        this.renderer.resize(Pacman.room.getDimensions());
         this.player.reset();
         Pacman.room.addGameObject(this.player);
         for (final Ghost ghost : this.ghosts) {

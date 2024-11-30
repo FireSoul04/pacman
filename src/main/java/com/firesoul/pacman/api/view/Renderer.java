@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.impl.controller.InputController;
+import com.firesoul.pacman.impl.util.Vector2D;
 
 public interface Renderer {
 
@@ -36,6 +37,12 @@ public interface Renderer {
      * @param height
      */
     void resize(int width, int height);
+
+    /**
+     * Resize the window.
+     * @param dimensions
+     */
+    void resize(Vector2D dimensions);
 
     /**
      * Set new scale factor.

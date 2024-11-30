@@ -40,8 +40,8 @@ public class Room2D implements Room {
      * @param entityMapPath the path to the entity map
      * @param blockMapPath the path to the block map
      */
-    public Room2D(final String entityMapPath, final String blockMapPath) {
-        this.map = new Map2D(entityMapPath, blockMapPath);
+    public Room2D(final String mapPath) {
+        this.map = new Map2D(mapPath);
         this.gameObjects.addAll(this.map.getGameObjects());
         this.collisionTimer.start();
     }

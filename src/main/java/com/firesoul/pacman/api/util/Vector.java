@@ -1,8 +1,10 @@
 package com.firesoul.pacman.api.util;
 
+import java.io.Serializable;
+
 import com.firesoul.pacman.impl.util.Vector2D;
 
-public interface Vector {
+public interface Vector extends Serializable {
 
     static double EPSILON = 0.1;
 

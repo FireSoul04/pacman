@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.controller.InputController;
+import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Window extends Canvas implements Renderer {
     
@@ -37,9 +38,6 @@ public class Window extends Canvas implements Renderer {
         this.inputController = new InputController();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void init() {
         this.frame.setSize(new Dimension(this.width * this.scale, this.height * this.scale));
@@ -52,24 +50,23 @@ public class Window extends Canvas implements Renderer {
         this.bufferStrategy = this.getBufferStrategy();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public synchronized void draw(final List<GameObject> gameObjects) {
         this.setGraphics();
         this.clear();
         for (final GameObject gameObject : gameObjects) {
             if (gameObject.isVisible()) {
-                final Image image = gameObject.getDrawable().getImage();
-                this.graphics.drawImage(
-                    image,
-                    (int)gameObject.getPosition().getX() * this.scale, 
-                    (int)gameObject.getPosition().getY() * this.scale,
-                    image.getWidth(null) * this.scale,
-                    image.getHeight(null) * this.scale,
-                    null
-                );
+                if (gameObject.getDrawable() != null) {
+                    final Image image = gameObject.getDrawable().getImage();
+                    this.graphics.drawImage(
+                        image,
+                        (int)gameObject.getPosition().getX() * this.scale, 
+                        (int)gameObject.getPosition().getY() * this.scale,
+                        image.getWidth(null) * this.scale,
+                        image.getHeight(null) * this.scale,
+                        null
+                    );
+                }
             }
         }
         this.graphics.dispose();
@@ -91,6 +88,12 @@ public class Window extends Canvas implements Renderer {
     public synchronized void resize(final int width, final int height) {
         this.width = width;
         this.height = height;
+    }
+
+    @Override
+    public synchronized void resize(final Vector2D dimensions) {
+        this.width = (int)dimensions.getX();
+        this.height = (int)dimensions.getY();
     }
 
     @Override
