@@ -35,9 +35,6 @@ public class Animation2D implements Drawable {
         this(name, name, animationSpeed);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Image getImage() {
         return this.frames.get(this.animationFrame);

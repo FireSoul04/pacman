@@ -37,25 +37,16 @@ public class GameObject2D implements GameObject {
         this(position, speed, null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Vector2D getPosition() {
         return this.position;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Vector2D getSpeed() {
         return this.speed;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Drawable getDrawable() {
         return this.drawable;
@@ -77,33 +68,21 @@ public class GameObject2D implements GameObject {
         
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void disable() {
         this.active = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void enable() {
         this.active = true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isActive() {
         return this.active;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isVisible() {
         return this.visible;

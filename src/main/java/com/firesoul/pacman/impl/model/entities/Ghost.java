@@ -45,9 +45,6 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         this.setDrawable(this.movementAnimations.getAnimation(Directions.RIGHT));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update(final double deltaTime) {
         this.move();
@@ -81,9 +78,6 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Collider getCollider() {
         return this.collider;

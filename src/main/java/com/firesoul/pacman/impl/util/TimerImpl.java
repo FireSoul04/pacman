@@ -31,9 +31,6 @@ public class TimerImpl implements Timer {
         this(INFINITE_TIMER);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void start() {
         final long temp = System.currentTimeMillis();
@@ -46,9 +43,6 @@ public class TimerImpl implements Timer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void restart() {
         this.pauseTime = 0;
@@ -56,9 +50,6 @@ public class TimerImpl implements Timer {
         this.start();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void update() {
         if (this.getRemainingTime() <= 0) {
@@ -67,9 +58,6 @@ public class TimerImpl implements Timer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void stop() {
         if (this.isCounting) {
@@ -78,9 +66,6 @@ public class TimerImpl implements Timer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void pause() {
         final long temp = System.currentTimeMillis();
@@ -90,17 +75,11 @@ public class TimerImpl implements Timer {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public long getEndTime() {
         return this.endTime;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public long getCurrentTime() {
         return this.isCounting
@@ -108,25 +87,16 @@ public class TimerImpl implements Timer {
             : Timer.differenceTime(this.startTime, this.pauseTime);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public long getRemainingTime() {
         return this.endTime - this.getCurrentTime();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isRunning() {
         return this.isCounting;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isExpired() {
         return this.isStopped;

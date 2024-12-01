@@ -12,9 +12,6 @@ public class Sprite2D implements Drawable {
         this.frame = Drawable.loadImage(name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Image getImage() {
         return this.frame;

@@ -6,8 +6,11 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferStrategy;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import com.firesoul.pacman.api.model.GameObject;
@@ -17,10 +20,14 @@ import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Window extends Canvas implements Renderer {
     
+    private static final int MAP_WIDTH = 224;
+    private static final int MAP_HEIGHT = 240;
+
     private final JFrame frame;
     private final InputController inputController;
     private BufferStrategy bufferStrategy;
     private Graphics graphics;
+    private Image backgroundImage;
     private int width;
     private int height;
     private int scale;
@@ -45,9 +52,21 @@ public class Window extends Canvas implements Renderer {
         this.frame.setLocationRelativeTo(null);
         this.frame.add(this);
         this.frame.setVisible(true);
-        this.addKeyListener(inputController);
+        this.backgroundImage = null;
+        this.addKeyListener(this.inputController);
         this.createBufferStrategy(3); // Create double buffering
         this.bufferStrategy = this.getBufferStrategy();
+    }
+
+    @Override
+    public synchronized void init(final String backgroundImagePath) {
+        this.init();
+        try {
+            this.backgroundImage = ImageIO.read(new File(backgroundImagePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     @Override
@@ -55,18 +74,16 @@ public class Window extends Canvas implements Renderer {
         this.setGraphics();
         this.clear();
         for (final GameObject gameObject : gameObjects) {
-            if (gameObject.isVisible()) {
-                if (gameObject.getDrawable() != null) {
-                    final Image image = gameObject.getDrawable().getImage();
-                    this.graphics.drawImage(
-                        image,
-                        (int)gameObject.getPosition().getX() * this.scale, 
-                        (int)gameObject.getPosition().getY() * this.scale,
-                        image.getWidth(null) * this.scale,
-                        image.getHeight(null) * this.scale,
-                        null
-                    );
-                }
+            if (gameObject.isVisible() && gameObject.getDrawable() != null) {
+                final Image image = gameObject.getDrawable().getImage();
+                this.graphics.drawImage(
+                    image,
+                    (int)gameObject.getPosition().getX() * this.scale, 
+                    (int)gameObject.getPosition().getY() * this.scale,
+                    image.getWidth(this.frame) * this.scale,
+                    image.getHeight(this.frame) * this.scale,
+                    this.frame
+                );
             }
         }
         this.graphics.dispose();
@@ -80,8 +97,12 @@ public class Window extends Canvas implements Renderer {
 
     @Override
     public synchronized void clear() {
-        this.setColor(Color.BLACK);
-        this.graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
+        if (backgroundImage == null) {
+            this.setColor(Color.BLACK);
+            this.graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
+        } else {
+            this.graphics.drawImage(this.backgroundImage, 0, 0, Window.MAP_WIDTH * this.scale, Window.MAP_HEIGHT * this.scale, this.frame);
+        }
     }
 
     @Override

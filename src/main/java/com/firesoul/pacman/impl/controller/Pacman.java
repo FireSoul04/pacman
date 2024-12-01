@@ -19,8 +19,9 @@ public class Pacman implements Game {
 
     private static final String TITLE = "Pacman";
     private static final String MAP_PATH = "src/main/resources/map/map.txt";
-    private static final int WIDTH = 400;
-    private static final int HEIGHT = WIDTH * 3 / 4;
+    private static final String MAP_IMAGE_PATH = "src/main/resources/sprites/map/map.png";
+    private static final int WIDTH = 229;
+    private static final int HEIGHT = 289;
     private static final int SCALE = 3;
     
     private static final PrintStream logger = System.out;
@@ -30,10 +31,10 @@ public class Pacman implements Game {
 
     // Meanwhile we don't have a proper way to load the ghosts from a file
     private final List<Ghost> ghosts = List.of(
-        new Blinky(new Vector2D(0, 16), new Vector2D(1, 1)),
-        new Inky(new Vector2D(0, 32), new Vector2D(1, 1)),
-        new Pinky(new Vector2D(0, 48), new Vector2D(1, 1)),
-        new Clyde(new Vector2D(0, 64), new Vector2D(1, 1))
+        new Blinky(new Vector2D(8, 16), new Vector2D(1, 1)),
+        new Inky(new Vector2D(8, 32), new Vector2D(1, 1)),
+        new Pinky(new Vector2D(8, 48), new Vector2D(1, 1)),
+        new Clyde(new Vector2D(8, 64), new Vector2D(1, 1))
     );
 
     private final Thread displayThread = new Thread(this, "Display");
@@ -54,7 +55,7 @@ public class Pacman implements Game {
     public synchronized void init() {
         this.level = 1;
         this.start();
-        this.renderer.init();
+        this.renderer.init(MAP_IMAGE_PATH);
         this.displayThread.start();
     }
 
@@ -158,7 +159,6 @@ public class Pacman implements Game {
 
     private void resetRoom() {
         Pacman.room = new Room2D(Pacman.MAP_PATH);
-        this.renderer.resize(Pacman.room.getDimensions());
         this.player.reset();
         Pacman.room.addGameObject(this.player);
         for (final Ghost ghost : this.ghosts) {
@@ -169,7 +169,6 @@ public class Pacman implements Game {
         for (int i = 0; i < 10; i++) {
             Pacman.room.addGameObject(new Pill(new Vector2D(100 + i * 16, 0)));
         }
-        //
         Pacman.dimensions = Pacman.room.getDimensions();
     }
 

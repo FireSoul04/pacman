@@ -14,8 +14,8 @@ import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Room2D implements Room {
 
-    private static final int DEFAULT_WIDTH = 400;
-    private static final int DEFAULT_HEIGHT = 300;
+    private static final int DEFAULT_WIDTH = 256;
+    private static final int DEFAULT_HEIGHT = 240;
 
     private final Timer collisionTimer = new TimerImpl(Timer.secondsToMillis(1 / 60));
     private final List<GameObject> gameObjects = new ArrayList<GameObject>();
@@ -46,9 +46,6 @@ public class Room2D implements Room {
         this.collisionTimer.start();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void updateAll(final double deltaTime) {
         for (final GameObject gameObject : this.gameObjects) {
@@ -60,9 +57,6 @@ public class Room2D implements Room {
         this.checkCollisions();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void pauseAll() {
         for (final GameObject gameObject : this.gameObjects) {
@@ -70,9 +64,6 @@ public class Room2D implements Room {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void wakeAll() {
         for (final GameObject gameObject : this.gameObjects) {
@@ -80,9 +71,6 @@ public class Room2D implements Room {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void addGameObject(final GameObject gameObject) {
         this.gameObjects.add(gameObject);
@@ -91,9 +79,6 @@ public class Room2D implements Room {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void removeGameObject(final GameObject gameObject) {
         this.gameObjects.remove(gameObject);
@@ -102,9 +87,6 @@ public class Room2D implements Room {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<GameObject> getGameObjects() {
         return List.copyOf(this.gameObjects);

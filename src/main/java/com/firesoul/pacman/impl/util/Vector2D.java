@@ -52,50 +52,32 @@ public class Vector2D implements Vector {
         this.y = y;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Vector2D add(final Vector2D v) {
         return Vector2D.add(this, v);
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Vector2D sub(final Vector2D v) {
         return Vector2D.sub(this, v);
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Vector2D invert() {
         return Vector2D.invert(this);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Vector2D dot(final double scalar) {
         return new Vector2D(this.x * scalar, this.y * scalar);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean intersect(final Vector2D v) {
         return this.x <= v.x + Vector.EPSILON && this.x >= v.x - Vector.EPSILON &&
                this.y <= v.y + Vector.EPSILON && this.y >= v.y - Vector.EPSILON;
     }
     
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Vector2D clamp(final Vector2D min, final Vector2D max) {
         return new Vector2D(
@@ -104,9 +86,6 @@ public class Vector2D implements Vector {
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Vector2D wrap(final Vector2D min, final Vector2D max) {
         Vector2D wrapped = new Vector2D(this.x, this.y);
@@ -123,9 +102,6 @@ public class Vector2D implements Vector {
         return wrapped;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(final Object o) {
         if (o == this) {
@@ -138,9 +114,6 @@ public class Vector2D implements Vector {
         return this.x == v.x && this.y == v.y;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return "[x: " + this.x + ", y:" + this.y + "]";

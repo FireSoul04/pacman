@@ -15,6 +15,12 @@ public interface Renderer {
     void init();
 
     /**
+     * Setup the game screen.
+     * @param backgroundImagePath
+     */
+    void init(String backgroundImagePath);
+
+    /**
      * Draw the game to the screen.
      * @param gameObjects List of game objects to draw.
      */
