@@ -22,6 +22,6 @@ public class Blinky extends Ghost {
     
     public void reset() {
         this.setDrawable(this.getAnimation(Directions.RIGHT));
-        this.setPosition(new Vector2D(4, 16));
+        this.setPosition(new Vector2D(4, 32));
     }
 }

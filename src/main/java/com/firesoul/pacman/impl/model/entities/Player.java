@@ -18,11 +18,12 @@ public class Player extends GameObject2D implements Movable, Collidable {
 
     private static final int MAX_LIVES = 3;
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.1);
-    private static final Vector2D SIZE = new Vector2D(4, 4);
-    private static final Vector2D PACMAN_START_POSITION = SIZE;
+    private static final Vector2D SIZE = new Vector2D(12, 12);
+    private static final Vector2D PACMAN_START_POSITION = SIZE.dot(0.5);
 
     private final DirectionalAnimation2D animations;
     private final Collider collider;
+    private Vector2D lastDirection;
     private boolean dead;
     private int lives;
 
@@ -30,6 +31,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
         super(position, speed);
         this.lives = MAX_LIVES;
         this.dead = false;
+        this.lastDirection = Vector2D.zero();
         this.collider = new BoxCollider2D(this, Player.SIZE);
         this.animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
         this.setDrawable(this.getAnimation(Directions.RIGHT));
@@ -38,17 +40,18 @@ public class Player extends GameObject2D implements Movable, Collidable {
     @Override
     public void onCollide(final Collidable other) {
         if (other instanceof Wall) {
-            System.out.println("Block");
+            this.setPosition(this.getPosition().sub(this.lastDirection));
         }
     }
 
     @Override
     public void update(final double deltaTime) {
-        final Vector2D direction = readInput();
+        final Vector2D direction = this.readInput();
         final Vector2D imageSize = this.getDrawable().getImageSize();
         final Vector2D newPosition = this.getPosition().add(direction.dot(deltaTime));
         this.setPosition(newPosition.wrap(imageSize.invert(), Pacman.getRoomDimensions()));
         this.animate(direction);
+        this.lastDirection = direction;
     }
 
     private Vector2D readInput() {

@@ -73,17 +73,18 @@ public class Gui extends JFrame implements MouseListener {
                     .forEach(t -> {
                         this.rects.add(
                             new Rectangle(
-                                (int)((Collidable)t).getCollider().getPosition().getX(),
-                                (int)((Collidable)t).getCollider().getPosition().getY(),
-                                (int)((Collidable)t).getCollider().getDimensions().getX(),
-                                (int)((Collidable)t).getCollider().getDimensions().getY()
+                                (int)((Collidable) t).getCollider().getPosition().getX(),
+                                (int)((Collidable) t).getCollider().getPosition().getY(),
+                                (int)((Collidable) t).getCollider().getDimensions().getX(),
+                                (int)((Collidable) t).getCollider().getDimensions().getY()
                             )
                         );
                     }
                 );
             }
         } catch (final IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("Cannot read file: " + e);
+            this.rects.clear();
         }
 
         this.buttonFrame.add(reset, BorderLayout.WEST);
@@ -93,13 +94,13 @@ public class Gui extends JFrame implements MouseListener {
         this.setVisible(true);
     }
 
-    private Rectangle getRectangle(final Point p1, final Point p2) {
+    private synchronized Rectangle getRectangle(final Point p1, final Point p2) {
         final int w = (int) Math.abs(p2.getX() - p1.getX());
         final int h = (int) Math.abs(p2.getY() - p1.getY());
         return new Rectangle(approximate((int)p1.x / 3), approximate((int)p1.y / 3), approximate(w / 3), approximate(h / 3));
     }
 
-    private int approximate(final int x) {
+    private synchronized int approximate(final int x) {
         return x - (x % 4);
     }
 
@@ -121,7 +122,7 @@ public class Gui extends JFrame implements MouseListener {
         this.canvas.update(g);
     }
 
-    private void save() {
+    private synchronized void save() {
         try (ObjectOutputStream os = new ObjectOutputStream(
             new FileOutputStream(MAP_PATH)
         )) {
@@ -148,7 +149,7 @@ public class Gui extends JFrame implements MouseListener {
     }
 
     @Override
-    public void mouseClicked(final MouseEvent e) {
+    public synchronized void mouseClicked(final MouseEvent e) {
     }
 
     @Override
@@ -165,10 +166,10 @@ public class Gui extends JFrame implements MouseListener {
     }
 
     @Override
-    public void mouseEntered(final MouseEvent e) {
+    public synchronized void mouseEntered(final MouseEvent e) {
     }
 
     @Override
-    public void mouseExited(final MouseEvent e) {
+    public synchronized void mouseExited(final MouseEvent e) {
     }
 }

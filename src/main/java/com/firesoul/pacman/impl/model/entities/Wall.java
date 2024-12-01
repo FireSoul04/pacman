@@ -13,16 +13,15 @@ public class Wall extends GameObject2D implements Collidable {
     public Wall(final Vector2D position, final Vector2D size) {
         super(position, Vector2D.zero());
         this.collider = new BoxCollider2D(this, size);
+        this.setVisible(false);
     }
 
     @Override
     public void onCollide(final Collidable other) {
-        
     }
 
     @Override
     public Collider getCollider() {
         return this.collider;
     }
-    
 }

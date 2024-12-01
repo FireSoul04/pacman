@@ -9,13 +9,15 @@ import com.firesoul.pacman.api.model.Room;
 import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
+import com.firesoul.pacman.impl.model.entities.Wall;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
+import com.firesoul.pacman.impl.view.Invisible2D;
 
 public class Room2D implements Room {
 
-    private static final int DEFAULT_WIDTH = 256;
-    private static final int DEFAULT_HEIGHT = 240;
+    private static final int DEFAULT_WIDTH = 224;
+    private static final int DEFAULT_HEIGHT = 288;
 
     private final Timer collisionTimer = new TimerImpl(Timer.secondsToMillis(1 / 60));
     private final List<GameObject> gameObjects = new ArrayList<GameObject>();
@@ -26,7 +28,7 @@ public class Room2D implements Room {
      * Default constructor for a room with no entities or blocks.
      */
     public Room2D() {
-        this(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        this(Room2D.DEFAULT_WIDTH, Room2D.DEFAULT_HEIGHT);
     }
 
     public Room2D(final int width, final int height) {
@@ -42,8 +44,14 @@ public class Room2D implements Room {
      */
     public Room2D(final String mapPath) {
         this.map = new Map2D(mapPath);
-        this.gameObjects.addAll(this.map.getGameObjects());
         this.collisionTimer.start();
+        
+        for (final GameObject g : this.map.getGameObjects()) {
+            if (g instanceof Wall) {
+                ((Wall)g).setDrawable(new Invisible2D(((Wall)g).getDimensions()));
+            }
+            this.addGameObject(g);
+        }
     }
 
     @Override

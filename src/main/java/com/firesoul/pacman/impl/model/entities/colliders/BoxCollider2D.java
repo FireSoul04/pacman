@@ -21,39 +21,27 @@ public class BoxCollider2D implements Collider, Serializable {
         this.dimensions = dimensions;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isColliding(final Collider other) {
         if (this.isOvelapping(other)) {
-            final Collidable thisEntity = (Collidable)this.entity;
-            final Collidable otherEntity = (Collidable)other.getAttachedEntity();
+            final Collidable thisEntity = (Collidable) this.entity;
+            final Collidable otherEntity = (Collidable) other.getAttachedEntity();
             thisEntity.onCollide(otherEntity);
             return true;
         }
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Vector2D getDimensions() {
         return this.dimensions;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Vector2D getPosition() {
         return this.entity.getPosition();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public GameObject2D getAttachedEntity() {
         return this.entity;
