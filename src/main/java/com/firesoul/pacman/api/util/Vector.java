@@ -57,4 +57,9 @@ public interface Vector extends Serializable {
      * @return the magnitude of the vector
      */
     Vector2D wrap(Vector2D min, Vector2D max);
+
+    /**
+     * @return the vector with both the coordinates approximated
+     */
+    // Vector2D approx();
 }

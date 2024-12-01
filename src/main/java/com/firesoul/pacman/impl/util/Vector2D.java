@@ -102,6 +102,11 @@ public class Vector2D implements Vector {
         return wrapped;
     }
 
+    // @Override
+    // public Vector2D approx() {
+    //     return new Vector2D((int)this.x, (int)this.y);
+    // }
+
     @Override
     public boolean equals(final Object o) {
         if (o == this) {
