@@ -11,7 +11,7 @@ import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.InputController;
 import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.model.Scene2D;
-import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
+import com.firesoul.pacman.impl.model.entities.colliders.DirectionalBoxCollider2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
 import com.firesoul.pacman.impl.view.DirectionalAnimation2D;
@@ -19,10 +19,9 @@ import com.firesoul.pacman.impl.view.DirectionalAnimation2D.Directions;
 
 public class Player extends GameObject2D implements Movable, Collidable {
 
-    private final static double DELTA = 2;
     private static final int MAX_LIVES = 3;
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.1);
-    private static final Vector2D SIZE = new Vector2D(18, 18);
+    private static final Vector2D SIZE = new Vector2D(16, 16);
     private static final Vector2D PACMAN_START_POSITION = new Vector2D(4, 4);
 
     private final Map<Directions, Boolean> move = new HashMap<>(Map.of(
@@ -46,7 +45,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
         this.scene = scene;
         this.input = input;
         this.lastDirection = Vector2D.right();
-        this.collider = new BoxCollider2D(this, Player.SIZE);
+        this.collider = new DirectionalBoxCollider2D(this, Player.SIZE);
         this.animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
         this.setDrawable(this.getAnimation(Directions.RIGHT));
     }
@@ -54,10 +53,11 @@ public class Player extends GameObject2D implements Movable, Collidable {
     @Override
     public void onCollide(final Collidable other) {
         if (other instanceof Wall) {
-            final Vector2D dist = this.getPosition();
-            if (dist.getX() > DELTA) {
-                this.move.put(this.getDirectionFromVector(Vector2D.right()), false);
-            }
+            final DirectionalBoxCollider2D collider = (DirectionalBoxCollider2D) this.getCollider();
+            System.out.println(collider.getDirections());
+            // final Map<Directions, Boolean> moveDirectons = collider.getDirections();
+            // moveDirectons.replaceAll((k, v) -> v = !v);
+            // this.move.putAll(moveDirectons);
         }
     }
 
@@ -109,7 +109,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
             this.move.put(this.getDirectionFromVector(this.lastDirection), true);
         }
         this.lastDirection = direction;
-        System.out.println(move);
+        //System.out.println(move);
         return direction;
     }
 

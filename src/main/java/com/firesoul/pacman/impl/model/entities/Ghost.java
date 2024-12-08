@@ -39,7 +39,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         this.scene = scene;
         this.dead = false;
         this.vulnerable = false;
-        this.collider = new BoxCollider2D(this, Ghost.SIZE);
+        this.collider = new BoxCollider2D(this, SIZE);
         this.vulnerabiltyTimer = new TimerImpl(VULNERABILITY_TIME);
         this.movementAnimations = new DirectionalAnimation2D(name, ANIMATION_SPEED);
         this.vulnerableAnimation = new Animation2D("vulnerable", ANIMATION_SPEED);
