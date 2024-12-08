@@ -14,7 +14,7 @@ import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Invisible2D;
 
-public class Room2D implements Room {
+public class Scene2D implements Room {
 
     private static final int DEFAULT_WIDTH = 224;
     private static final int DEFAULT_HEIGHT = 288;
@@ -27,11 +27,11 @@ public class Room2D implements Room {
     /**
      * Default constructor for a room with no entities or blocks.
      */
-    public Room2D() {
-        this(Room2D.DEFAULT_WIDTH, Room2D.DEFAULT_HEIGHT);
+    public Scene2D() {
+        this(Scene2D.DEFAULT_WIDTH, Scene2D.DEFAULT_HEIGHT);
     }
 
-    public Room2D(final int width, final int height) {
+    public Scene2D(final int width, final int height) {
         this.map = new Map2D(width, height);
         this.collisionTimer.start();
     }
@@ -42,7 +42,7 @@ public class Room2D implements Room {
      * @param entityMapPath the path to the entity map
      * @param blockMapPath the path to the block map
      */
-    public Room2D(final String mapPath) {
+    public Scene2D(final String mapPath) {
         this.map = new Map2D(mapPath);
         this.collisionTimer.start();
         

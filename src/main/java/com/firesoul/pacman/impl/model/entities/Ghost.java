@@ -4,7 +4,7 @@ import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
-import com.firesoul.pacman.impl.controller.Pacman;
+import com.firesoul.pacman.impl.controller.GameCore;
 import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
@@ -53,7 +53,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         final Vector2D direction = Vector2D.down();
         final Vector2D imageSize = this.getDrawable().getImageSize();
         final Vector2D newPosition = this.getPosition().add(direction.dot(deltaTime));
-        this.setPosition(newPosition.wrap(imageSize.invert(), Pacman.getRoomDimensions()));
+        this.setPosition(newPosition.wrap(imageSize.invert(), GameCore.getSceneDimensions()));
         //
 
         this.vulnerabiltyTimer.update();

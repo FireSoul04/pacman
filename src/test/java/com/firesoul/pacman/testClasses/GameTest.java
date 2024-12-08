@@ -4,12 +4,12 @@ import com.firesoul.pacman.api.controller.Game;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.view.Renderer;
-import com.firesoul.pacman.impl.model.Room2D;
+import com.firesoul.pacman.impl.model.Scene2D;
 
 public class GameTest implements Game {
     
     private Runnable consumer;
-    private Room2D room = new Room2D();
+    private Scene2D room = new Scene2D();
     private State state;
 
     public GameTest() {
