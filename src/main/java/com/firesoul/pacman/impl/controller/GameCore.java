@@ -6,58 +6,52 @@ import java.util.List;
 
 import com.firesoul.pacman.api.controller.Game;
 import com.firesoul.pacman.api.model.GameObject;
-import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.model.Pacman;
 import com.firesoul.pacman.impl.model.Scene2D;
-import com.firesoul.pacman.impl.model.entities.*;
-import com.firesoul.pacman.impl.model.entities.ghosts.*;
-import com.firesoul.pacman.impl.util.TimerImpl;
-import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Window;
 
 public class GameCore implements Game {
 
-    private static final String TITLE = "Pacman";
     private static final String MAP_PATH = "src/main/resources/map/map.txt";
     private static final String MAP_IMAGE_PATH = "src/main/resources/sprites/map/map.png";
+    private static final String TITLE = "Pacman";
     private static final int WIDTH = 229;
     private static final int HEIGHT = 289;
     private static final int SCALE = 3;
-    
     private static final PrintStream logger = System.out;
-    private static InputController inputController = new InputController();
-    private static Scene2D scene;
-    private static Vector2D dimensions;
 
-    private final Pacman pacman = new Pacman(this);
     private final Thread displayThread = new Thread(this, "Display");
     private final Renderer renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
+    private final InputController inputController = new InputController();
+    private final Pacman pacman;
+    private Scene2D scene;
     private State state;
 
     public GameCore() {
-        this.renderer.addInputController(GameCore.inputController);
-        this.resetScene();
+        this.renderer.addInputController(this.inputController);
+        this.pacman = new Pacman(this);
     }
 
     @Override
     public synchronized void init() {
-        this.start();
+        this.scene = new Scene2D(MAP_PATH);
         this.pacman.init();
         this.renderer.init(MAP_IMAGE_PATH);
         this.displayThread.start();
+        this.start();
     }
 
     @Override
     public void start() {
         this.state = State.RUNNING;
-        GameCore.scene.wakeAll();
+        this.scene.wakeAll();
     }
 
     @Override
     public void pause() {
         this.state = State.PAUSED;
-        GameCore.scene.pauseAll();
+        this.scene.pauseAll();
     }
 
     @Override
@@ -75,7 +69,7 @@ public class GameCore implements Game {
      * @param key
      */
     public void pauseOnKeyPressed(final int key) {
-        if (GameCore.inputController.isKeyPressedOnce(key)) {
+        if (this.inputController.isKeyPressedOnce(key)) {
             this.pause();
         }
     }
@@ -84,21 +78,20 @@ public class GameCore implements Game {
      * Resets the current scene objects and load the new scene.
      */
     public void resetScene() {
-        GameCore.scene = new Scene2D(GameCore.MAP_PATH);
+        this.scene = new Scene2D(MAP_PATH);
         this.pacman.reset();
-        GameCore.dimensions = GameCore.scene.getDimensions();
     }
 
     @Override
     public void onPause() {
-        if (GameCore.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
+        if (this.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
             this.start();
         }
     }
 
     @Override
     public void render() {
-        this.renderer.draw(GameCore.scene.getGameObjects());
+        this.renderer.draw(this.scene.getGameObjects());
     }
 
     @Override
@@ -125,15 +118,15 @@ public class GameCore implements Game {
      * @return All the gameObjects in the current scene.
      */
     public List<GameObject> getGameObjects() {
-        return GameCore.scene.getGameObjects();
+        return this.scene.getGameObjects();
     }
 
     /**
      * Add a gameObject to the scene.
-     * @param g
+     * @param gameObject
      */
-    public void addGameObject(final GameObject g) {
-        GameCore.scene.addGameObject(g);
+    public void addGameObject(final GameObject gameObject) {
+        this.scene.addGameObject(gameObject);
     }
 
     /**
@@ -141,35 +134,28 @@ public class GameCore implements Game {
      * @param deltaTime
      */
     public void updateAll(final double deltaTime) {
-        GameCore.scene.updateAll(deltaTime);
+        this.scene.updateAll(deltaTime);
     }
 
     /**
-     * @return the current game level scene dimensions.
+     * @return the current scene.
      */
-    public static Vector2D getSceneDimensions() {
-        return GameCore.dimensions;
+    public Scene2D getScene() {
+        return this.scene;
     }
 
     /**
-     * @return the key controller.
+     * @return the input handler.
      */
-    public static boolean isKeyPressed(final int key) {
-        return GameCore.inputController.isKeyPressed(key);
-    }
-
-    /**
-     * @return the key controller.
-     */
-    public static boolean isKeyPressedOnce(final int key) {
-        return GameCore.inputController.isKeyPressedOnce(key);
+    public InputController getInputController() {
+        return this.inputController;
     }
 
     /**
      * Log a message to standard output.
-     * @param log the message to log.
+     * @param message
      */
-    public static void log(final String log) {
-        GameCore.logger.println(log);
+    public static void log(final String message) {
+        GameCore.logger.println(message);
     }
 }

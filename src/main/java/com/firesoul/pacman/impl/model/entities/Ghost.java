@@ -4,8 +4,8 @@ import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
-import com.firesoul.pacman.impl.controller.GameCore;
 import com.firesoul.pacman.impl.model.GameObject2D;
+import com.firesoul.pacman.impl.model.Scene2D;
 import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
@@ -20,6 +20,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.2);
     private static final Vector2D SIZE = new Vector2D(8, 8);
 
+    private final Scene2D scene;
     private final DirectionalAnimation2D movementAnimations;
     private final Animation2D vulnerableAnimation;
     private final Animation2D vulnerableAnimationBlinking;
@@ -33,8 +34,9 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
      * @param position
      * @param speed
      */
-    public Ghost(final Vector2D position, final Vector2D speed, final String name) {
+    public Ghost(final Vector2D position, final Vector2D speed, final String name, final Scene2D scene) {
         super(position, speed);
+        this.scene = scene;
         this.dead = false;
         this.vulnerable = false;
         this.collider = new BoxCollider2D(this, Ghost.SIZE);
@@ -53,7 +55,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         final Vector2D direction = Vector2D.down();
         final Vector2D imageSize = this.getDrawable().getImageSize();
         final Vector2D newPosition = this.getPosition().add(direction.dot(deltaTime));
-        this.setPosition(newPosition.wrap(imageSize.invert(), GameCore.getSceneDimensions()));
+        this.setPosition(newPosition.wrap(imageSize.invert(), this.scene.getDimensions()));
         //
 
         this.vulnerabiltyTimer.update();

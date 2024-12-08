@@ -20,17 +20,11 @@ import com.firesoul.pacman.impl.util.Vector2D;
 public class Pacman {
 
     private final GameCore game;
-
-    // Meanwhile we don't have a proper way to load the ghosts from a file
-    private final List<Ghost> ghosts = List.of(
-        new Blinky(new Vector2D(8, 16), new Vector2D(1, 1)),
-        new Inky(new Vector2D(8, 32), new Vector2D(1, 1)),
-        new Pinky(new Vector2D(8, 48), new Vector2D(1, 1)),
-        new Clyde(new Vector2D(8, 64), new Vector2D(1, 1))
-    );
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
-    private final Player player = new Player(Vector2D.zero(), new Vector2D(1, 1));
+    // Meanwhile we don't have a proper way to load the ghosts from a file
+    private List<Ghost> ghosts;
+    private Player player;
     
     private int level;
 
@@ -41,6 +35,14 @@ public class Pacman {
     public void init() {
         this.level = 1;
         this.nextLevelTimer.start();
+        this.player = new Player(Vector2D.zero(), new Vector2D(1, 1), this.game.getScene(), this.game.getInputController());
+        this.ghosts = List.of(
+            new Blinky(new Vector2D(8, 16), new Vector2D(1, 1), this.game.getScene()),
+            new Inky(new Vector2D(8, 32), new Vector2D(1, 1), this.game.getScene()),
+            new Pinky(new Vector2D(8, 48), new Vector2D(1, 1), this.game.getScene()),
+            new Clyde(new Vector2D(8, 64), new Vector2D(1, 1), this.game.getScene())
+        );
+        this.reset();
     }
 
     public void update(final double deltaTime) {
