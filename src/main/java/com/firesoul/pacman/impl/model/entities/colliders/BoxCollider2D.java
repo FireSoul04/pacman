@@ -2,7 +2,6 @@ package com.firesoul.pacman.impl.model.entities.colliders;
 
 import java.io.Serializable;
 
-import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.util.Vector2D;
@@ -19,17 +18,6 @@ public class BoxCollider2D implements Collider, Serializable {
     public BoxCollider2D(final GameObject2D entity, final Vector2D dimensions) {
         this.entity = entity;
         this.dimensions = dimensions;
-    }
-
-    @Override
-    public boolean isColliding(final Collider other) {
-        if (this.isOvelapping(other)) {
-            final Collidable thisEntity = (Collidable) this.entity;
-            final Collidable otherEntity = (Collidable) other.getAttachedEntity();
-            thisEntity.onCollide(otherEntity);
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -54,7 +42,7 @@ public class BoxCollider2D implements Collider, Serializable {
      * @param other The other collider.
      * @return True if the colliders are overlapping, false otherwise.
      */
-    private boolean isOvelapping(final Collider other) {
+    public boolean isOvelapping(final Collider other) {
         final Vector2D d1 = this.getDimensions().dot(0.5);
         final Vector2D d2 = other.getDimensions().dot(0.5);
         final Vector2D i1 = this.getAttachedEntity().getDrawable().getImageSize().dot(0.5);

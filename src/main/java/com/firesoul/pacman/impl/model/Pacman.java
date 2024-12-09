@@ -37,10 +37,10 @@ public class Pacman {
         this.nextLevelTimer.start();
         this.player = new Player(Vector2D.zero(), new Vector2D(1, 1), this.game.getScene(), this.game.getInputController());
         this.ghosts = List.of(
-            new Blinky(new Vector2D(8, 16), new Vector2D(1, 1), this.game.getScene()),
-            new Inky(new Vector2D(8, 32), new Vector2D(1, 1), this.game.getScene()),
-            new Pinky(new Vector2D(8, 48), new Vector2D(1, 1), this.game.getScene()),
-            new Clyde(new Vector2D(8, 64), new Vector2D(1, 1), this.game.getScene())
+            new Blinky(new Vector2D(16, 16), new Vector2D(1, 1), this.game.getScene()),
+            new Inky(new Vector2D(16, 32), new Vector2D(1, 1), this.game.getScene()),
+            new Pinky(new Vector2D(16, 48), new Vector2D(1, 1), this.game.getScene()),
+            new Clyde(new Vector2D(16, 64), new Vector2D(1, 1), this.game.getScene())
         );
         this.reset();
     }
@@ -147,9 +147,9 @@ public class Pacman {
             ghost.reset();
             this.game.addGameObject(ghost);
         }
-        this.game.addGameObject(new PowerPill(new Vector2D(60, 0), this));
+        this.game.addGameObject(new PowerPill(new Vector2D(60, 16), this));
         for (int i = 0; i < 10; i++) {
-            this.game.addGameObject(new Pill(new Vector2D(100 + i * 16, 0)));
+            this.game.addGameObject(new Pill(new Vector2D(100 + i * 16, 16)));
         }
     }
 }

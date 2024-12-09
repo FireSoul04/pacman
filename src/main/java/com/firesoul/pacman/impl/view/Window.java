@@ -75,19 +75,27 @@ public class Window extends Canvas implements Renderer {
         this.clear();
         for (final GameObject gameObject : gameObjects) {
             if (gameObject.isVisible() && gameObject.getDrawable() != null) {
-                final Image image = gameObject.getDrawable().getImage();
-                this.graphics.drawImage(
-                    image,
-                    (int)gameObject.getPosition().getX() * this.scale, 
-                    (int)gameObject.getPosition().getY() * this.scale,
-                    image.getWidth(this.frame) * this.scale,
-                    image.getHeight(this.frame) * this.scale,
-                    this.frame
-                );
+                this.drawImage(gameObject);
             }
         }
         this.graphics.dispose();
         this.bufferStrategy.show();
+    }
+
+    private synchronized void drawImage(final GameObject gameObject) {
+        final Image image = gameObject.getDrawable().getImage();
+        final Vector2D imageSize = new Vector2D(image.getWidth(this.frame), image.getHeight(this.frame));
+        final Vector2D position = gameObject.getPosition();
+        final int x = (int) position.getX();
+        final int y = (int) position.getY();
+        this.graphics.drawImage(
+            image,
+            x * this.scale,
+            y * this.scale,
+            (int) imageSize.getX() * this.scale,
+            (int) imageSize.getY() * this.scale,
+            this.frame
+        );
     }
 
     @Override
@@ -113,8 +121,8 @@ public class Window extends Canvas implements Renderer {
 
     @Override
     public synchronized void resize(final Vector2D dimensions) {
-        this.width = (int)dimensions.getX();
-        this.height = (int)dimensions.getY();
+        this.width = (int) dimensions.getX();
+        this.height = (int) dimensions.getY();
     }
 
     @Override
