@@ -61,11 +61,21 @@ public class DirectionalBoxCollider2D extends BoxCollider2D {
         final boolean collidingUp = c1.getY() - d1.getY() < c2.getY() + d2.getY();
         final boolean collidingDown = c1.getY() + d1.getY() > c2.getY() - d2.getY();
 
-        // TODO
-        // this.collideDirections.put(Directions.RIGHT, collidingRight);
-        // this.collideDirections.put(Directions.LEFT, collidingLeft);
-        // this.collideDirections.put(Directions.UP, collidingUp);
-        // this.collideDirections.put(Directions.DOWN, collidingDown);
+        // // TODO
+        // if (collidingRight) {
+        //     this.collideDirections.put(Directions.RIGHT, true);
+        //     this.collideDirections.put(Directions.LEFT, false);
+        // } else if (collidingLeft) {
+        //     this.collideDirections.put(Directions.LEFT, true);
+        //     this.collideDirections.put(Directions.RIGHT, false);
+        // }
+        // if (collidingUp) {
+        //     this.collideDirections.put(Directions.UP, true);
+        //     this.collideDirections.put(Directions.DOWN, false);
+        // } else if (collidingDown) {
+        //     this.collideDirections.put(Directions.DOWN, true);
+        //     this.collideDirections.put(Directions.UP, false);
+        // }
 
         return collidingRight && collidingLeft && collidingUp && collidingDown;
     }
