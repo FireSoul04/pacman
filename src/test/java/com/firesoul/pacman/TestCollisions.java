@@ -25,7 +25,7 @@ public class TestCollisions {
 
     @BeforeEach
     void setup() {
-        timer = new TimerImpl(Timer.secondsToMillis(2));
+        timer = new TimerImpl(Timer.secondsToMillis(0.2));
         game = new GameTest();
         bounds = new Vector2D(BOUNDS_X, BOUNDS_Y);
     }
@@ -33,7 +33,6 @@ public class TestCollisions {
     @AfterEach
     void start() {
         timer.start();
-        game.start();
         game.run();
     }
 
@@ -49,7 +48,7 @@ public class TestCollisions {
 
     @Test
     void testOutOfBoundsXAndY() {
-        outOfBounds(newPos ->
+        outOfBounds(newPos -> 
             newPos.getX() < 0 || newPos.getX() > bounds.getX() ||
             newPos.getY() < 0 || newPos.getY() > bounds.getY()
         );
@@ -81,24 +80,21 @@ public class TestCollisions {
     @Test
     void testCollisionsX() {
         EntityTest collidingEntity = new EntityTest(
-            new Vector2D(BOUNDS_X / 2, 0), Vector2D.zero()
-        );
+            new Vector2D(BOUNDS_X / 2, 0), Vector2D.zero());
         setupCollisions(collidingEntity, new Vector2D(20, 0));
     }
 
     @Test
     void testCollisionsY() {
         EntityTest collidingEntity = new EntityTest(
-            new Vector2D(0, BOUNDS_Y / 2), Vector2D.zero()
-        );
+            new Vector2D(0, BOUNDS_Y / 2), Vector2D.zero());
         setupCollisions(collidingEntity, new Vector2D(0, 15));
     }
 
     @Test
     void testCollisionsXAndY() {
         EntityTest collidingEntity = new EntityTest(
-            new Vector2D(BOUNDS_X / 2, BOUNDS_Y / 2), Vector2D.zero()
-        );
+            new Vector2D(BOUNDS_X / 2, BOUNDS_Y / 2), Vector2D.zero());
         setupCollisions(collidingEntity, new Vector2D(20, 15));
     }
 

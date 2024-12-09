@@ -10,22 +10,7 @@ public interface Collider {
      * @param other the other collider to check for collision
      * @return true if this collider is colliding with the other collider
      */
-    default boolean isColliding(final Collider other) {
-        if (this.isOvelapping(other)) {
-            final Collidable thisEntity = (Collidable) this.getAttachedEntity();
-            final Collidable otherEntity = (Collidable) other.getAttachedEntity();
-            thisEntity.onCollide(otherEntity);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Check if two colliders are overlapping with each other.
-     * @param other collider to check
-     * @return if the two colliders are overlapping
-     */
-    boolean isOvelapping(Collider other);
+    boolean isColliding(Collider other);
 
     /**
      * @return the position of this collider

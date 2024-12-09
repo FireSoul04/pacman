@@ -3,6 +3,7 @@ package com.firesoul.pacman.impl.model.entities.colliders;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.util.Vector2D;
@@ -22,6 +23,17 @@ public class DirectionalBoxCollider2D extends BoxCollider2D {
         ));
     }
 
+    @Override
+    public boolean isColliding(final Collider other) {
+        if (this.isOvelapping(other)) {
+            final Collidable thisEntity = (Collidable) this.getAttachedEntity();
+            final Collidable otherEntity = (Collidable) other.getAttachedEntity();
+            thisEntity.onCollide(otherEntity);
+            return true;
+        }
+        return false;
+    }
+
     /**
      * @return The directions where the colliders is colliding.
      */
@@ -36,16 +48,35 @@ public class DirectionalBoxCollider2D extends BoxCollider2D {
      * @param other The other collider.
      * @return True if the colliders are overlapping, false otherwise.
      */
-    public boolean isOvelapping(final Collider other) {
+    private boolean isOvelapping(final Collider other) {
         final Vector2D d1 = this.getDimensions().dot(0.5);
         final Vector2D d2 = other.getDimensions().dot(0.5);
         final Vector2D i1 = this.getAttachedEntity().getDrawable().getImageSize().dot(0.5);
         final Vector2D i2 = other.getAttachedEntity().getDrawable().getImageSize().dot(0.5);
         final Vector2D c1 = this.getPosition().add(i1);
         final Vector2D c2 = other.getPosition().add(i2);
-        return c1.getX() - d1.getX() < c2.getX() + d2.getX()
-            && c1.getX() + d1.getX() > c2.getX() - d2.getX()
-            && c1.getY() - d1.getY() < c2.getY() + d2.getY()
-            && c1.getY() + d1.getY() > c2.getY() - d2.getY();
+
+        final boolean collidingRight = c1.getX() - d1.getX() < c2.getX() + d2.getX();
+        final boolean collidingLeft = c1.getX() + d1.getX() > c2.getX() - d2.getX();
+        final boolean collidingUp = c1.getY() - d1.getY() < c2.getY() + d2.getY();
+        final boolean collidingDown = c1.getY() + d1.getY() > c2.getY() - d2.getY();
+
+        // // TODO
+        // if (collidingRight) {
+        //     this.collideDirections.put(Directions.RIGHT, true);
+        //     this.collideDirections.put(Directions.LEFT, false);
+        // } else if (collidingLeft) {
+        //     this.collideDirections.put(Directions.LEFT, true);
+        //     this.collideDirections.put(Directions.RIGHT, false);
+        // }
+        // if (collidingUp) {
+        //     this.collideDirections.put(Directions.UP, true);
+        //     this.collideDirections.put(Directions.DOWN, false);
+        // } else if (collidingDown) {
+        //     this.collideDirections.put(Directions.DOWN, true);
+        //     this.collideDirections.put(Directions.UP, false);
+        // }
+
+        return collidingRight && collidingLeft && collidingUp && collidingDown;
     }
 }
