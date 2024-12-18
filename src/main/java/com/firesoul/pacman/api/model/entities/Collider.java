@@ -10,7 +10,22 @@ public interface Collider {
      * @param other the other collider to check for collision
      * @return true if this collider is colliding with the other collider
      */
-    boolean isColliding(Collider other);
+    default boolean isColliding(final Collider other) {
+        if (this.isOvelapping(other)) {
+            final Collidable thisGameObject = (Collidable) this.getAttachedGameObject();
+            final Collidable otherGameObject = (Collidable) other.getAttachedGameObject();
+            thisGameObject.onCollide(otherGameObject);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Check if two colliders are overlapping.
+     * @param other collider to check with
+     * @return if they are overlapping
+     */
+    boolean isOvelapping(Collider other);
 
     /**
      * @return the position of this collider
@@ -18,12 +33,18 @@ public interface Collider {
     Vector2D getPosition();
 
     /**
+     * Update the position of the collider.
+     * @param position
+     */
+    void setPosition(Vector2D position);
+
+    /**
      * @return the dimensions of this collider
      */
     Vector2D getDimensions();
 
     /**
-     * @return the entity attached to this collider
+     * @return the game object attached to this collider
      */
-    GameObject2D getAttachedEntity();
+    GameObject2D getAttachedGameObject();
 }

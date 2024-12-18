@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
@@ -73,10 +74,10 @@ public class Gui extends JFrame implements MouseListener {
                     .forEach(t -> {
                         this.rects.add(
                             new Rectangle(
-                                (int)((Collidable) t).getCollider().getPosition().getX(),
-                                (int)((Collidable) t).getCollider().getPosition().getY(),
-                                (int)((Collidable) t).getCollider().getDimensions().getX(),
-                                (int)((Collidable) t).getCollider().getDimensions().getY()
+                                (int)((Collidable) t).getColliders().get(0).getPosition().getX(),
+                                (int)((Collidable) t).getColliders().get(0).getPosition().getY(),
+                                (int)((Collidable) t).getColliders().get(0).getDimensions().getX(),
+                                (int)((Collidable) t).getColliders().get(0).getDimensions().getY()
                             )
                         );
                     }
@@ -142,10 +143,14 @@ public class Gui extends JFrame implements MouseListener {
         try {
             while (true) {
                 g.setColor(Color.BLUE);
-                g.drawImage(ImageIO.read(new File("src/main/resources/sprites/map/map_hitboxes.png")), 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
+                g.drawImage(this.readImage(), 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
                 this.rects.forEach(t -> g.fillRect(t.x * 3, t.y * 3, t.width * 3, t.height * 3));
             }
         } catch (IOException e) {}
+    }
+
+    public synchronized Image readImage() throws IOException {
+        return ImageIO.read(new File("src/main/resources/sprites/map/map_hitboxes.png"));
     }
 
     @Override

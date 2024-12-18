@@ -107,7 +107,7 @@ public class TestCollisions {
     }
 
     void checkCollisions(final EntityTest e, final double dt) {
-        if (entity.getCollider().isColliding(e.getCollider())) {
+        if (entity.isColliding(e)) {
             game.gameOver();
         }
         move(e, dt);

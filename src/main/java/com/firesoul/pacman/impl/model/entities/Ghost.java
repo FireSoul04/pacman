@@ -1,5 +1,7 @@
 package com.firesoul.pacman.impl.model.entities;
 
+import java.util.*;
+
 import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
@@ -81,8 +83,8 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
     }
 
     @Override
-    public Collider getCollider() {
-        return this.collider;
+    public List<Collider> getColliders() {
+        return Collections.unmodifiableList(List.of(this.collider));
     }
 
     /**

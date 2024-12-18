@@ -48,7 +48,7 @@ public class Scene2D implements Room {
         
         for (final GameObject g : this.map.getGameObjects()) {
             if (g instanceof Wall) {
-                ((Wall)g).setDrawable(new Invisible2D(((Wall)g).getDimensions()));
+                ((Wall)g).setDrawable(new Invisible2D(((Wall)g).getColliders().get(0).getDimensions()));
             }
             this.addGameObject(g);
         }
@@ -130,6 +130,7 @@ public class Scene2D implements Room {
                 for (final Collidable c2 : this.cachedCollidables) {
                     if (c1 != c2 && c1.isColliding(c2)) {
                         c1.onCollide(c2);
+                        c2.onCollide(c1);
                     }
                 }
             }

@@ -1,5 +1,8 @@
 package com.firesoul.pacman.impl.model.entities;
 
+import java.util.Collections;
+import java.util.List;
+
 import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.impl.model.GameObject2D;
@@ -25,8 +28,7 @@ public class Fruit extends GameObject2D implements Collidable {
     }
 
     @Override
-    public Collider getCollider() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCollider'");
+    public List<Collider> getColliders() {
+        return Collections.unmodifiableList(List.of(/*this.collider*/));
     }
 }

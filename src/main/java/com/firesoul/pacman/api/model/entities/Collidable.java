@@ -1,40 +1,34 @@
 package com.firesoul.pacman.api.model.entities;
 
-import com.firesoul.pacman.impl.util.Vector2D;
+import java.util.List;
 
 public interface Collidable {
 
     /**
-     * The action perfomed when this entity is colliding
-     * @param other entity whom is colliding
+     * The action perfomed when this game object is colliding
+     * @param other game object whom is colliding
      */
     void onCollide(Collidable other);
 
     /**
-     * @return the collider of this entity
+     * @return the collider of this game object
      */
-    Collider getCollider();
+    List<Collider> getColliders();
 
     /**
-     * @return the bounds of this entity
-     */
-    default Vector2D getDimensions() {
-        return this.getCollider().getDimensions();
-    }
-
-    /**
-     * @return the position of this entity
-     */
-    default Vector2D getColliderPosition() {
-        return this.getCollider().getPosition();
-    }
-
-    /**
-     * Check if this entity is colliding with the other
-     * @param other entity to check collision with
-     * @return if the two entity are colliding
+     * Check if this game object is colliding with the other
+     * @param other game object to check collision with
+     * @return if the two game object are colliding
      */
     default boolean isColliding(final Collidable other) {
-        return this.getCollider().isColliding(other.getCollider());
+        boolean colliding = false;
+        for (final Collider c1 : this.getColliders()) {
+            for (final Collider c2 : other.getColliders()) {
+                if (c1.isColliding(c2)) {
+                    colliding = true;
+                }
+            }
+        }
+        return colliding;
     }
 }

@@ -1,5 +1,7 @@
 package com.firesoul.pacman.testClasses;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 import com.firesoul.pacman.api.model.entities.Collidable;
@@ -31,8 +33,8 @@ public class EntityTest extends GameObject2D implements Movable, Collidable {
     }
 
     @Override
-    public Collider getCollider() {
-        return this.collider;
+    public List<Collider> getColliders() {
+        return Collections.unmodifiableList(List.of(this.collider));
     }
 
     @Override
