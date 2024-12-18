@@ -48,21 +48,18 @@ public class BoxCollider2D implements Collider, Serializable {
 
     /**
      * Check if this collider is overlapping with the other collider.
-     * The position of the colliders is the center of the attached entity.
      * 
      * @param other The other collider.
      * @return True if the colliders are overlapping, false otherwise.
      */
     public boolean isOvelapping(final Collider other) {
-        final Vector2D d1 = this.getDimensions().dot(0.5);
-        final Vector2D d2 = other.getDimensions().dot(0.5);
-        final Vector2D i1 = this.getAttachedGameObject().getDrawable().getImageSize().dot(0.5);
-        final Vector2D i2 = other.getAttachedGameObject().getDrawable().getImageSize().dot(0.5);
-        final Vector2D c1 = this.getPosition().add(i1);
-        final Vector2D c2 = other.getPosition().add(i2);
-        return c1.getX() - d1.getX() < c2.getX() + d2.getX()
-            && c1.getX() + d1.getX() > c2.getX() - d2.getX()
-            && c1.getY() - d1.getY() < c2.getY() + d2.getY()
-            && c1.getY() + d1.getY() > c2.getY() - d2.getY();
+        final Vector2D d1 = this.getDimensions();
+        final Vector2D d2 = other.getDimensions();
+        final Vector2D c1 = this.getPosition();
+        final Vector2D c2 = other.getPosition();
+        return c1.getX() < c2.getX() + d2.getX()
+            && c1.getX() + d1.getX() > c2.getX()
+            && c1.getY() < c2.getY() + d2.getY()
+            && c1.getY() + d1.getY() > c2.getY();
     }
 }

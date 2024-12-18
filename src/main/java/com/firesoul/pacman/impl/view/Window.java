@@ -14,6 +14,8 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import com.firesoul.pacman.api.model.GameObject;
+import com.firesoul.pacman.api.model.entities.Collidable;
+import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.controller.InputController;
 import com.firesoul.pacman.impl.util.Vector2D;
@@ -54,7 +56,7 @@ public class Window extends Canvas implements Renderer {
         this.frame.setVisible(true);
         this.backgroundImage = null;
         this.addKeyListener(this.inputController);
-        this.createBufferStrategy(3); // Create double buffering
+        this.createBufferStrategy(2); // Create double buffering
         this.bufferStrategy = this.getBufferStrategy();
     }
 
@@ -76,18 +78,38 @@ public class Window extends Canvas implements Renderer {
         for (final GameObject gameObject : gameObjects) {
             if (gameObject.isVisible() && gameObject.getDrawable() != null) {
                 final Image image = gameObject.getDrawable().getImage();
+                final int w = image.getWidth(this.frame);
+                final int h = image.getHeight(this.frame);
+                final Vector2D start = gameObject.getPosition().sub(new Vector2D(w, h).dot(0.5));
+                final int x = (int)start.getX();
+                final int y = (int)start.getY();
                 this.graphics.drawImage(
                     image,
-                    (int)gameObject.getPosition().getX() * this.scale, 
-                    (int)gameObject.getPosition().getY() * this.scale,
-                    image.getWidth(this.frame) * this.scale,
-                    image.getHeight(this.frame) * this.scale,
+                    x * this.scale, 
+                    y * this.scale,
+                    w * this.scale,
+                    h * this.scale,
                     this.frame
                 );
+                this.drawColliders(gameObject);
             }
         }
         this.graphics.dispose();
         this.bufferStrategy.show();
+    }
+
+    private void drawColliders(final GameObject g) {
+        if (g instanceof Collidable) {
+            Collidable collidable = (Collidable) g;
+            for (Collider c : collidable.getColliders()) {
+                int cx = (int) c.getPosition().dot(this.scale).getX();
+                int cy = (int) c.getPosition().dot(this.scale).getY();
+                int cw = (int) c.getDimensions().dot(this.scale).getX();
+                int ch = (int) c.getDimensions().dot(this.scale).getY();
+                this.graphics.setColor(Color.RED);
+                this.graphics.fillRect(cx, cy, cw, ch);
+            }
+        }
     }
 
     @Override
@@ -101,7 +123,7 @@ public class Window extends Canvas implements Renderer {
             this.setColor(Color.BLACK);
             this.graphics.fillRect(0, 0, this.getWidth(), this.getHeight());
         } else {
-            this.graphics.drawImage(this.backgroundImage, 0, 0, Window.MAP_WIDTH * this.scale, Window.MAP_HEIGHT * this.scale, this.frame);
+            this.graphics.drawImage(this.backgroundImage, 0, 0, MAP_WIDTH * this.scale, MAP_HEIGHT * this.scale, this.frame);
         }
     }
 
@@ -113,8 +135,8 @@ public class Window extends Canvas implements Renderer {
 
     @Override
     public synchronized void resize(final Vector2D dimensions) {
-        this.width = (int)dimensions.getX();
-        this.height = (int)dimensions.getY();
+        this.width = (int) dimensions.getX();
+        this.height = (int) dimensions.getY();
     }
 
     @Override

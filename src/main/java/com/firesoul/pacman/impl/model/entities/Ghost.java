@@ -54,7 +54,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         this.move();
 
         // TODO
-        final Vector2D direction = Vector2D.down();
+        final Vector2D direction = Vector2D.left();
         final Vector2D imageSize = this.getDrawable().getImageSize();
         final Vector2D newPosition = this.getPosition().add(direction.dot(deltaTime));
         this.setPosition(newPosition.wrap(imageSize.invert(), this.scene.getDimensions()));
@@ -64,6 +64,11 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         if (this.vulnerabiltyTimer.isExpired()) {
             this.vulnerable = false;
         }
+
+        this.collider.setPosition(this.getPosition()
+            .sub(SIZE.dot(0.5))
+            .wrap(imageSize.invert(), this.scene.getDimensions()));
+
         this.animate(direction);
     }
 

@@ -23,6 +23,6 @@ public class Clyde extends Ghost {
     
     public void reset() {
         this.setDrawable(this.getAnimation(Directions.RIGHT));
-        this.setPosition(new Vector2D(4, 80));
+        this.setPosition(new Vector2D(12, 80));
     }
 }
