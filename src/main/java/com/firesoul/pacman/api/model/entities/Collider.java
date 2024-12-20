@@ -33,12 +33,6 @@ public interface Collider {
     Vector2D getPosition();
 
     /**
-     * Update the position of the collider.
-     * @param position
-     */
-    void setPosition(Vector2D position);
-
-    /**
      * @return the dimensions of this collider
      */
     Vector2D getDimensions();
@@ -47,4 +41,9 @@ public interface Collider {
      * @return the game object attached to this collider
      */
     GameObject2D getAttachedGameObject();
+
+    /**
+     * Update the position based on the position of this game object.
+     */
+    void update();
 }

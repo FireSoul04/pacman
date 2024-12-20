@@ -133,8 +133,10 @@ public class Gui extends JFrame implements MouseListener {
             this.rects.forEach(t -> gameObjects.add(new Wall(new Vector2D(t.x, t.y), new Vector2D(t.width, t.height))));
 
             os.writeObject(gameObjects);
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Cannot open file: " + e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

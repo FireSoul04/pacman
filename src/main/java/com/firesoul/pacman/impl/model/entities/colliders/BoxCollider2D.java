@@ -3,12 +3,14 @@ package com.firesoul.pacman.impl.model.entities.colliders;
 import java.io.Serializable;
 
 import com.firesoul.pacman.api.model.entities.Collider;
+import com.firesoul.pacman.api.model.entities.ColliderLayout;
 import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class BoxCollider2D implements Collider, Serializable {
 
     private GameObject2D gameObject;
+    private ColliderLayout layout;
     private Vector2D position;
     private Vector2D dimensions;
 
@@ -24,6 +26,7 @@ public class BoxCollider2D implements Collider, Serializable {
         this.gameObject = gameObject;
         this.position = position;
         this.dimensions = dimensions;
+        this.position = this.layout.positionRelativeTo(gameObject, dimensions);
     }
 
     @Override
@@ -37,8 +40,8 @@ public class BoxCollider2D implements Collider, Serializable {
     }
 
     @Override
-    public void setPosition(final Vector2D position) {
-        this.position = position;
+    public void update() {
+        this.position = this.layout.positionRelativeTo(this.gameObject, this.dimensions);
     }
 
     @Override

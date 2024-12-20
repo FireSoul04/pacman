@@ -31,6 +31,24 @@ public class Player extends GameObject2D implements Movable, Collidable {
         Directions.LEFT, true,
         Directions.RIGHT, true
     ));
+
+    // this.colliders.get(this.getDirectionFromVector(Vector2D.up())).setPosition(playerPosition
+    //     .add(Vector2D.up())
+    //     .sub(SIZE.dot(0.5))
+
+    // this.colliders.get(this.getDirectionFromVector(Vector2D.left())).setPosition(playerPosition
+    //     .add(Vector2D.left())
+    //     .sub(SIZE.dot(0.5))
+
+    // this.colliders.get(this.getDirectionFromVector(Vector2D.down())).setPosition(playerPosition
+    //     .add(Vector2D.down())
+    //     .sub(SIZE.dot(0.5))
+    //     .add(new Vector2D(0, SIZE.getY() - 1))
+
+    // this.colliders.get(this.getDirectionFromVector(Vector2D.right())).setPosition(playerPosition
+    //     .add(Vector2D.right())
+    //     .sub(SIZE.dot(0.5))
+    //     .add(new Vector2D(SIZE.getX() - 1, 0))
     private final Map<Directions, Collider> colliders = new HashMap<>(Map.of(
         Directions.UP, new BoxCollider2D(this, SIZE_HORIZONTAL),
         Directions.DOWN, new BoxCollider2D(this, SIZE_HORIZONTAL),
@@ -53,6 +71,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
         this.lastDirection = Vector2D.right();
         this.animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
         this.setDrawable(this.getAnimation(Directions.RIGHT));
+        this.moveColliders();
     }
 
     @Override
@@ -84,34 +103,14 @@ public class Player extends GameObject2D implements Movable, Collidable {
             .dot(deltaTime));
         final Vector2D roundedPosition = this.roundedPosition(newPosition.wrap(imageSize.invert(), this.scene.getDimensions()));
         this.setPosition(roundedPosition);
-        this.moveColliders(roundedPosition);
+        this.moveColliders();
         this.animate(direction);
     }
 
-    private void moveColliders(final Vector2D playerPosition) {
-        final Vector2D imageSize = this.getDrawable().getImageSize();
-
-        this.colliders.get(this.getDirectionFromVector(Vector2D.up())).setPosition(playerPosition
-            .add(Vector2D.up())
-            .sub(SIZE.dot(0.5))
-            .wrap(imageSize.invert(), this.scene.getDimensions()));
-
-        this.colliders.get(this.getDirectionFromVector(Vector2D.left())).setPosition(playerPosition
-            .add(Vector2D.left())
-            .sub(SIZE.dot(0.5))
-            .wrap(imageSize.invert(), this.scene.getDimensions()));
-
-        this.colliders.get(this.getDirectionFromVector(Vector2D.down())).setPosition(playerPosition
-            .add(Vector2D.down())
-            .sub(SIZE.dot(0.5))
-            .add(new Vector2D(0, SIZE.getY() - 1))
-            .wrap(imageSize.invert(), this.scene.getDimensions()));
-
-        this.colliders.get(this.getDirectionFromVector(Vector2D.right())).setPosition(playerPosition
-            .add(Vector2D.right())
-            .sub(SIZE.dot(0.5))
-            .add(new Vector2D(SIZE.getX() - 1, 0))
-            .wrap(imageSize.invert(), this.scene.getDimensions()));
+    private void moveColliders() {
+        for (final Collider c : this.getColliders()) {
+            c.update();
+        }
     }
 
     private Vector2D readInput() {
