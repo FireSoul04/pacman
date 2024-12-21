@@ -19,6 +19,14 @@ import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Pacman {
 
+    public static enum Directions {
+        NONE,
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
+    }
+
     private final GameCore game;
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
@@ -35,12 +43,12 @@ public class Pacman {
     public void init() {
         this.level = 1;
         this.nextLevelTimer.start();
-        this.player = new Player(Vector2D.zero(), new Vector2D(1, 1), this.game.getScene(), this.game.getInputController());
+        this.player = new Player(this.game.getScene(), this.game.getInputController());
         this.ghosts = List.of(
-            new Blinky(new Vector2D(8, 16), new Vector2D(1, 1), this.game.getScene()),
-            new Inky(new Vector2D(8, 32), new Vector2D(1, 1), this.game.getScene()),
-            new Pinky(new Vector2D(8, 48), new Vector2D(1, 1), this.game.getScene()),
-            new Clyde(new Vector2D(8, 64), new Vector2D(1, 1), this.game.getScene())
+            new Blinky(this.game.getScene()),
+            new Inky(this.game.getScene()),
+            new Pinky(this.game.getScene()),
+            new Clyde(this.game.getScene())
         );
         this.reset();
     }

@@ -20,7 +20,7 @@ public class Wall extends GameObject2D implements Collidable {
     }
 
     @Override
-    public void onCollide(final Collidable other) {
+    public void onCollide(final Collider other) {
     }
 
     @Override

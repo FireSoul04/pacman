@@ -35,7 +35,8 @@ public class GameCore implements Game {
 
     @Override
     public synchronized void init() {
-        this.scene = new Scene2D(MAP_PATH);
+        //this.scene = new Scene2D(MAP_PATH);
+        this.scene = new Scene2D(WIDTH, HEIGHT);
         this.pacman.init();
         this.renderer.init(MAP_IMAGE_PATH);
         this.displayThread.start();

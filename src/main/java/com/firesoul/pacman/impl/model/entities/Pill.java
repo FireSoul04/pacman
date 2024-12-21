@@ -6,6 +6,7 @@ import java.util.List;
 import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.impl.model.GameObject2D;
+import com.firesoul.pacman.impl.model.Pacman.Directions;
 import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Sprite2D;
@@ -24,9 +25,14 @@ public class Pill extends GameObject2D implements Collidable {
     }
 
     @Override
-    public void onCollide(final Collidable other) {
-        if (other instanceof Player) {
-            this.disable();
+    public void onCollide(final Collider other) {
+        final Collidable gameObject = (Collidable) other.getAttachedGameObject();
+        if (gameObject instanceof Player) {
+            final Player player = (Player) gameObject;
+            final Directions direction = player.getDirectionFromCollider(other);
+            if (direction.equals(Directions.NONE)) {
+                this.disable();
+            }
         }
     }
 

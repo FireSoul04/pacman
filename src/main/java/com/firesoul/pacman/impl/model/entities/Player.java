@@ -11,84 +11,64 @@ import com.firesoul.pacman.impl.controller.InputController;
 import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.model.Scene2D;
 import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
+import com.firesoul.pacman.impl.model.entities.colliders.ColliderCenterLayout;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
 import com.firesoul.pacman.impl.view.DirectionalAnimation2D;
-import com.firesoul.pacman.impl.view.DirectionalAnimation2D.Directions;
+import com.firesoul.pacman.impl.model.Pacman.Directions;
 
 public class Player extends GameObject2D implements Movable, Collidable {
 
     private static final int MAX_LIVES = 3;
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.1);
-    private static final Vector2D SIZE = new Vector2D(16, 16);
-    private static final Vector2D SIZE_HORIZONTAL = new Vector2D(SIZE.getX(), 1);
-    private static final Vector2D SIZE_VERTICAL = new Vector2D(1, SIZE.getY());
-    private static final Vector2D PACMAN_START_POSITION = new Vector2D(4, 4).add(SIZE.dot(0.5));
+    private static final Vector2D SPRITE_SIZE = new Vector2D(16, 16);
+    private static final Vector2D SIZE = SPRITE_SIZE.dot(0.5);
+    private static final Vector2D START_POSITION = new Vector2D(4, 4).add(SIZE);
+    private static final Vector2D SPEED = new Vector2D(1, 1);
 
-    private final Map<Directions, Boolean> move = new HashMap<>(Map.of(
-        Directions.UP, true,
-        Directions.DOWN, true,
-        Directions.LEFT, true,
-        Directions.RIGHT, true
-    ));
-
-    // this.colliders.get(this.getDirectionFromVector(Vector2D.up())).setPosition(playerPosition
-    //     .add(Vector2D.up())
-    //     .sub(SIZE.dot(0.5))
-
-    // this.colliders.get(this.getDirectionFromVector(Vector2D.left())).setPosition(playerPosition
-    //     .add(Vector2D.left())
-    //     .sub(SIZE.dot(0.5))
-
-    // this.colliders.get(this.getDirectionFromVector(Vector2D.down())).setPosition(playerPosition
-    //     .add(Vector2D.down())
-    //     .sub(SIZE.dot(0.5))
-    //     .add(new Vector2D(0, SIZE.getY() - 1))
-
-    // this.colliders.get(this.getDirectionFromVector(Vector2D.right())).setPosition(playerPosition
-    //     .add(Vector2D.right())
-    //     .sub(SIZE.dot(0.5))
-    //     .add(new Vector2D(SIZE.getX() - 1, 0))
-    private final Map<Directions, Collider> colliders = new HashMap<>(Map.of(
-        Directions.UP, new BoxCollider2D(this, SIZE_HORIZONTAL),
-        Directions.DOWN, new BoxCollider2D(this, SIZE_HORIZONTAL),
-        Directions.LEFT, new BoxCollider2D(this, SIZE_VERTICAL),
-        Directions.RIGHT, new BoxCollider2D(this, SIZE_VERTICAL)
-    ));
+    /**
+     * Colliders for directions are placed in every edge of the sprite of pacman
+     */
+    private final Map<Directions, Collider> colliders;
     private final Scene2D scene;
     private final InputController input;
-    private final DirectionalAnimation2D animations;
-    private Vector2D lastDirection;
-    private boolean dead;
-    private int lives;
+    private final DirectionalAnimation2D animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
+    private Vector2D lastDirection = Vector2D.right();
+    private boolean dead = false;
+    private int lives = MAX_LIVES;
 
-    public Player(final Vector2D position, final Vector2D speed, final Scene2D scene, final InputController input) {
-        super(position, speed);
-        this.lives = MAX_LIVES;
-        this.dead = false;
+    public Player(final Scene2D scene, final InputController input) {
+        super(START_POSITION, SPEED);
         this.scene = scene;
         this.input = input;
-        this.lastDirection = Vector2D.right();
-        this.animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
+
+        final Vector2D sizeHorizontal = new Vector2D(SPRITE_SIZE.getX(), 1);
+        final Vector2D sizeVertical = new Vector2D(1, SPRITE_SIZE.getY());
+        this.colliders = new HashMap<>(Map.of(
+            Directions.NONE, new BoxCollider2D(this, SIZE, new ColliderCenterLayout()),
+            Directions.UP, new BoxCollider2D(this, sizeHorizontal, 
+                (g, s) -> g.getPosition().add(Vector2D.up()).sub(SIZE)),
+            Directions.DOWN, new BoxCollider2D(this, sizeHorizontal, 
+                (g, s) -> g.getPosition().add(Vector2D.down()).add(sizeVertical.sub(new Vector2D(1, 1))).sub(SIZE)),
+            Directions.LEFT, new BoxCollider2D(this, sizeVertical, 
+                (g, s) -> g.getPosition().add(Vector2D.left()).sub(SIZE)),
+            Directions.RIGHT, new BoxCollider2D(this, sizeVertical, 
+                (g, s) -> g.getPosition().add(Vector2D.right()).add(sizeHorizontal.sub(new Vector2D(1, 1))).sub(SIZE))
+        ));
         this.setDrawable(this.getAnimation(Directions.RIGHT));
-        this.moveColliders();
     }
 
     @Override
-    public void onCollide(final Collidable other) {
+    public void onCollide(final Collider other) {
         if (other instanceof Wall) {
-            for (final var collider : this.colliders.entrySet()) {
-                for (final Collider c2 : other.getColliders()) {
-                    final Collider c1 = collider.getValue();
-                    final Directions direction = collider.getKey();
-                    this.move.put(direction, c1.isOvelapping(c2));
-                }
-            }
+            // for (final var collider : this.colliders.entrySet()) {
+            //     for (final Collider c2 : other.getColliders()) {
+            //         final Collider c1 = collider.getValue();
+            //         final Directions direction = collider.getKey();
+            //         this.move.put(direction, c1.isOvelapping(c2));
+            //     }
+            // }
         } 
-    }
-
-    private Vector2D roundedPosition(final Vector2D v) {
-        return new Vector2D(Math.round(v.getX()), Math.round(v.getY()));
     }
 
     @Override
@@ -101,7 +81,11 @@ public class Player extends GameObject2D implements Movable, Collidable {
                 direction.getY() * this.getSpeed().getY()
             )
             .dot(deltaTime));
-        final Vector2D roundedPosition = this.roundedPosition(newPosition.wrap(imageSize.invert(), this.scene.getDimensions()));
+        final Vector2D roundedPosition = new Vector2D(
+            Math.round(newPosition.getX()), 
+            Math.round(newPosition.getY())
+        )
+        .wrap(imageSize.invert(), this.scene.getDimensions());
         this.setPosition(roundedPosition);
         this.moveColliders();
         this.animate(direction);
@@ -115,19 +99,19 @@ public class Player extends GameObject2D implements Movable, Collidable {
 
     private Vector2D readInput() {
         Vector2D direction = this.lastDirection;
-        if (!this.move.get(this.getDirectionFromVector(direction))) {
+        if (this.colliders.get(this.getDirectionFromVector(direction)).hasCollidedLastFrame()) {
             direction = Vector2D.zero();
         }
-        if (this.input.isKeyPressed(KeyEvent.VK_W) && this.move.get(this.getDirectionFromVector(Vector2D.up()))) {
+        if (this.input.isKeyPressed(KeyEvent.VK_W) && !this.colliders.get(this.getDirectionFromVector(Vector2D.up())).hasCollidedLastFrame()) {
             direction = Vector2D.up();
         }
-        if (this.input.isKeyPressed(KeyEvent.VK_S) && this.move.get(this.getDirectionFromVector(Vector2D.down()))) {
+        if (this.input.isKeyPressed(KeyEvent.VK_S) && !this.colliders.get(this.getDirectionFromVector(Vector2D.down())).hasCollidedLastFrame()) {
             direction = Vector2D.down();
         }
-        if (this.input.isKeyPressed(KeyEvent.VK_A) && this.move.get(this.getDirectionFromVector(Vector2D.left()))) {
+        if (this.input.isKeyPressed(KeyEvent.VK_A) && !this.colliders.get(this.getDirectionFromVector(Vector2D.left())).hasCollidedLastFrame()) {
             direction = Vector2D.left();
         }
-        if (this.input.isKeyPressed(KeyEvent.VK_D) && this.move.get(this.getDirectionFromVector(Vector2D.right()))) {
+        if (this.input.isKeyPressed(KeyEvent.VK_D) && !this.colliders.get(this.getDirectionFromVector(Vector2D.right())).hasCollidedLastFrame()) {
             direction = Vector2D.right();
         }
         this.lastDirection = direction;
@@ -135,7 +119,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
     }
 
     private void animate(final Vector2D direction) {
-        final Animation2D animation = (Animation2D)this.getDrawable();
+        final Animation2D animation = (Animation2D) this.getDrawable();
         if (direction.equals(Vector2D.zero())) {
             animation.stop();
             animation.reset();
@@ -183,12 +167,25 @@ public class Player extends GameObject2D implements Movable, Collidable {
     }
 
     /**
+     * @param other
+     * @return the directions of the collier
+     */
+    public Directions getDirectionFromCollider(final Collider other) {
+        return this.colliders
+            .entrySet()
+            .stream()
+            .filter(t -> t.getValue().equals(other))
+            .map(t -> t.getKey())
+            .findFirst()
+            .get();
+    }
+
+    /**
      * Reset the player.
      */
     public void reset() {
         this.setDrawable(this.getAnimation(Directions.RIGHT));
-        this.setPosition(Player.PACMAN_START_POSITION);
-        this.move.replaceAll((k, v) -> true);
+        this.setPosition(Player.START_POSITION);
         this.dead = false;
     }
 

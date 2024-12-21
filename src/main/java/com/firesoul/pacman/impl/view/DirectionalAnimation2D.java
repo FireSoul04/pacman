@@ -2,18 +2,9 @@ package com.firesoul.pacman.impl.view;
 
 import java.util.Map;
 
+import com.firesoul.pacman.impl.model.Pacman.Directions;
+
 public class DirectionalAnimation2D {
-    
-    /**
-     * Directions possible for the animations.
-     * Those can go UP, DOWN, LEFT, RIGHT.
-     */
-    public enum Directions {
-        UP,
-        DOWN,
-        LEFT,
-        RIGHT
-    }
 
     private final Map<Directions, Animation2D> animations;
 

@@ -13,7 +13,7 @@ import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
 import com.firesoul.pacman.impl.view.DirectionalAnimation2D;
-import com.firesoul.pacman.impl.view.DirectionalAnimation2D.Directions;
+import com.firesoul.pacman.impl.model.Pacman.Directions;
 
 public abstract class Ghost extends GameObject2D implements Movable, Collidable {
 
@@ -21,31 +21,26 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
     private static final long VULNERABILITY_TIME = Timer.secondsToMillis(5);
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.2);
     private static final Vector2D SIZE = new Vector2D(8, 8);
+    private static final Vector2D SPEED = new Vector2D(1, 1);
 
     private final Scene2D scene;
     private final DirectionalAnimation2D movementAnimations;
-    private final Animation2D vulnerableAnimation;
-    private final Animation2D vulnerableAnimationBlinking;
-    private final Timer vulnerabiltyTimer;
-    private final Collider collider;
-    private boolean dead;
-    private boolean vulnerable;
+    private final Animation2D vulnerableAnimation = new Animation2D("vulnerable", ANIMATION_SPEED);
+    private final Animation2D vulnerableAnimationBlinking = new Animation2D("vulnerable_blinking", ANIMATION_SPEED);
+    private final Timer vulnerabiltyTimer = new TimerImpl(VULNERABILITY_TIME);
+    private final Collider collider = new BoxCollider2D(this, SIZE);
+    private boolean dead = false;
+    private boolean vulnerable = false;
 
     /**
      * Create a ghost.
      * @param position
      * @param speed
      */
-    public Ghost(final Vector2D position, final Vector2D speed, final String name, final Scene2D scene) {
-        super(position, speed);
+    public Ghost(final Vector2D position, final String name, final Scene2D scene) {
+        super(position, SPEED);
         this.scene = scene;
-        this.dead = false;
-        this.vulnerable = false;
-        this.collider = new BoxCollider2D(this, SIZE);
-        this.vulnerabiltyTimer = new TimerImpl(VULNERABILITY_TIME);
         this.movementAnimations = new DirectionalAnimation2D(name, ANIMATION_SPEED);
-        this.vulnerableAnimation = new Animation2D("vulnerable", ANIMATION_SPEED);
-        this.vulnerableAnimationBlinking = new Animation2D("vulnerable_blinking", ANIMATION_SPEED);
         this.setDrawable(this.movementAnimations.getAnimation(Directions.RIGHT));
     }
 
@@ -65,7 +60,6 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
             this.vulnerable = false;
         }
         this.collider.update();
-
         this.animate(direction);
     }
 
@@ -73,13 +67,17 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
      * If the ghost is colliding with the player, based on the vulnerability of the ghost, the player or the ghost dies.
      */
     @Override
-    public void onCollide(final Collidable other) {
-        if (other instanceof Player) {
-            final Player player = (Player) other;
-            if (this.isVulnerable()) {
-                this.die();
-            } else if (!player.isDead()) {
-                player.die();
+    public void onCollide(final Collider other) {
+        final Collidable gameObject = (Collidable) other.getAttachedGameObject();
+        if (gameObject instanceof Player) {
+            final Player player = (Player) gameObject;
+            final Directions direction = player.getDirectionFromCollider(other);
+            if (direction.equals(Directions.NONE)) {
+                if (this.isVulnerable()) {
+                    this.die();
+                } else if (!player.isDead()) {
+                    player.die();
+                }
             }
         }
     }

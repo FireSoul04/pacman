@@ -13,20 +13,28 @@ public class BoxCollider2D implements Collider, Serializable {
     private ColliderLayout layout;
     private Vector2D position;
     private Vector2D dimensions;
+    private boolean collided = false;
 
     /**
-     * Creates a new BoxCollider2D with the given dimensions.
-     * @param dimensions The dimensions of the collider.
+     * Creates a new collider with a box form with the given dimensions. It position in the center of the image by default.
+     * @param gameObject attached to
+     * @param dimensions of the box
      */
     public BoxCollider2D(final GameObject2D gameObject, final Vector2D dimensions) {
-        this(gameObject, gameObject.getPosition(), dimensions);
+        this(gameObject, dimensions, new ColliderCenterLayout());
     }
 
-    public BoxCollider2D(final GameObject2D gameObject, final Vector2D position, final Vector2D dimensions) {
+    /**
+     * Creates a new collider with a box form.
+     * @param gameObject attached to
+     * @param dimensions of the box
+     * @param layout that decide how to follow the game object when it moves
+     */
+    public BoxCollider2D(final GameObject2D gameObject, final Vector2D dimensions, final ColliderLayout layout) {
         this.gameObject = gameObject;
-        this.position = position;
         this.dimensions = dimensions;
-        this.position = this.layout.positionRelativeTo(gameObject, dimensions);
+        this.layout = layout;
+        this.position = layout.positionRelativeTo(gameObject, dimensions);
     }
 
     @Override
@@ -49,6 +57,11 @@ public class BoxCollider2D implements Collider, Serializable {
         return this.gameObject;
     }
 
+    @Override
+    public boolean hasCollidedLastFrame() {
+        return this.collided;
+    }
+
     /**
      * Check if this collider is overlapping with the other collider.
      * 
@@ -60,9 +73,10 @@ public class BoxCollider2D implements Collider, Serializable {
         final Vector2D d2 = other.getDimensions();
         final Vector2D c1 = this.getPosition();
         final Vector2D c2 = other.getPosition();
-        return c1.getX() < c2.getX() + d2.getX()
+        this.collided = c1.getX() < c2.getX() + d2.getX()
             && c1.getX() + d1.getX() > c2.getX()
             && c1.getY() < c2.getY() + d2.getY()
             && c1.getY() + d1.getY() > c2.getY();
+        return this.collided;
     }
 }

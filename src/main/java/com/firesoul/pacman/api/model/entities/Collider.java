@@ -13,8 +13,7 @@ public interface Collider {
     default boolean isColliding(final Collider other) {
         if (this.isOvelapping(other)) {
             final Collidable thisGameObject = (Collidable) this.getAttachedGameObject();
-            final Collidable otherGameObject = (Collidable) other.getAttachedGameObject();
-            thisGameObject.onCollide(otherGameObject);
+            thisGameObject.onCollide(other);
             return true;
         }
         return false;
@@ -41,6 +40,11 @@ public interface Collider {
      * @return the game object attached to this collider
      */
     GameObject2D getAttachedGameObject();
+
+    /**
+     * @return if last frame was overlapping
+     */
+    boolean hasCollidedLastFrame();
 
     /**
      * Update the position based on the position of this game object.

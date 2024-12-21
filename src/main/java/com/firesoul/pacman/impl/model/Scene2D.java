@@ -7,6 +7,7 @@ import java.util.Iterator;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Room;
 import com.firesoul.pacman.api.model.entities.Collidable;
+import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.model.entities.Wall;
@@ -126,11 +127,17 @@ public class Scene2D implements Room {
     private void checkCollisions() {
         this.collisionTimer.update();
         if (this.collisionTimer.isExpired()) {
-            for (final Collidable c1 : this.cachedCollidables) {
-                for (final Collidable c2 : this.cachedCollidables) {
-                    if (c1 != c2 && c1.isColliding(c2)) {
-                        c1.onCollide(c2);
-                        c2.onCollide(c1);
+            for (final Collidable g1 : this.cachedCollidables) {
+                for (final Collidable g2 : this.cachedCollidables) {
+                    if (g1 != g2) {
+                        for (final Collider c1 : g1.getColliders()) {
+                            for (final Collider c2 : g2.getColliders()) {
+                                if (c1.isColliding(c2)) {
+                                    g1.onCollide(c2);
+                                    g2.onCollide(c1);
+                                }
+                            }
+                        }
                     }
                 }
             }
