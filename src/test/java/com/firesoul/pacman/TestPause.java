@@ -31,6 +31,7 @@ public class TestPause {
     void testMove() {
         game = new GameTest(this::onPause);
         game.addGameObject(entity);
+        game.init();
         game.run();
     }
 

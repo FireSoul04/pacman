@@ -33,6 +33,7 @@ public class TestCollisions {
     @AfterEach
     void start() {
         timer.start();
+        game.init();
         game.run();
     }
 

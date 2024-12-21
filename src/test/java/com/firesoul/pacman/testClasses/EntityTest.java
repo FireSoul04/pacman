@@ -28,7 +28,7 @@ public class EntityTest extends GameObject2D implements Movable, Collidable {
     }
 
     @Override
-    public void onCollide(final Collidable other) {
+    public void onCollide(final Collider other) {
         System.out.println("Collided with " + other);
     }
 
