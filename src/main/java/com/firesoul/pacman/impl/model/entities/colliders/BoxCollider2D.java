@@ -62,6 +62,14 @@ public class BoxCollider2D implements Collider, Serializable {
         return this.collided;
     }
 
+    @Override
+    public boolean equals(final Object o) {
+        final BoxCollider2D b = (BoxCollider2D) o;
+        return this == o || 
+            (this.position.equals(b.getPosition())
+            && this.dimensions.equals(b.getDimensions()));
+    }
+
     /**
      * Check if this collider is overlapping with the other collider.
      * 

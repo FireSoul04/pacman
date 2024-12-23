@@ -51,10 +51,16 @@ public interface Renderer {
     void resize(Vector2D dimensions);
 
     /**
-     * Set new scale factor.
-     * @param scale
+     * Set new scale factor for x axis.
+     * @param scaleX
      */
-    void setScale(int scale);
+    void setScaleX(double scaleX);
+
+    /**
+     * Set new scale factor for y axis.
+     * @param scaleY
+     */
+    void setScaleY(double scaleY);
 
     /**
      * Add input controller to the game.

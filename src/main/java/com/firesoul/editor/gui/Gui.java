@@ -50,7 +50,7 @@ public class Gui extends JFrame implements MouseListener {
         this.buttonFrame = new JPanel(new BorderLayout());
         this.canvas = new Canvas();
         this.canvas.addMouseListener(this);
-        this.setSize(1200, 900);
+        this.setSize(WIDTH * SCALE + 20, HEIGHT * SCALE + 80);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(new BorderLayout());
         this.add(this.canvas);
@@ -98,17 +98,17 @@ public class Gui extends JFrame implements MouseListener {
     private synchronized Rectangle getRectangle(final Point p1, final Point p2) {
         final int w = (int) Math.abs(p2.getX() - p1.getX());
         final int h = (int) Math.abs(p2.getY() - p1.getY());
-        return new Rectangle(approximate((int)p1.x / 3), approximate((int)p1.y / 3), approximate(w / 3), approximate(h / 3));
+        return new Rectangle(approximate((int)p1.x / SCALE), approximate((int)p1.y / SCALE), approximate(w / SCALE), approximate(h / SCALE));
     }
 
     private synchronized int approximate(final int x) {
-        return x - (x % 4);
+        return x - (x % SCALE);
     }
 
     private synchronized void reset() {
         final Graphics g = this.canvas.getGraphics();
         g.setColor(Color.WHITE);
-        g.fillRect(0, 0, WIDTH, HEIGHT);
+        g.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
         this.canvas.update(g);
         this.rects.clear();
     }
@@ -119,7 +119,7 @@ public class Gui extends JFrame implements MouseListener {
         }
         final Graphics g = this.canvas.getGraphics();
         g.setColor(Color.WHITE);
-        g.fillRect(0, 0, WIDTH, HEIGHT);
+        g.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
         this.canvas.update(g);
     }
 
@@ -145,8 +145,8 @@ public class Gui extends JFrame implements MouseListener {
         try {
             while (true) {
                 g.setColor(Color.BLUE);
-                g.drawImage(this.readImage(), 0, 0, WIDTH * SCALE, HEIGHT * SCALE, null);
-                this.rects.forEach(t -> g.fillRect(t.x * 3, t.y * 3, t.width * 3, t.height * 3));
+                g.drawImage(this.readImage(), 0, 0, WIDTH * SCALE, HEIGHT * SCALE, this.canvas);
+                this.rects.forEach(t -> g.fillRect(t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE));
             }
         } catch (IOException e) {}
     }

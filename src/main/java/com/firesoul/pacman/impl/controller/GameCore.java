@@ -16,13 +16,13 @@ public class GameCore implements Game {
     private static final String MAP_PATH = "src/main/resources/map/map.txt";
     private static final String MAP_IMAGE_PATH = "src/main/resources/sprites/map/map.png";
     private static final String TITLE = "Pacman";
-    private static final int WIDTH = 229;
-    private static final int HEIGHT = 289;
-    private static final int SCALE = 3;
+    private static final int WIDTH = 224;
+    private static final int HEIGHT = 288;
+    private static final double SCALE = 3;
     private static final PrintStream logger = System.out;
 
     private final Thread displayThread = new Thread(this, "Display");
-    private final Renderer renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE);
+    private final Renderer renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE, SCALE);
     private final InputController inputController = new InputController();
     private final Pacman pacman;
     private Scene2D scene;
@@ -35,8 +35,8 @@ public class GameCore implements Game {
 
     @Override
     public synchronized void init() {
-        //this.scene = new Scene2D(MAP_PATH);
-        this.scene = new Scene2D(WIDTH, HEIGHT);
+        this.scene = new Scene2D(MAP_PATH);
+        //this.scene = new Scene2D(WIDTH, HEIGHT);
         this.pacman.init();
         this.renderer.init(MAP_IMAGE_PATH);
         this.displayThread.start();
