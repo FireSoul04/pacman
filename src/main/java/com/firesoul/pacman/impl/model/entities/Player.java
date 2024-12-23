@@ -1,6 +1,5 @@
 package com.firesoul.pacman.impl.model.entities;
 
-import java.awt.event.KeyEvent;
 import java.util.*;
 
 import com.firesoul.pacman.api.model.entities.Collidable;
@@ -47,6 +46,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
         super(START_POSITION, SPEED);
         this.scene = scene;
         this.input = input;
+        this.setDrawable(this.getAnimation(Directions.RIGHT));
 
         final Vector2D sizeHorizontal = new Vector2D(SPRITE_SIZE.getX(), 1);
         final Vector2D sizeVertical = new Vector2D(1, SPRITE_SIZE.getY());
@@ -61,7 +61,6 @@ public class Player extends GameObject2D implements Movable, Collidable {
             Directions.RIGHT, new BoxCollider2D(this, sizeVertical, 
                 (g, s) -> g.getPosition().add(Vector2D.right()).add(sizeHorizontal.sub(new Vector2D(1, 1))).sub(SIZE))
         ));
-        this.setDrawable(this.getAnimation(Directions.RIGHT));
     }
 
     @Override
@@ -100,24 +99,19 @@ public class Player extends GameObject2D implements Movable, Collidable {
 
     private Vector2D readInput() {
         Vector2D direction = this.lastDirection;
-        //if (this.colliders.get(this.getDirectionFromVector(direction)).hasCollidedLastFrame()) {
         if (!this.move.values().stream().anyMatch(t -> true)) {
             direction = Vector2D.zero();
         }
-        //if (this.input.isKeyPressed(KeyEvent.VK_W) && !this.colliders.get(this.getDirectionFromVector(Vector2D.up())).hasCollidedLastFrame()) {
-        if (this.input.isKeyPressed(KeyEvent.VK_W) && this.move.get(this.getDirectionFromVector(Vector2D.up()))) {
+        if (this.input.getEvent("MoveUp") && this.move.get(this.getDirectionFromVector(Vector2D.up()))) {
             direction = Vector2D.up();
         }
-        //if (this.input.isKeyPressed(KeyEvent.VK_S) && !this.colliders.get(this.getDirectionFromVector(Vector2D.down())).hasCollidedLastFrame()) {
-        if (this.input.isKeyPressed(KeyEvent.VK_S) && this.move.get(this.getDirectionFromVector(Vector2D.down()))) {
+        if (this.input.getEvent("MoveDown") && this.move.get(this.getDirectionFromVector(Vector2D.down()))) {
             direction = Vector2D.down();
         }
-        //if (this.input.isKeyPressed(KeyEvent.VK_A) && !this.colliders.get(this.getDirectionFromVector(Vector2D.left())).hasCollidedLastFrame()) {
-        if (this.input.isKeyPressed(KeyEvent.VK_A) && this.move.get(this.getDirectionFromVector(Vector2D.left()))) {
+        if (this.input.getEvent("MoveLeft") && this.move.get(this.getDirectionFromVector(Vector2D.left()))) {
             direction = Vector2D.left();
         }
-        //if (this.input.isKeyPressed(KeyEvent.VK_D) && !this.colliders.get(this.getDirectionFromVector(Vector2D.right())).hasCollidedLastFrame()) {
-        if (this.input.isKeyPressed(KeyEvent.VK_D) && this.move.get(this.getDirectionFromVector(Vector2D.right()))) {
+        if (this.input.getEvent("MoveRight") && this.move.get(this.getDirectionFromVector(Vector2D.right()))) {
             direction = Vector2D.right();
         }
         this.lastDirection = direction;

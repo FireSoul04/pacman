@@ -28,9 +28,9 @@ public class Window extends JFrame implements Renderer {
     private static final int MAP_HEIGHT = 248;
 
     private final Canvas canvas;
-    private final InputController inputController;
     private final int startWidth;
     private final int startHeight;
+    private InputController inputController;
     private BufferStrategy bufferStrategy;
     private Graphics graphics;
     private Image backgroundImage;
@@ -54,7 +54,6 @@ public class Window extends JFrame implements Renderer {
         this.scaleX = scaleX;
         this.scaleY = scaleY;
         this.canvas = new Canvas();
-        this.inputController = new InputController();
     }
 
     @Override
@@ -66,7 +65,7 @@ public class Window extends JFrame implements Renderer {
         this.setVisible(true);
         this.pack();
         this.setMinimumSize(this.getSize());
-        this.canvas.addKeyListener(this.inputController);
+        this.canvas.addKeyListener(this.inputController.getKeyListener());
         this.canvas.createBufferStrategy(2); // Create double buffering
         this.backgroundImage = null;
         this.bufferStrategy = this.canvas.getBufferStrategy();
@@ -182,7 +181,7 @@ public class Window extends JFrame implements Renderer {
 
     @Override
     public synchronized void addInputController(final InputController inputController) {
-        this.canvas.addKeyListener(inputController);
+        this.inputController = inputController;
     }
 
     /**

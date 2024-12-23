@@ -1,6 +1,5 @@
 package com.firesoul.pacman.impl.controller;
 
-import java.awt.event.KeyEvent;
 import java.io.PrintStream;
 import java.util.List;
 
@@ -70,7 +69,7 @@ public class GameCore implements Game {
      * @param key
      */
     public void pauseOnKeyPressed(final int key) {
-        if (this.inputController.isKeyPressedOnce(key)) {
+        if (this.inputController.getEvent("PauseGame")) {
             this.pause();
         }
     }
@@ -85,7 +84,7 @@ public class GameCore implements Game {
 
     @Override
     public void onPause() {
-        if (this.inputController.isKeyPressedOnce(KeyEvent.VK_ESCAPE)) {
+        if (this.inputController.getEvent("PauseGame")) {
             this.start();
         }
     }
