@@ -28,17 +28,13 @@ public class Player extends GameObject2D implements Movable, Collidable {
     /**
      * Colliders for directions are placed in every edge of the sprite of pacman
      */
-    private final Map<Directions, Boolean> move = new HashMap<>(Map.of(
-        Directions.UP, true,
-        Directions.DOWN, true,
-        Directions.LEFT, true,
-        Directions.RIGHT, true
-    ));
+    private final Set<Directions> move = new HashSet<>();
     private final Map<Directions, Collider> colliders;
     private final Scene2D scene;
     private final InputController input;
     private final DirectionalAnimation2D animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
-    private Vector2D lastDirection = Vector2D.right();
+    private Vector2D currentDirection = Vector2D.right();
+    private Vector2D nextDirection = Vector2D.right();
     private boolean dead = false;
     private int lives = MAX_LIVES;
 
@@ -48,18 +44,18 @@ public class Player extends GameObject2D implements Movable, Collidable {
         this.input = input;
         this.setDrawable(this.getAnimation(Directions.RIGHT));
 
-        final Vector2D sizeHorizontal = new Vector2D(SPRITE_SIZE.getX(), 1);
-        final Vector2D sizeVertical = new Vector2D(1, SPRITE_SIZE.getY());
+        final Vector2D sizeHorizontal = new Vector2D(SPRITE_SIZE.getX() - 1, 1);
+        final Vector2D sizeVertical = new Vector2D(1, SPRITE_SIZE.getY() - 1);
         this.colliders = new HashMap<>(Map.of(
             Directions.NONE, new BoxCollider2D(this, SIZE, new ColliderCenterLayout()),
             Directions.UP, new BoxCollider2D(this, sizeHorizontal, 
-                (g, s) -> g.getPosition().add(Vector2D.up()).sub(SIZE)),
+                (g, s) -> g.getPosition().add(Vector2D.up()).sub(SIZE).add(new Vector2D(0.5, 0.5))),
             Directions.DOWN, new BoxCollider2D(this, sizeHorizontal, 
-                (g, s) -> g.getPosition().add(Vector2D.down()).add(sizeVertical.sub(new Vector2D(1, 1))).sub(SIZE)),
+                (g, s) -> g.getPosition().add(Vector2D.down()).add(sizeVertical.sub(new Vector2D(0.5, 0.5))).sub(SIZE)),
             Directions.LEFT, new BoxCollider2D(this, sizeVertical, 
-                (g, s) -> g.getPosition().add(Vector2D.left()).sub(SIZE)),
+                (g, s) -> g.getPosition().add(Vector2D.left()).sub(SIZE).add(new Vector2D(0.5, 0.5))),
             Directions.RIGHT, new BoxCollider2D(this, sizeVertical, 
-                (g, s) -> g.getPosition().add(Vector2D.right()).add(sizeHorizontal.sub(new Vector2D(1, 1))).sub(SIZE))
+                (g, s) -> g.getPosition().add(Vector2D.right()).add(sizeHorizontal.sub(new Vector2D(0.5, 0.5))).sub(SIZE))
         ));
     }
 
@@ -68,8 +64,10 @@ public class Player extends GameObject2D implements Movable, Collidable {
         final GameObject2D gameObject = other.getAttachedGameObject();
         if (gameObject instanceof Wall) {
             this.colliders.forEach((k, v) -> {
-                if (v.hasCollidedLastFrame()) {
-                    //System.out.println(k);
+                if (!k.equals(Directions.NONE)) {
+                    if (v.hasCollidedLastFrame()) {
+                        this.move.add(k);
+                    }
                 }
             });
         }
@@ -77,45 +75,46 @@ public class Player extends GameObject2D implements Movable, Collidable {
 
     @Override
     public void update(final double deltaTime) {
-        final Vector2D direction = this.readInput();
+        this.readInput();
         final Vector2D imageSize = this.getDrawable().getImageSize();
         final Vector2D newPosition = this.getPosition()
             .add(new Vector2D(
-                direction.getX() * this.getSpeed().getX(),
-                direction.getY() * this.getSpeed().getY()
+                this.currentDirection.getX() * this.getSpeed().getX(),
+                this.currentDirection.getY() * this.getSpeed().getY()
             )
             .dot(deltaTime))
             .wrap(imageSize.invert(), this.scene.getDimensions());
         this.setPosition(newPosition);
         this.moveColliders();
-        this.animate(direction);
+        this.animate(this.currentDirection);
     }
 
     private void moveColliders() {
         for (final Collider c : this.getColliders()) {
             c.update();
+            this.move.clear();
         }
     }
 
-    private Vector2D readInput() {
-        Vector2D direction = this.lastDirection;
-        if (!this.move.values().stream().anyMatch(t -> true)) {
-            direction = Vector2D.zero();
+    private void readInput() {
+        if (this.input.getEvent("MoveUp")) {
+            this.nextDirection = Vector2D.up();
         }
-        if (this.input.getEvent("MoveUp") && this.move.get(this.getDirectionFromVector(Vector2D.up()))) {
-            direction = Vector2D.up();
+        if (this.input.getEvent("MoveDown")) {
+            this.nextDirection = Vector2D.down();
         }
-        if (this.input.getEvent("MoveDown") && this.move.get(this.getDirectionFromVector(Vector2D.down()))) {
-            direction = Vector2D.down();
+        if (this.input.getEvent("MoveLeft")) {
+            this.nextDirection = Vector2D.left();
         }
-        if (this.input.getEvent("MoveLeft") && this.move.get(this.getDirectionFromVector(Vector2D.left()))) {
-            direction = Vector2D.left();
+        if (this.input.getEvent("MoveRight")) {
+            this.nextDirection = Vector2D.right();
         }
-        if (this.input.getEvent("MoveRight") && this.move.get(this.getDirectionFromVector(Vector2D.right()))) {
-            direction = Vector2D.right();
+        if (this.move.contains(this.getDirectionFromVector(this.currentDirection))) {
+            this.currentDirection = Vector2D.zero();
         }
-        this.lastDirection = direction;
-        return direction;
+        if (!this.move.contains(this.getDirectionFromVector(this.nextDirection))) {
+            this.currentDirection = this.nextDirection;
+        }
     }
 
     private void animate(final Vector2D direction) {

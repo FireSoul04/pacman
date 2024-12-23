@@ -20,7 +20,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
     private static final long VULNERABILITY_START_BLINKING_TIME = Timer.secondsToMillis(3);
     private static final long VULNERABILITY_TIME = Timer.secondsToMillis(5);
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.2);
-    private static final Vector2D SIZE = new Vector2D(8, 8);
+    private static final Vector2D SIZE = new Vector2D();//new Vector2D(8, 8);
     private static final Vector2D SPEED = new Vector2D(1, 1);
 
     private final Scene2D scene;
