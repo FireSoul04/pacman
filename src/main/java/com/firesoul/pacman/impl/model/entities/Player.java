@@ -48,8 +48,8 @@ public class Player extends GameObject2D implements Movable, Collidable {
         this.scene = scene;
         this.input = input;
 
-        final Vector2D sizeHorizontal = new Vector2D(SPRITE_SIZE.getX() - 1, 1);
-        final Vector2D sizeVertical = new Vector2D(1, SPRITE_SIZE.getY() - 1);
+        final Vector2D sizeHorizontal = new Vector2D(SPRITE_SIZE.getX(), 1);
+        final Vector2D sizeVertical = new Vector2D(1, SPRITE_SIZE.getY());
         this.colliders = new HashMap<>(Map.of(
             Directions.NONE, new BoxCollider2D(this, SIZE, new ColliderCenterLayout()),
             Directions.UP, new BoxCollider2D(this, sizeHorizontal, 
