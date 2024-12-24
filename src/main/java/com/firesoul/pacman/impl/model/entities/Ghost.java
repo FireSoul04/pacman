@@ -9,6 +9,7 @@ import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.model.Scene2D;
 import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
+import com.firesoul.pacman.impl.model.entities.colliders.ColliderCenterLayout;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
@@ -20,15 +21,17 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
     private static final long VULNERABILITY_START_BLINKING_TIME = Timer.secondsToMillis(3);
     private static final long VULNERABILITY_TIME = Timer.secondsToMillis(5);
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.2);
-    private static final Vector2D SIZE = new Vector2D();//new Vector2D(8, 8);
+    private static final Vector2D SPRITE_SIZE = new Vector2D(16, 16);
+    private static final Vector2D SIZE = SPRITE_SIZE.dot(0.5);
     private static final Vector2D SPEED = new Vector2D(1, 1);
 
+    private final Set<Directions> move = new HashSet<>();
+    private final Map<Directions, Collider> colliders;
     private final Scene2D scene;
     private final DirectionalAnimation2D movementAnimations;
     private final Animation2D vulnerableAnimation = new Animation2D("vulnerable", ANIMATION_SPEED);
     private final Animation2D vulnerableAnimationBlinking = new Animation2D("vulnerable_blinking", ANIMATION_SPEED);
     private final Timer vulnerabiltyTimer = new TimerImpl(VULNERABILITY_TIME);
-    private final Collider collider = new BoxCollider2D(this, SIZE);
     private boolean dead = false;
     private boolean vulnerable = false;
 
@@ -42,6 +45,20 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         this.scene = scene;
         this.movementAnimations = new DirectionalAnimation2D(name, ANIMATION_SPEED);
         this.setDrawable(this.movementAnimations.getAnimation(Directions.RIGHT));
+
+        final Vector2D sizeHorizontal = new Vector2D(SPRITE_SIZE.getX() - 1, 1);
+        final Vector2D sizeVertical = new Vector2D(1, SPRITE_SIZE.getY() - 1);
+        this.colliders = new HashMap<>(Map.of(
+            Directions.NONE, new BoxCollider2D(this, SIZE, new ColliderCenterLayout()),
+            Directions.UP, new BoxCollider2D(this, sizeHorizontal, 
+                (g, s) -> g.getPosition().add(Vector2D.up()).sub(SIZE).add(new Vector2D(0.5, 0.5))),
+            Directions.DOWN, new BoxCollider2D(this, sizeHorizontal, 
+                (g, s) -> g.getPosition().add(Vector2D.down()).add(sizeVertical.sub(new Vector2D(0.5, 0.5))).sub(SIZE)),
+            Directions.LEFT, new BoxCollider2D(this, sizeVertical, 
+                (g, s) -> g.getPosition().add(Vector2D.left()).sub(SIZE).add(new Vector2D(0.5, 0.5))),
+            Directions.RIGHT, new BoxCollider2D(this, sizeVertical, 
+                (g, s) -> g.getPosition().add(Vector2D.right()).add(sizeHorizontal.sub(new Vector2D(0.5, 0.5))).sub(SIZE))
+        ));
     }
 
     @Override
@@ -51,28 +68,41 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         // TODO
         final Vector2D direction = Vector2D.left();
         final Vector2D imageSize = this.getDrawable().getImageSize();
-        final Vector2D newPosition = this.getPosition().add(direction.dot(deltaTime));
-        this.setPosition(newPosition.wrap(imageSize.invert(), this.scene.getDimensions()));
+        final Vector2D newPosition = this.getPosition()
+            .add(new Vector2D(
+                direction.getX() * this.getSpeed().getX(),
+                direction.getY() * this.getSpeed().getY()
+            )
+            .dot(deltaTime))
+            .wrap(imageSize.invert(), this.scene.getDimensions());
+        this.setPosition(newPosition);
         //
 
         this.vulnerabiltyTimer.update();
         if (this.vulnerabiltyTimer.isExpired()) {
             this.vulnerable = false;
         }
-        this.collider.update();
+        this.moveColliders();
         this.animate(direction);
+    }
+
+    private void moveColliders() {
+        for (final Collider c : this.getColliders()) {
+            c.update();
+            this.move.clear();
+        }
     }
 
     /**
      * If the ghost is colliding with the player, based on the vulnerability of the ghost, the player or the ghost dies.
      */
     @Override
-    public void onCollide(final Collider other) {
+    public void onCollide(final Collider collider, final Collider other) {
         final Collidable gameObject = (Collidable) other.getAttachedGameObject();
-        if (gameObject instanceof Player) {
-            final Player player = (Player) gameObject;
-            final Directions direction = player.getDirectionFromCollider(other);
-            if (direction.equals(Directions.NONE)) {
+        if (gameObject instanceof Player player) {
+            final Directions playerDirection = player.getDirectionFromCollider(other);
+            final Directions ghostDirection = this.getDirectionFromCollider(collider);
+            if (playerDirection.equals(Directions.NONE) && ghostDirection.equals(Directions.NONE)) {
                 if (this.isVulnerable()) {
                     this.die();
                 } else if (!player.isDead()) {
@@ -84,7 +114,10 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
 
     @Override
     public List<Collider> getColliders() {
-        return Collections.unmodifiableList(List.of(this.collider));
+        return Collections.unmodifiableList(this.colliders
+            .values()
+            .stream()
+            .toList());
     }
 
     /**
@@ -105,6 +138,20 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         if (this.isVulnerable()) {
             this.vulnerabiltyTimer.start();
         }
+    }
+
+    /**
+     * @param other
+     * @return the directions of the collier
+     */
+    public Directions getDirectionFromCollider(final Collider other) {
+        Directions d = Directions.NONE;
+        for (final var entry : this.colliders.entrySet()) {
+            if (entry.getValue().equals(other)) {
+                d = entry.getKey();
+            }
+        }
+        return d;
     }
 
     /**

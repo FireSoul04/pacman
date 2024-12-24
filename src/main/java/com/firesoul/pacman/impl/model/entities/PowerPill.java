@@ -28,7 +28,7 @@ public class PowerPill extends GameObject2D implements Collidable {
     }
 
     @Override
-    public void onCollide(final Collider other) {
+    public void onCollide(final Collider collider, final Collider other) {
         final Collidable gameObject = (Collidable) other.getAttachedGameObject();
         if (gameObject instanceof Player) {
             final Player player = (Player) gameObject;

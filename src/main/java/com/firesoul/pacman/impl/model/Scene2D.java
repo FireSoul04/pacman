@@ -133,8 +133,8 @@ public class Scene2D implements Room {
                         for (final Collider c1 : g1.getColliders()) {
                             for (final Collider c2 : g2.getColliders()) {
                                 if (c1.isColliding(c2)) {
-                                    g1.onCollide(c2);
-                                    g2.onCollide(c1);
+                                    g1.onCollide(c1, c2);
+                                    g2.onCollide(c2, c1);
                                 }
                             }
                         }

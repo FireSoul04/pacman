@@ -13,7 +13,7 @@ public interface Collider {
     default boolean isColliding(final Collider other) {
         if (this.isOvelapping(other)) {
             final Collidable thisGameObject = (Collidable) this.getAttachedGameObject();
-            thisGameObject.onCollide(other);
+            thisGameObject.onCollide(this, other);
             return true;
         }
         return false;

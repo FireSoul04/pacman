@@ -102,7 +102,7 @@ public class Gui extends JFrame implements MouseListener {
     }
 
     private synchronized int approximate(final int x) {
-        return x - (x % SCALE);
+        return x - (x % 4);
     }
 
     private synchronized void reset() {

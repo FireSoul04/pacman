@@ -22,7 +22,7 @@ public class Fruit extends GameObject2D implements Collidable {
     }
 
     @Override
-    public void onCollide(final Collider other) {
+    public void onCollide(final Collider collider, final Collider other) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'onCollide'");
     }

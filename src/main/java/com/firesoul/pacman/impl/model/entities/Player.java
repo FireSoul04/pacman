@@ -60,7 +60,7 @@ public class Player extends GameObject2D implements Movable, Collidable {
     }
 
     @Override
-    public void onCollide(final Collider other) {
+    public void onCollide(final Collider collider, final Collider other) {
         final GameObject2D gameObject = other.getAttachedGameObject();
         if (gameObject instanceof Wall) {
             this.colliders.forEach((k, v) -> {

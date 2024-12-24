@@ -6,9 +6,10 @@ public interface Collidable {
 
     /**
      * The action perfomed when this game object is colliding
-     * @param other game object collder whom is colliding
+     * @param collider of this game object that collided
+     * @param other game object collider whom is colliding
      */
-    void onCollide(Collider other);
+    void onCollide(Collider collider, Collider other);
 
     /**
      * @return the collider of this game object
