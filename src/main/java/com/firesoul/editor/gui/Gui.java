@@ -33,6 +33,7 @@ import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Gui extends JFrame implements MouseListener {
 
+    private static final int LEFT_MARGIN = 48;
     private static final int WIDTH = 224;
     private static final int HEIGHT = 248;
     private static final int SCALE = 3;
@@ -50,7 +51,7 @@ public class Gui extends JFrame implements MouseListener {
         this.buttonFrame = new JPanel(new BorderLayout());
         this.canvas = new Canvas();
         this.canvas.addMouseListener(this);
-        this.setSize(WIDTH * SCALE + 20, HEIGHT * SCALE + 80);
+        this.setSize(WIDTH * SCALE + 100, HEIGHT * SCALE + 80);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(new BorderLayout());
         this.add(this.canvas);
@@ -74,7 +75,7 @@ public class Gui extends JFrame implements MouseListener {
                     .forEach(t -> {
                         this.rects.add(
                             new Rectangle(
-                                (int)((Collidable) t).getColliders().get(0).getPosition().getX(),
+                                (int)((Collidable) t).getColliders().get(0).getPosition().getX() + (LEFT_MARGIN / SCALE),
                                 (int)((Collidable) t).getColliders().get(0).getPosition().getY(),
                                 (int)((Collidable) t).getColliders().get(0).getDimensions().getX(),
                                 (int)((Collidable) t).getColliders().get(0).getDimensions().getY()
@@ -95,6 +96,17 @@ public class Gui extends JFrame implements MouseListener {
         this.setVisible(true);
     }
 
+    public void run() {
+        final Graphics g = this.canvas.getGraphics();
+        try {
+            while (true) {
+                g.setColor(Color.BLUE);
+                g.drawImage(this.readImage(), LEFT_MARGIN, 0, WIDTH * SCALE, HEIGHT * SCALE, this.canvas);
+                this.rects.forEach(t -> g.fillRect(t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE));
+            }
+        } catch (IOException e) {}
+    }
+
     private synchronized Rectangle getRectangle(final Point p1, final Point p2) {
         final int w = (int) Math.abs(p2.getX() - p1.getX());
         final int h = (int) Math.abs(p2.getY() - p1.getY());
@@ -108,7 +120,7 @@ public class Gui extends JFrame implements MouseListener {
     private synchronized void reset() {
         final Graphics g = this.canvas.getGraphics();
         g.setColor(Color.WHITE);
-        g.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
+        g.fillRect(0, 0, WIDTH * SCALE + LEFT_MARGIN, HEIGHT * SCALE);
         this.canvas.update(g);
         this.rects.clear();
     }
@@ -119,7 +131,7 @@ public class Gui extends JFrame implements MouseListener {
         }
         final Graphics g = this.canvas.getGraphics();
         g.setColor(Color.WHITE);
-        g.fillRect(0, 0, WIDTH * SCALE, HEIGHT * SCALE);
+        g.fillRect(0, 0, WIDTH * SCALE + LEFT_MARGIN, HEIGHT * SCALE);
         this.canvas.update(g);
     }
 
@@ -130,7 +142,7 @@ public class Gui extends JFrame implements MouseListener {
             os.writeObject(new Vector2D(WIDTH, HEIGHT));
 
             final List<GameObject> gameObjects = new ArrayList<>();
-            this.rects.forEach(t -> gameObjects.add(new Wall(new Vector2D(t.x, t.y), null, new Vector2D(t.width, t.height))));
+            this.rects.forEach(t -> gameObjects.add(new Wall(new Vector2D(t.x - (LEFT_MARGIN / SCALE), t.y), new Vector2D(t.width, t.height))));
 
             os.writeObject(gameObjects);
         } catch (IOException e) {
@@ -138,17 +150,6 @@ public class Gui extends JFrame implements MouseListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void run() {
-        final Graphics g = this.canvas.getGraphics();
-        try {
-            while (true) {
-                g.setColor(Color.BLUE);
-                g.drawImage(this.readImage(), 0, 0, WIDTH * SCALE, HEIGHT * SCALE, this.canvas);
-                this.rects.forEach(t -> g.fillRect(t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE));
-            }
-        } catch (IOException e) {}
     }
 
     public synchronized Image readImage() throws IOException {

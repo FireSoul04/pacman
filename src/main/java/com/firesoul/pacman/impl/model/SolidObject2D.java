@@ -17,8 +17,8 @@ public class SolidObject2D extends GameObject2D implements Collidable {
     private final Set<Directions> move = new HashSet<>();
     private final Map<Directions, Collider> colliders;
 
-    public SolidObject2D(final Vector2D position, final Vector2D speed, final Scene2D scene, final Vector2D spriteSize, final Vector2D objectSize) {
-        super(position, speed, scene);
+    public SolidObject2D(final Vector2D position, final Scene2D scene, final Vector2D spriteSize, final Vector2D objectSize) {
+        super(position, scene);
         final Vector2D sizeHorizontal = new Vector2D(spriteSize.getX() - 1, 1);
         final Vector2D sizeVertical = new Vector2D(1, spriteSize.getY() - 1);
         this.colliders = new HashMap<>(Map.of(
@@ -68,10 +68,29 @@ public class SolidObject2D extends GameObject2D implements Collidable {
     }
 
     /**
-     * @param other
-     * @return the directions of the collier
+     * Check if the body of this solid object is colliding with the body of a solid object.
+     * @param solidObject
+     * @param collider of this solid object
+     * @param other collider of the other solid object
+     * @return if both colliders are the bodys of the two solid objects
      */
-    public Directions getDirectionFromCollider(final Collider other) {
+    public boolean bodyIsCollidingWithBodyOf(final SolidObject2D solidObject, final Collider collider, final Collider other) {
+        final Directions otherDirection = solidObject.getDirectionFromCollider(other);
+        final Directions thisDirection = this.getDirectionFromCollider(collider);
+        return thisDirection.equals(Directions.NONE) && otherDirection.equals(Directions.NONE);
+    }
+
+    /**
+     * Check if the body of this solid object is colliding with a game object.
+     * @param collider of this solid object
+     * @return if the collider is colliding with the body of this solid object
+     */
+    public boolean bodyIsCollidingWith(final Collider collider) {
+        final Directions thisDirection = this.getDirectionFromCollider(collider);
+        return thisDirection.equals(Directions.NONE);
+    }
+    
+    private Directions getDirectionFromCollider(final Collider other) {
         Directions d = Directions.NONE;
         for (final var entry : this.colliders.entrySet()) {
             if (entry.getValue().equals(other)) {
@@ -82,7 +101,24 @@ public class SolidObject2D extends GameObject2D implements Collidable {
     }
 
     /**
-     * Move the colliders based on object's direction and colliders' layout.
+     * 
+     * @param v
+     * @return
+     */
+    protected Directions getDirectionFromVector(final Vector2D v) {
+        Directions d = Directions.RIGHT;
+        if (v.equals(Vector2D.up())) {
+            d = Directions.UP;
+        } else if (v.equals(Vector2D.down())) {
+            d = Directions.DOWN;
+        } else if (v.equals(Vector2D.left())) {
+            d = Directions.LEFT;
+        }
+        return d;
+    }
+
+    /**
+     * Move the colliders based on object's direction.
      */
     protected void moveColliders() {
         for (final Collider c : this.getColliders()) {

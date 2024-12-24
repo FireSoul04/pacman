@@ -19,7 +19,6 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.2);
     private static final Vector2D SPRITE_SIZE = new Vector2D(16, 16);
     private static final Vector2D SIZE = SPRITE_SIZE.dot(0.5);
-    private static final Vector2D SPEED = new Vector2D(1, 1);
 
     private final DirectionalAnimation2D movementAnimations;
     private final Animation2D vulnerableAnimation = new Animation2D("vulnerable", ANIMATION_SPEED);
@@ -27,6 +26,7 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     private final Timer vulnerabiltyTimer = new TimerImpl(VULNERABILITY_TIME);
     private Vector2D currentDirection = Vector2D.right();
     private Vector2D nextDirection = Vector2D.right();
+    private double speed = 1.0;
     private boolean dead = false;
     private boolean vulnerable = false;
 
@@ -36,7 +36,7 @@ public abstract class Ghost extends SolidObject2D implements Movable {
      * @param speed
      */
     public Ghost(final Vector2D position, final String name, final Scene2D scene) {
-        super(position, SPEED, scene, SPRITE_SIZE, SIZE);
+        super(position, scene, SPRITE_SIZE, SIZE);
         this.movementAnimations = new DirectionalAnimation2D(name, ANIMATION_SPEED);
         this.setDrawable(this.movementAnimations.getAnimation(Directions.RIGHT));
     }
@@ -44,17 +44,14 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     @Override
     public void update(final double deltaTime) {
         this.move();
-        final Vector2D imageSize = this.getDrawable().getImageSize();
+        if (this.canMove(this.getDirectionFromVector(this.nextDirection))) {
+            this.currentDirection = this.nextDirection;
+        }
         final Vector2D newPosition = this.getPosition()
-            .add(new Vector2D(
-                this.currentDirection.getX() * this.getSpeed().getX(),
-                this.currentDirection.getY() * this.getSpeed().getY()
-            )
+            .add(this.currentDirection.dot(speed)
             .dot(deltaTime))
-            .wrap(imageSize.invert(), this.getScene().getDimensions());
+            .wrap(SPRITE_SIZE.invert(), this.getScene().getDimensions().add(SPRITE_SIZE));
         this.setPosition(newPosition);
-        //
-
         this.vulnerabiltyTimer.update();
         if (this.vulnerabiltyTimer.isExpired()) {
             this.vulnerable = false;
@@ -69,16 +66,14 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     @Override
     public void onCollide(final Collider collider, final Collider other) {
         final Collidable gameObject = (Collidable) other.getAttachedGameObject();
-        if (gameObject instanceof Player player) {
-            final Directions playerDirection = player.getDirectionFromCollider(other);
-            final Directions ghostDirection = this.getDirectionFromCollider(collider);
-            if (playerDirection.equals(Directions.NONE) && ghostDirection.equals(Directions.NONE)) {
-                if (this.isVulnerable()) {
-                    this.die();
-                } else if (!player.isDead()) {
-                    player.die();
-                }
+        if (gameObject instanceof Player player && this.bodyIsCollidingWithBodyOf(player, collider, other)) {
+            if (this.isVulnerable()) {
+                this.die();
+            } else if (!player.isDead()) {
+                player.die();
             }
+        } else if (gameObject instanceof Wall) {
+            this.checkMove();
         }
     }
 
@@ -149,6 +144,22 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         this.changeVariant(direction);
         animation.start();
         animation.update();
+    }
+
+    protected Vector2D getCurrentDirection() {
+        return this.currentDirection;
+    }
+
+    protected Vector2D getNextDirection() {
+        return this.nextDirection;
+    }
+
+    protected void setCurrentDirection(final Vector2D direction) {
+        this.currentDirection = direction;
+    }
+
+    protected void setNextDirection(final Vector2D direction) {
+        this.nextDirection = direction;
     }
 
     private void changeVariant(final Vector2D direction) {

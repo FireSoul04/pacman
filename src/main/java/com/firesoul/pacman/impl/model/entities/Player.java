@@ -19,17 +19,17 @@ public class Player extends SolidObject2D implements Movable {
     private static final Vector2D SPRITE_SIZE = new Vector2D(16, 16);
     private static final Vector2D SIZE = SPRITE_SIZE.dot(0.5);
     private static final Vector2D START_POSITION = new Vector2D(4, 4).add(SIZE);
-    private static final Vector2D SPEED = new Vector2D(1, 1);
 
     private final InputController input;
     private final DirectionalAnimation2D animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
     private Vector2D currentDirection = Vector2D.right();
     private Vector2D nextDirection = Vector2D.right();
+    private double speed = 1.0;
     private boolean dead = false;
     private int lives = MAX_LIVES;
 
     public Player(final Scene2D scene, final InputController input) {
-        super(START_POSITION, SPEED, scene, SPRITE_SIZE, SIZE);
+        super(START_POSITION, scene, SPRITE_SIZE, SIZE);
         this.input = input;
         this.setDrawable(this.getAnimation(Directions.RIGHT));
     }
@@ -45,14 +45,10 @@ public class Player extends SolidObject2D implements Movable {
     @Override
     public void update(final double deltaTime) {
         this.readInput();
-        final Vector2D imageSize = this.getDrawable().getImageSize();
         final Vector2D newPosition = this.getPosition()
-            .add(new Vector2D(
-                this.currentDirection.getX() * this.getSpeed().getX(),
-                this.currentDirection.getY() * this.getSpeed().getY()
-            )
+            .add(this.currentDirection.dot(this.speed)
             .dot(deltaTime))
-            .wrap(imageSize.invert(), this.getScene().getDimensions());
+            .wrap(SPRITE_SIZE.invert(), this.getScene().getDimensions().add(SPRITE_SIZE));
         this.setPosition(newPosition);
         this.moveColliders();
         this.animate(this.currentDirection);
@@ -93,18 +89,6 @@ public class Player extends SolidObject2D implements Movable {
 
     private void changeVariant(final Vector2D direction) {
         this.setDrawable(this.getAnimation(this.getDirectionFromVector(direction)));
-    }
-
-    private Directions getDirectionFromVector(final Vector2D v) {
-        Directions d = Directions.RIGHT;
-        if (v.equals(Vector2D.up())) {
-            d = Directions.UP;
-        } else if (v.equals(Vector2D.down())) {
-            d = Directions.DOWN;
-        } else if (v.equals(Vector2D.left())) {
-            d = Directions.LEFT;
-        }
-        return d;
     }
     
     private Animation2D getAnimation(final Directions direction) {

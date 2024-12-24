@@ -6,14 +6,8 @@ import java.util.List;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.GameCore;
-import com.firesoul.pacman.impl.model.entities.Ghost;
-import com.firesoul.pacman.impl.model.entities.Pill;
-import com.firesoul.pacman.impl.model.entities.Player;
-import com.firesoul.pacman.impl.model.entities.PowerPill;
-import com.firesoul.pacman.impl.model.entities.ghosts.Blinky;
-import com.firesoul.pacman.impl.model.entities.ghosts.Clyde;
-import com.firesoul.pacman.impl.model.entities.ghosts.Inky;
-import com.firesoul.pacman.impl.model.entities.ghosts.Pinky;
+import com.firesoul.pacman.impl.model.entities.*;
+import com.firesoul.pacman.impl.model.entities.ghosts.*;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 
@@ -45,10 +39,10 @@ public class Pacman {
         this.nextLevelTimer.start();
         this.player = new Player(this.game.getScene(), this.game.getInputController());
         this.ghosts = List.of(
-            new Blinky(this.game.getScene()),
-            new Inky(this.game.getScene()),
-            new Pinky(this.game.getScene()),
-            new Clyde(this.game.getScene())
+            new Blinky(this.game.getScene())//,
+            // new Inky(this.game.getScene()),
+            // new Pinky(this.game.getScene()),
+            // new Clyde(this.game.getScene())
         );
         this.reset();
     }
@@ -155,9 +149,9 @@ public class Pacman {
             ghost.reset();
             this.game.addGameObject(ghost);
         }
-        this.game.addGameObject(new PowerPill(new Vector2D(60, 0), this.game.getScene(), this));
+        this.game.addGameObject(new PowerPill(new Vector2D(60, 16), this));
         for (int i = 0; i < 10; i++) {
-            this.game.addGameObject(new Pill(new Vector2D(100 + i * 16, 0), this.game.getScene()));
+            this.game.addGameObject(new Pill(new Vector2D(100 + i * 16, 16)));
         }
     }
 }

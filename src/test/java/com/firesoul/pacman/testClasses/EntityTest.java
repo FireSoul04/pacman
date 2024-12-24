@@ -8,7 +8,6 @@ import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.impl.model.GameObject2D;
-import com.firesoul.pacman.impl.model.Scene2D;
 import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 
@@ -18,9 +17,11 @@ public class EntityTest extends GameObject2D implements Movable, Collidable {
 
     private BiConsumer<EntityTest, Double> test;
     private final Collider collider;
+    private final Vector2D speed;
     
     public EntityTest(final Vector2D position, final Vector2D speed) {
-        super(position, speed);
+        super(position);
+        this.speed = speed;
         this.collider = new BoxCollider2D(this, HITBOX_SIZE);
     }
 
@@ -47,7 +48,11 @@ public class EntityTest extends GameObject2D implements Movable, Collidable {
     public String toString() {
         return this.getClass().getSimpleName() + " [" +
             "pos: " + this.getPosition() + ", " +
-            "speed: " + this.getSpeed() + "]";
+            "speed: " + this.speed + "]";
+    }
+
+    public Vector2D getSpeed() {
+        return this.speed;
     }
 
     public void setTestPosition(final Vector2D position) {

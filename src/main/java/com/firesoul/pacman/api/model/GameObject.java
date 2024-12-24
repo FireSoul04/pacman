@@ -14,11 +14,6 @@ public interface GameObject extends Serializable {
     Vector2D getPosition();
 
     /**
-     * @return Game object's speed
-     */
-    Vector2D getSpeed();
-
-    /**
      * @return Scene where the game object is
      */
     Scene2D getScene();
