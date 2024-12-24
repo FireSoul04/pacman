@@ -7,6 +7,7 @@ import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.model.Pacman;
+import com.firesoul.pacman.impl.model.Scene2D;
 import com.firesoul.pacman.impl.model.Pacman.Directions;
 import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.Vector2D;
@@ -21,8 +22,8 @@ public class PowerPill extends GameObject2D implements Collidable {
      * Create a pill that if eaten by pacman ghosts are vulnerable
      * @param position
      */
-    public PowerPill(final Vector2D position, final Pacman pacman) {
-        super(position, Vector2D.zero(), new Sprite2D("powerpill"));
+    public PowerPill(final Vector2D position, final Scene2D scene, final Pacman pacman) {
+        super(position, Vector2D.zero(), scene, new Sprite2D("powerpill"));
         this.collider = new BoxCollider2D(this, new Vector2D(8, 8));
         this.pacman = pacman;
     }

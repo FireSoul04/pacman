@@ -155,9 +155,9 @@ public class Pacman {
             ghost.reset();
             this.game.addGameObject(ghost);
         }
-        this.game.addGameObject(new PowerPill(new Vector2D(60, 0), this));
+        this.game.addGameObject(new PowerPill(new Vector2D(60, 0), this.game.getScene(), this));
         for (int i = 0; i < 10; i++) {
-            this.game.addGameObject(new Pill(new Vector2D(100 + i * 16, 0)));
+            this.game.addGameObject(new Pill(new Vector2D(100 + i * 16, 0), this.game.getScene()));
         }
     }
 }

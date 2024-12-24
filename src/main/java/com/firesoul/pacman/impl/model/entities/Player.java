@@ -1,22 +1,18 @@
 package com.firesoul.pacman.impl.model.entities;
 
-import java.util.*;
-
-import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.InputController;
 import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.model.Scene2D;
-import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
-import com.firesoul.pacman.impl.model.entities.colliders.ColliderCenterLayout;
+import com.firesoul.pacman.impl.model.SolidObject2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
 import com.firesoul.pacman.impl.view.DirectionalAnimation2D;
 import com.firesoul.pacman.impl.model.Pacman.Directions;
 
-public class Player extends GameObject2D implements Movable, Collidable {
+public class Player extends SolidObject2D implements Movable {
 
     private static final int MAX_LIVES = 3;
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.1);
@@ -25,12 +21,6 @@ public class Player extends GameObject2D implements Movable, Collidable {
     private static final Vector2D START_POSITION = new Vector2D(4, 4).add(SIZE);
     private static final Vector2D SPEED = new Vector2D(1, 1);
 
-    /**
-     * Colliders for directions are placed in every edge of the sprite of pacman
-     */
-    private final Set<Directions> move = new HashSet<>();
-    private final Map<Directions, Collider> colliders;
-    private final Scene2D scene;
     private final InputController input;
     private final DirectionalAnimation2D animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
     private Vector2D currentDirection = Vector2D.right();
@@ -39,37 +29,16 @@ public class Player extends GameObject2D implements Movable, Collidable {
     private int lives = MAX_LIVES;
 
     public Player(final Scene2D scene, final InputController input) {
-        super(START_POSITION, SPEED);
-        this.scene = scene;
+        super(START_POSITION, SPEED, scene, SPRITE_SIZE, SIZE);
         this.input = input;
         this.setDrawable(this.getAnimation(Directions.RIGHT));
-
-        final Vector2D sizeHorizontal = new Vector2D(SPRITE_SIZE.getX() - 1, 1);
-        final Vector2D sizeVertical = new Vector2D(1, SPRITE_SIZE.getY() - 1);
-        this.colliders = new HashMap<>(Map.of(
-            Directions.NONE, new BoxCollider2D(this, SIZE, new ColliderCenterLayout()),
-            Directions.UP, new BoxCollider2D(this, sizeHorizontal, 
-                (g, s) -> g.getPosition().add(Vector2D.up()).sub(SIZE).add(new Vector2D(0.5, 0.5))),
-            Directions.DOWN, new BoxCollider2D(this, sizeHorizontal, 
-                (g, s) -> g.getPosition().add(Vector2D.down()).add(sizeVertical.sub(new Vector2D(0.5, 0.5))).sub(SIZE)),
-            Directions.LEFT, new BoxCollider2D(this, sizeVertical, 
-                (g, s) -> g.getPosition().add(Vector2D.left()).sub(SIZE).add(new Vector2D(0.5, 0.5))),
-            Directions.RIGHT, new BoxCollider2D(this, sizeVertical, 
-                (g, s) -> g.getPosition().add(Vector2D.right()).add(sizeHorizontal.sub(new Vector2D(0.5, 0.5))).sub(SIZE))
-        ));
     }
 
     @Override
     public void onCollide(final Collider collider, final Collider other) {
         final GameObject2D gameObject = other.getAttachedGameObject();
         if (gameObject instanceof Wall) {
-            this.colliders.forEach((k, v) -> {
-                if (!k.equals(Directions.NONE)) {
-                    if (v.hasCollidedLastFrame()) {
-                        this.move.add(k);
-                    }
-                }
-            });
+            this.checkMove();
         }
     }
 
@@ -83,17 +52,10 @@ public class Player extends GameObject2D implements Movable, Collidable {
                 this.currentDirection.getY() * this.getSpeed().getY()
             )
             .dot(deltaTime))
-            .wrap(imageSize.invert(), this.scene.getDimensions());
+            .wrap(imageSize.invert(), this.getScene().getDimensions());
         this.setPosition(newPosition);
         this.moveColliders();
         this.animate(this.currentDirection);
-    }
-
-    private void moveColliders() {
-        for (final Collider c : this.getColliders()) {
-            c.update();
-            this.move.clear();
-        }
     }
 
     private void readInput() {
@@ -109,10 +71,10 @@ public class Player extends GameObject2D implements Movable, Collidable {
         if (this.input.getEvent("MoveRight")) {
             this.nextDirection = Vector2D.right();
         }
-        if (this.move.contains(this.getDirectionFromVector(this.currentDirection))) {
+        if (!this.canMove(this.getDirectionFromVector(this.currentDirection))) {
             this.currentDirection = Vector2D.zero();
         }
-        if (!this.move.contains(this.getDirectionFromVector(this.nextDirection))) {
+        if (this.canMove(this.getDirectionFromVector(this.nextDirection))) {
             this.currentDirection = this.nextDirection;
         }
     }
@@ -150,33 +112,11 @@ public class Player extends GameObject2D implements Movable, Collidable {
     }
 
     @Override
-    public List<Collider> getColliders() {
-        return Collections.unmodifiableList(this.colliders
-            .values()
-            .stream()
-            .toList());
-    }
-
-    @Override
     public void pause() {
     }
 
     @Override
     public void wake() {
-    }
-
-    /**
-     * @param other
-     * @return the directions of the collier
-     */
-    public Directions getDirectionFromCollider(final Collider other) {
-        Directions d = Directions.NONE;
-        for (final var entry : this.colliders.entrySet()) {
-            if (entry.getValue().equals(other)) {
-                d = entry.getKey();
-            }
-        }
-        return d;
     }
 
     /**

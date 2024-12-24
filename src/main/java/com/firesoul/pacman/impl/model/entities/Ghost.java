@@ -1,22 +1,18 @@
 package com.firesoul.pacman.impl.model.entities;
 
-import java.util.*;
-
 import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
-import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.model.Scene2D;
-import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
-import com.firesoul.pacman.impl.model.entities.colliders.ColliderCenterLayout;
+import com.firesoul.pacman.impl.model.SolidObject2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
 import com.firesoul.pacman.impl.view.DirectionalAnimation2D;
 import com.firesoul.pacman.impl.model.Pacman.Directions;
 
-public abstract class Ghost extends GameObject2D implements Movable, Collidable {
+public abstract class Ghost extends SolidObject2D implements Movable {
 
     private static final long VULNERABILITY_START_BLINKING_TIME = Timer.secondsToMillis(3);
     private static final long VULNERABILITY_TIME = Timer.secondsToMillis(5);
@@ -25,13 +21,12 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
     private static final Vector2D SIZE = SPRITE_SIZE.dot(0.5);
     private static final Vector2D SPEED = new Vector2D(1, 1);
 
-    private final Set<Directions> move = new HashSet<>();
-    private final Map<Directions, Collider> colliders;
-    private final Scene2D scene;
     private final DirectionalAnimation2D movementAnimations;
     private final Animation2D vulnerableAnimation = new Animation2D("vulnerable", ANIMATION_SPEED);
     private final Animation2D vulnerableAnimationBlinking = new Animation2D("vulnerable_blinking", ANIMATION_SPEED);
     private final Timer vulnerabiltyTimer = new TimerImpl(VULNERABILITY_TIME);
+    private Vector2D currentDirection = Vector2D.right();
+    private Vector2D nextDirection = Vector2D.right();
     private boolean dead = false;
     private boolean vulnerable = false;
 
@@ -41,40 +36,22 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
      * @param speed
      */
     public Ghost(final Vector2D position, final String name, final Scene2D scene) {
-        super(position, SPEED);
-        this.scene = scene;
+        super(position, SPEED, scene, SPRITE_SIZE, SIZE);
         this.movementAnimations = new DirectionalAnimation2D(name, ANIMATION_SPEED);
         this.setDrawable(this.movementAnimations.getAnimation(Directions.RIGHT));
-
-        final Vector2D sizeHorizontal = new Vector2D(SPRITE_SIZE.getX() - 1, 1);
-        final Vector2D sizeVertical = new Vector2D(1, SPRITE_SIZE.getY() - 1);
-        this.colliders = new HashMap<>(Map.of(
-            Directions.NONE, new BoxCollider2D(this, SIZE, new ColliderCenterLayout()),
-            Directions.UP, new BoxCollider2D(this, sizeHorizontal, 
-                (g, s) -> g.getPosition().add(Vector2D.up()).sub(SIZE).add(new Vector2D(0.5, 0.5))),
-            Directions.DOWN, new BoxCollider2D(this, sizeHorizontal, 
-                (g, s) -> g.getPosition().add(Vector2D.down()).add(sizeVertical.sub(new Vector2D(0.5, 0.5))).sub(SIZE)),
-            Directions.LEFT, new BoxCollider2D(this, sizeVertical, 
-                (g, s) -> g.getPosition().add(Vector2D.left()).sub(SIZE).add(new Vector2D(0.5, 0.5))),
-            Directions.RIGHT, new BoxCollider2D(this, sizeVertical, 
-                (g, s) -> g.getPosition().add(Vector2D.right()).add(sizeHorizontal.sub(new Vector2D(0.5, 0.5))).sub(SIZE))
-        ));
     }
 
     @Override
     public void update(final double deltaTime) {
         this.move();
-
-        // TODO
-        final Vector2D direction = Vector2D.left();
         final Vector2D imageSize = this.getDrawable().getImageSize();
         final Vector2D newPosition = this.getPosition()
             .add(new Vector2D(
-                direction.getX() * this.getSpeed().getX(),
-                direction.getY() * this.getSpeed().getY()
+                this.currentDirection.getX() * this.getSpeed().getX(),
+                this.currentDirection.getY() * this.getSpeed().getY()
             )
             .dot(deltaTime))
-            .wrap(imageSize.invert(), this.scene.getDimensions());
+            .wrap(imageSize.invert(), this.getScene().getDimensions());
         this.setPosition(newPosition);
         //
 
@@ -83,14 +60,7 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
             this.vulnerable = false;
         }
         this.moveColliders();
-        this.animate(direction);
-    }
-
-    private void moveColliders() {
-        for (final Collider c : this.getColliders()) {
-            c.update();
-            this.move.clear();
-        }
+        this.animate(this.currentDirection);
     }
 
     /**
@@ -112,14 +82,6 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         }
     }
 
-    @Override
-    public List<Collider> getColliders() {
-        return Collections.unmodifiableList(this.colliders
-            .values()
-            .stream()
-            .toList());
-    }
-
     /**
      * Stop the vulnerability timer on pause, if it's started.
      */
@@ -138,20 +100,6 @@ public abstract class Ghost extends GameObject2D implements Movable, Collidable 
         if (this.isVulnerable()) {
             this.vulnerabiltyTimer.start();
         }
-    }
-
-    /**
-     * @param other
-     * @return the directions of the collier
-     */
-    public Directions getDirectionFromCollider(final Collider other) {
-        Directions d = Directions.NONE;
-        for (final var entry : this.colliders.entrySet()) {
-            if (entry.getValue().equals(other)) {
-                d = entry.getKey();
-            }
-        }
-        return d;
     }
 
     /**

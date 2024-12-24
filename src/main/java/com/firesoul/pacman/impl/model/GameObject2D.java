@@ -10,6 +10,7 @@ public class GameObject2D implements GameObject {
 
     private Vector2D position;
     private Vector2D speed;
+    private Scene2D scene;
     private Drawable drawable;
     private boolean visible;
     private boolean active;
@@ -18,12 +19,14 @@ public class GameObject2D implements GameObject {
      * Create a new GameObject2D with a method to render it.
      * @param position
      * @param speed
+     * @param scene
      * @param drawable
      */
-    public GameObject2D(final Vector2D position, final Vector2D speed, final Drawable drawable) {
+    public GameObject2D(final Vector2D position, final Vector2D speed, final Scene2D scene, final Drawable drawable) {
         this.drawable = drawable;
         this.position = position;
         this.speed = speed;
+        this.scene = scene;
         this.visible = true;
         this.active = true;
     }
@@ -32,7 +35,12 @@ public class GameObject2D implements GameObject {
      * Create a new GameObject2D without a method to render it.
      * @param position
      * @param speed
+     * @param scene
      */
+    public GameObject2D(final Vector2D position, final Vector2D speed, final Scene2D scene) {
+        this(position, speed, scene, null);
+    }
+
     public GameObject2D(final Vector2D position, final Vector2D speed) {
         this(position, speed, null);
     }
@@ -48,24 +56,18 @@ public class GameObject2D implements GameObject {
     }
 
     @Override
+    public Scene2D getScene() {
+        return this.scene;
+    }
+
+    @Override
     public Drawable getDrawable() {
         return this.drawable;
     }
 
-    /**
-     * Default method doesn't do anything. Override to make use of this.
-     */
     @Override
-    public void pause() {
-        
-    }
-
-    /**
-     * Default method doesn't do anything. Override to make use of this.
-     */
-    @Override
-    public void wake() {
-        
+    public void setScene(final Scene2D scene) {
+        this.scene = scene;
     }
 
     @Override
@@ -86,6 +88,20 @@ public class GameObject2D implements GameObject {
     @Override
     public boolean isVisible() {
         return this.visible;
+    }
+
+    /**
+     * Default method doesn't do anything. Override to make use of this.
+     */
+    @Override
+    public void pause() {
+    }
+
+    /**
+     * Default method doesn't do anything. Override to make use of this.
+     */
+    @Override
+    public void wake() {
     }
 
     /**

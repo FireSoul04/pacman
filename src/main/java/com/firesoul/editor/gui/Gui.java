@@ -130,7 +130,7 @@ public class Gui extends JFrame implements MouseListener {
             os.writeObject(new Vector2D(WIDTH, HEIGHT));
 
             final List<GameObject> gameObjects = new ArrayList<>();
-            this.rects.forEach(t -> gameObjects.add(new Wall(new Vector2D(t.x, t.y), new Vector2D(t.width, t.height))));
+            this.rects.forEach(t -> gameObjects.add(new Wall(new Vector2D(t.x, t.y), null, new Vector2D(t.width, t.height))));
 
             os.writeObject(gameObjects);
         } catch (IOException e) {

@@ -3,6 +3,7 @@ package com.firesoul.pacman.api.model;
 import java.io.Serializable;
 
 import com.firesoul.pacman.api.view.Drawable;
+import com.firesoul.pacman.impl.model.Scene2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public interface GameObject extends Serializable {
@@ -18,9 +19,19 @@ public interface GameObject extends Serializable {
     Vector2D getSpeed();
 
     /**
-     * @return Game object's drawable representation.
+     * @return Scene where the game object is
+     */
+    Scene2D getScene();
+
+    /**
+     * @return Game object's drawable representation
      */
     Drawable getDrawable();
+
+    /**
+     * @param scene where to move the game object
+     */
+    void setScene(Scene2D scene);
 
     /**
      * Pause all the timers attached to this game object.
@@ -43,12 +54,12 @@ public interface GameObject extends Serializable {
     void enable();
 
     /**
-     * @return Game object's activity.
+     * @return Game object's activity
      */
     boolean isActive();
 
     /**
-     * @return Game object's visibility.
+     * @return Game object's visibility
      */
     boolean isVisible();
 }
