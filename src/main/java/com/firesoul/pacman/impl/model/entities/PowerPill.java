@@ -13,16 +13,19 @@ import com.firesoul.pacman.impl.view.Sprite2D;
 
 public class PowerPill extends GameObject2D implements Collidable {
 
-    private final Pacman pacman;
+    private Pacman pacman;
     private final Collider collider;
 
     /**
      * Create a pill that if eaten by pacman ghosts are vulnerable
      * @param position
      */
-    public PowerPill(final Vector2D position, final Pacman pacman) {
+    public PowerPill(final Vector2D position) {
         super(position, new Sprite2D("powerpill"));
         this.collider = new BoxCollider2D(this, new Vector2D(8, 8));
+    }
+
+    public void connectToGameLogic(final Pacman pacman) {
         this.pacman = pacman;
     }
 

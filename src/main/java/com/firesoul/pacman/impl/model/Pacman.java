@@ -37,13 +37,13 @@ public class Pacman {
     public void init() {
         this.level = 1;
         this.nextLevelTimer.start();
-        this.player = new Player(this.game.getScene(), this.game.getInputController());
-        this.ghosts = List.of(
-            new Blinky(this.game.getScene())//,
-            // new Inky(this.game.getScene()),
-            // new Pinky(this.game.getScene()),
-            // new Clyde(this.game.getScene())
-        );
+        // this.player = new Player(this.game.getScene(), this.game.getInputController());
+        // this.ghosts = List.of(
+        //     new Blinky(this.game.getScene()),
+        //     new Inky(this.game.getScene()),
+        //     new Pinky(this.game.getScene()),
+        //     new Clyde(this.game.getScene())
+        // );
         this.reset();
     }
 
@@ -115,7 +115,7 @@ public class Pacman {
 
     private void checkDeadGhosts() {
         for (final GameObject g : this.game.getGameObjects()) {
-            if (g instanceof Ghost && ((Ghost) g).isDead()) {
+            if (g instanceof Ghost gh && gh.isDead()) {
                 g.disable();
             }
         }
@@ -126,8 +126,8 @@ public class Pacman {
      */
     public void setGhostVulnerable() {
         for (final GameObject g : this.game.getGameObjects()) {
-            if (g instanceof Ghost) {
-                ((Ghost) g).setVulnerable();
+            if (g instanceof Ghost gh) {
+                gh.setVulnerable();
             }
         }
     }
@@ -143,15 +143,15 @@ public class Pacman {
      * Resets all the gameObjects of the scene.
      */
     public void reset() {
-        this.player.reset();
-        this.game.addGameObject(this.player);
-        for (final Ghost ghost : this.ghosts) {
-            ghost.reset();
-            this.game.addGameObject(ghost);
-        }
-        this.game.addGameObject(new PowerPill(new Vector2D(60, 16), this));
-        for (int i = 0; i < 10; i++) {
-            this.game.addGameObject(new Pill(new Vector2D(100 + i * 16, 16)));
-        }
+        // this.player.reset();
+        // this.game.addGameObject(this.player);
+        // for (final Ghost ghost : this.ghosts) {
+        //     ghost.reset();
+        //     this.game.addGameObject(ghost);
+        // }
+        // this.game.addGameObject(new PowerPill(new Vector2D(60, 16), this));
+        // for (int i = 0; i < 10; i++) {
+        //     this.game.addGameObject(new Pill(new Vector2D(100 + i * 16, 16)));
+        // }
     }
 }

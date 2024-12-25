@@ -4,7 +4,6 @@ import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
-import com.firesoul.pacman.impl.model.Scene2D;
 import com.firesoul.pacman.impl.model.SolidObject2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
@@ -35,8 +34,8 @@ public abstract class Ghost extends SolidObject2D implements Movable {
      * @param position
      * @param speed
      */
-    public Ghost(final Vector2D position, final String name, final Scene2D scene) {
-        super(position, scene, SPRITE_SIZE, SIZE);
+    public Ghost(final Vector2D position, final String name) {
+        super(position, SPRITE_SIZE, SIZE);
         this.movementAnimations = new DirectionalAnimation2D(name, ANIMATION_SPEED);
         this.setDrawable(this.movementAnimations.getAnimation(Directions.RIGHT));
     }

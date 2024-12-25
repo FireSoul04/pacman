@@ -1,6 +1,5 @@
 package com.firesoul.pacman.impl.model.entities.ghosts;
 
-import com.firesoul.pacman.impl.model.Scene2D;
 import com.firesoul.pacman.impl.model.entities.Ghost;
 import com.firesoul.pacman.impl.util.Vector2D;
 
@@ -10,9 +9,8 @@ import java.util.Random;
 import com.firesoul.pacman.impl.model.Pacman.Directions;
 
 public class Blinky extends Ghost {
-    
-    private static final Vector2D START_POSITION = new Vector2D(52, 116);
-    
+
+    private final Vector2D startPosition;
     private List<Directions> allDirections = List.of(
         Directions.UP,
         Directions.DOWN,
@@ -22,10 +20,10 @@ public class Blinky extends Ghost {
 
     /**
      * Creates Blinky, the red ghost.
-     * @param scene where it belongs
      */
-    public Blinky(final Scene2D scene) {
-        super(START_POSITION, "blinky", scene);
+    public Blinky(final Vector2D position) {
+        super(position, "blinky");
+        this.startPosition = position;
     }
 
     @Override
@@ -69,6 +67,6 @@ public class Blinky extends Ghost {
     
     public void reset() {
         this.setDrawable(this.getAnimation(Directions.RIGHT));
-        this.setPosition(START_POSITION);
+        this.setPosition(this.startPosition);
     }
 }

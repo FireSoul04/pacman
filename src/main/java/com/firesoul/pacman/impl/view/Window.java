@@ -59,7 +59,6 @@ public class Window extends JFrame implements Renderer {
     @Override
     public synchronized void init() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLocationRelativeTo(null);
         this.getContentPane().add(this.canvas);
         this.getContentPane().setPreferredSize(new Dimension((int) (this.width * this.scaleX), (int) (this.height * this.scaleY)));
         this.setVisible(true);
@@ -121,9 +120,8 @@ public class Window extends JFrame implements Renderer {
     final Color color = new Color(1, 0, 0, 0.5f);
     private void drawColliders(final GameObject g) {
         this.graphics.setColor(color);
-        if (g instanceof Collidable) {
-            Collidable collidable = (Collidable) g;
-            for (Collider c : collidable.getColliders()) {
+        if (g instanceof Collidable collidable) {
+            for (final Collider c : collidable.getColliders()) {
                 int cx = (int) c.getPosition().dot(this.scaleX).getX();
                 int cy = (int) c.getPosition().dot(this.scaleY).getY();
                 int cw = (int) c.getDimensions().dot(this.scaleX).getX();

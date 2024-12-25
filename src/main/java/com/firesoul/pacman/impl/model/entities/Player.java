@@ -5,7 +5,6 @@ import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.InputController;
 import com.firesoul.pacman.impl.model.GameObject2D;
-import com.firesoul.pacman.impl.model.Scene2D;
 import com.firesoul.pacman.impl.model.SolidObject2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
@@ -18,19 +17,19 @@ public class Player extends SolidObject2D implements Movable {
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.1);
     private static final Vector2D SPRITE_SIZE = new Vector2D(16, 16);
     private static final Vector2D SIZE = SPRITE_SIZE.dot(0.5);
-    private static final Vector2D START_POSITION = new Vector2D(4, 4).add(SIZE);
 
-    private final InputController input;
     private final DirectionalAnimation2D animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
+    private final Vector2D startPosition;
+    private InputController input;
     private Vector2D currentDirection = Vector2D.right();
     private Vector2D nextDirection = Vector2D.right();
     private double speed = 1.0;
     private boolean dead = false;
     private int lives = MAX_LIVES;
 
-    public Player(final Scene2D scene, final InputController input) {
-        super(START_POSITION, scene, SPRITE_SIZE, SIZE);
-        this.input = input;
+    public Player(final Vector2D position) {
+        super(position, SPRITE_SIZE, SIZE);
+        this.startPosition = position;
         this.setDrawable(this.getAnimation(Directions.RIGHT));
     }
 
@@ -52,6 +51,10 @@ public class Player extends SolidObject2D implements Movable {
         this.setPosition(newPosition);
         this.moveColliders();
         this.animate(this.currentDirection);
+    }
+
+    public void addInput(final InputController input) {
+        this.input = input;
     }
 
     private void readInput() {
@@ -108,7 +111,7 @@ public class Player extends SolidObject2D implements Movable {
      */
     public void reset() {
         this.setDrawable(this.getAnimation(Directions.RIGHT));
-        this.setPosition(Player.START_POSITION);
+        this.setPosition(this.startPosition);
         this.dead = false;
     }
 

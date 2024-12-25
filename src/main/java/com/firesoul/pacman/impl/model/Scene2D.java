@@ -10,6 +10,7 @@ import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
+import com.firesoul.pacman.impl.model.entities.PowerPill;
 import com.firesoul.pacman.impl.model.entities.Wall;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
@@ -24,17 +25,22 @@ public class Scene2D implements Room {
     private final List<GameObject> gameObjects = new ArrayList<GameObject>();
     private final List<Collidable> cachedCollidables = new ArrayList<Collidable>();
     private final Map2D map;
+    private Pacman pacman;
 
     /**
      * Default constructor for a room with no entities or blocks.
      */
     public Scene2D() {
-        this(Scene2D.DEFAULT_WIDTH, Scene2D.DEFAULT_HEIGHT);
+        this(DEFAULT_WIDTH, DEFAULT_HEIGHT);
     }
 
     public Scene2D(final int width, final int height) {
         this.map = new Map2D(width, height);
         this.collisionTimer.start();
+    }
+
+    public void connectToGameLogic(final Pacman pacman) {
+        this.pacman = pacman;
     }
 
     /**
@@ -48,8 +54,8 @@ public class Scene2D implements Room {
         this.collisionTimer.start();
         
         for (final GameObject g : this.map.getGameObjects()) {
-            if (g instanceof Wall) {
-                ((Wall)g).setDrawable(new Invisible2D(((Wall)g).getColliders().get(0).getDimensions()));
+            if (g instanceof Wall w) {
+                w.setDrawable(new Invisible2D(w.getColliders().get(0).getDimensions()));
             }
             this.addGameObject(g);
         }
@@ -58,8 +64,8 @@ public class Scene2D implements Room {
     @Override
     public void updateAll(final double deltaTime) {
         for (final GameObject gameObject : this.gameObjects) {
-            if (gameObject instanceof Movable) {
-                ((Movable) gameObject).update(deltaTime);
+            if (gameObject instanceof Movable movable) {
+                movable.update(deltaTime);
             }
         }
         this.removeInactiveGameObjects();
@@ -82,17 +88,20 @@ public class Scene2D implements Room {
 
     @Override
     public void addGameObject(final GameObject gameObject) {
+        gameObject.setScene(this);
         this.gameObjects.add(gameObject);
-        if (gameObject instanceof Collidable) {
-            this.cachedCollidables.add((Collidable) gameObject);
+        if (gameObject instanceof Collidable collidable) {
+            this.cachedCollidables.add(collidable);
+        } else if (gameObject instanceof PowerPill powerPill) {
+            powerPill.connectToGameLogic(this.pacman);
         }
     }
 
     @Override
     public void removeGameObject(final GameObject gameObject) {
         this.gameObjects.remove(gameObject);
-        if (gameObject instanceof Collidable) {
-            this.cachedCollidables.remove((Collidable) gameObject);
+        if (gameObject instanceof Collidable collidable) {
+            this.cachedCollidables.remove(collidable);
         }
     }
 
@@ -117,8 +126,8 @@ public class Scene2D implements Room {
             final GameObject gameObject = it.next();
             if (!gameObject.isActive()) {
                 it.remove();
-                if (gameObject instanceof Collidable) {
-                    this.cachedCollidables.remove((Collidable) gameObject);
+                if (gameObject instanceof Collidable collidable) {
+                    this.cachedCollidables.remove(collidable);
                 }
             }
         }

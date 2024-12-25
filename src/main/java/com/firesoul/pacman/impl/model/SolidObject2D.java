@@ -34,6 +34,10 @@ public class SolidObject2D extends GameObject2D implements Collidable {
         ));
     }
 
+    public SolidObject2D(final Vector2D position, final Vector2D spriteSize, final Vector2D objectSize) {
+        this(position, null, spriteSize, objectSize);
+    }
+
     @Override
     public void onCollide(final Collider collider, final Collider other) {
     }

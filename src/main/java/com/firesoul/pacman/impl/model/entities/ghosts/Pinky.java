@@ -1,20 +1,19 @@
 package com.firesoul.pacman.impl.model.entities.ghosts;
 
-import com.firesoul.pacman.impl.model.Scene2D;
 import com.firesoul.pacman.impl.model.entities.Ghost;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.model.Pacman.Directions;
 
 public class Pinky extends Ghost {
     
-    private static final Vector2D START_POSITION = new Vector2D(12, 64);
+    private final Vector2D startPosition;
 
     /**
      * Creates Pinky, the pink ghost.
-     * @param scene where it belongs
      */
-    public Pinky(final Scene2D scene) {
-        super(START_POSITION, "pinky", scene);
+    public Pinky(final Vector2D position) {
+        super(position, "pinky");
+        this.startPosition = position;
     }
 
     @Override
@@ -24,6 +23,6 @@ public class Pinky extends Ghost {
     
     public void reset() {
         this.setDrawable(this.getAnimation(Directions.RIGHT));
-        this.setPosition(START_POSITION);
+        this.setPosition(startPosition);
     }
 }
