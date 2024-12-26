@@ -20,12 +20,14 @@ public class Pacman {
         RIGHT
     }
 
+    private static final int MAX_LIVES = 3;
     private static final String MAP_PATH = "src/main/resources/map/map.txt";
 
     private final GameCore game;
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final List<Ghost> ghosts = new ArrayList<>();
+    private int lives = MAX_LIVES;
     private Player player;
     private Scene2D scene;
     
@@ -33,13 +35,12 @@ public class Pacman {
 
     public Pacman(final GameCore game) {
         this.game = game;
-        this.scene = new Scene2D(MAP_PATH);
     }
 
     public void init() {
         this.level = 1;
         this.nextLevelTimer.start();
-        this.createScene();
+        this.reset();
     }
 
     public void update(final double deltaTime) {
@@ -74,14 +75,14 @@ public class Pacman {
 
     private void checkPlayerDeath() {
         if (this.player.isDead()) {
-            GameCore.log("Player is dead, lives remaining: " + this.player.getLives());
+            GameCore.log("Player is dead, lives remaining: " + this.lives);
             this.reset();
             this.liveLostTimer.restart();
         }
     }
 
     private void checkGameOver() {
-        if (this.player.getLives() <= 0) {
+        if (this.lives <= 0) {
             this.game.gameOver();
         }
     }
@@ -171,40 +172,26 @@ public class Pacman {
         return this.level;
     }
 
+    public void playerDie() {
+        this.lives--;
+    }
+
     private void reset() {
-        Player oldPlayer = this.loadGameObjects(p -> {
-            this.player.addInput(this.game.getInputController());
-            this.player.reset();
-        });
-        this.scene.removeGameObject(oldPlayer);
-        this.scene.addGameObject(this.player);
-    }
-
-    private void createScene() {
-        this.loadGameObjects(p -> {
-            p.addInput(this.game.getInputController());
-            this.player = p;
-        });
-        if (this.player == null) {
-            throw new IllegalStateException("Cannot find player in this scene");
-        } else if (this.ghosts.size() != 4) {
-            throw new IllegalStateException("One or more ghosts are missing in this scene");
-        }
-    }
-
-    private Player loadGameObjects(java.util.function.Consumer<Player> fun) {
-        Player player = null;
         this.scene = new Scene2D(MAP_PATH);
         for (final GameObject g : this.getGameObjects()) {
             if (g instanceof Player p) {
-                player = p;
-                fun.accept(p);
+                p.addInput(this.game.getInputController());
+                this.player = p;
             } else if (g instanceof Ghost gh) {
                 this.ghosts.add(gh);
             } else if (g instanceof PowerPill pl) {
                 pl.connectToGameLogic(this);
             }
         }
-        return player;
+        if (this.player == null) {
+            throw new IllegalStateException("Cannot find player in this scene");
+        } else if (this.ghosts.size() != 4) {
+            throw new IllegalStateException("One or more ghosts are missing in this scene");
+        }
     }
 }

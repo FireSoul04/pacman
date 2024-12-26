@@ -186,11 +186,6 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     }
 
     /**
-     * Reset the ghost position.
-     */
-    public abstract void reset();
-
-    /**
      * Move based on specific ghost.
      */
     protected abstract void move();

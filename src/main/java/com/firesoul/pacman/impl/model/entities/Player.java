@@ -13,23 +13,19 @@ import com.firesoul.pacman.impl.model.Pacman.Directions;
 
 public class Player extends SolidObject2D implements Movable {
 
-    private static final int MAX_LIVES = 3;
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.1);
     private static final Vector2D SPRITE_SIZE = new Vector2D(16, 16);
     private static final Vector2D SIZE = SPRITE_SIZE.dot(0.5);
 
     private final DirectionalAnimation2D animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
-    private final Vector2D startPosition;
     private InputController input;
     private Vector2D currentDirection = Vector2D.right();
     private Vector2D nextDirection = Vector2D.right();
     private double speed = 1.0;
     private boolean dead = false;
-    private int lives = MAX_LIVES;
 
     public Player(final Vector2D position) {
         super(position, SPRITE_SIZE, SIZE);
-        this.startPosition = position;
         this.setDrawable(this.getAnimation(Directions.RIGHT));
     }
 
@@ -107,20 +103,11 @@ public class Player extends SolidObject2D implements Movable {
     }
 
     /**
-     * Reset the player.
-     */
-    public void reset() {
-        this.setDrawable(this.getAnimation(Directions.RIGHT));
-        this.setPosition(this.startPosition);
-        this.dead = false;
-    }
-
-    /**
      * The player dies.
      */
     public void die() {
         this.dead = true;
-        this.lives--;
+        // this.lives--;
     }
 
     /**
@@ -130,10 +117,10 @@ public class Player extends SolidObject2D implements Movable {
         return this.dead;
     }
 
-    /**
-     * @return player's lives.
-     */
-    public int getLives() {
-        return this.lives;
-    }
+    // /**
+    //  * @return player's lives.
+    //  */
+    // public int getLives() {
+    //     return this.lives;
+    // }
 }

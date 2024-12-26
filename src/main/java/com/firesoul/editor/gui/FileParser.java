@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class FileParser {
@@ -25,7 +24,7 @@ public class FileParser {
         this.mapPath = mapPath;
     }
 
-    public synchronized void save(final Map<Pair<Vector2D, Vector2D>, Class<? extends GameObject>> gameObjects) {
+    public synchronized void save(final Map<Pair<Vector2D, Vector2D>, String> gameObjects) {
         try (ObjectOutputStream os = new ObjectOutputStream(
             new FileOutputStream(this.mapPath)
         )) {
@@ -39,8 +38,8 @@ public class FileParser {
     }
 
     @SuppressWarnings("unchecked")
-    public synchronized Map<Pair<Vector2D, Vector2D>, Class<? extends GameObject>> load() {
-        final Map<Pair<Vector2D, Vector2D>, Class<? extends GameObject>> gameObjects = new HashMap<>();
+    public synchronized Map<Pair<Vector2D, Vector2D>, String> load() {
+        final Map<Pair<Vector2D, Vector2D>, String> gameObjects = new HashMap<>();
         try (
             final ObjectInputStream reader = new ObjectInputStream(
                 new FileInputStream(this.mapPath)
@@ -48,7 +47,7 @@ public class FileParser {
         ) {
             if (Files.size(Path.of(this.mapPath)) > 0) {
                 reader.readObject();
-                gameObjects.putAll((Map<Pair<Vector2D, Vector2D>, Class<? extends GameObject>>) reader.readObject());
+                gameObjects.putAll((Map<Pair<Vector2D, Vector2D>, String>) reader.readObject());
             }
         } catch (final IOException | ClassNotFoundException e) {
             System.out.println("Cannot read file: " + e);

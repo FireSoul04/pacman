@@ -10,7 +10,6 @@ import com.firesoul.pacman.impl.model.Pacman.Directions;
 
 public class Blinky extends Ghost {
 
-    private final Vector2D startPosition;
     private List<Directions> allDirections = List.of(
         Directions.UP,
         Directions.DOWN,
@@ -23,7 +22,6 @@ public class Blinky extends Ghost {
      */
     public Blinky(final Vector2D position) {
         super(position, "blinky");
-        this.startPosition = position;
     }
 
     @Override
@@ -63,10 +61,5 @@ public class Blinky extends Ghost {
                 default -> this.getCurrentDirection();
             };
         }
-    }
-    
-    public void reset() {
-        this.setDrawable(this.getAnimation(Directions.RIGHT));
-        this.setPosition(this.startPosition);
     }
 }

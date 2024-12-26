@@ -133,7 +133,7 @@ public class Gui extends JFrame implements MouseListener {
             this.parser.save(this.gameObjects.stream()
                 .collect(Collectors.toMap(
                     t -> new Pair<>(t.x().getPosition(), new Vector2D(t.y().getWidth(), t.y().getHeight())),
-                    t -> t.x().getClass())
+                    t -> t.x().getClass().getSimpleName())
                 )
             );
         } else {
@@ -158,12 +158,12 @@ public class Gui extends JFrame implements MouseListener {
                 .map(t -> {
                     try {
                         GameObject g = null;
-                        if (t.getValue().equals(Wall.class)) {
-                            g = t.getValue()
+                        if (t.getValue().equals("Wall")) {
+                            g = Class.forName(t.getValue())
                                 .getConstructor(Vector2D.class, Vector2D.class)
                                 .newInstance(t.getKey().x(), t.getKey().y());
                         } else {
-                            g = t.getValue()
+                            g = Class.forName(t.getValue())
                                 .getConstructor(Vector2D.class)
                                 .newInstance(t.getKey().x());
                         }
