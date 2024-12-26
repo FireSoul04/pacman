@@ -11,17 +11,8 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
@@ -32,7 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.firesoul.pacman.api.model.GameObject;
-import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.impl.model.entities.Pill;
 import com.firesoul.pacman.impl.model.entities.Player;
 import com.firesoul.pacman.impl.model.entities.PowerPill;
@@ -61,24 +51,15 @@ public class Gui extends JFrame implements MouseListener {
     );
 
     private enum GameObjects {
-        PLAYER(Color.YELLOW),
-        BLINKY(Color.RED),
-        PINKY(Color.PINK),
-        INKY(Color.CYAN),
-        CLYDE(Color.ORANGE),
-        PILL(Color.GRAY),
-        POWERPILL(Color.WHITE),
-        WALL(Color.BLUE);
-
-        private final Color color;
-
-        private GameObjects(final Color color) {
-            this.color = color;
-        }
-
-        public Color getColor() {
-            return this.color;
-        }
+        PLAYER,
+        BLINKY,
+        PINKY,
+        INKY,
+        CLYDE,
+        PILL,
+        POWERPILL,
+        WALL,
+        ERASER;
 
         public static List<String> getAll() {
             return List.of(
@@ -89,12 +70,13 @@ public class Gui extends JFrame implements MouseListener {
                 "Clyde",
                 "Pill",
                 "Powerpill",
-                "Wall"
+                "Wall",
+                "Eraser"
             );
         }
     };
 
-    private final ConcurrentLinkedQueue<Entry<GameObject, Rectangle>> gameObjects = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<Pair<GameObject, Rectangle>> gameObjects = new ConcurrentLinkedQueue<>();
     private final FileParser parser = new FileParser(WIDTH, HEIGHT, MAP_PATH);
     private final JPanel buttonFrame;
     private final JPanel editorFrame;
@@ -147,13 +129,25 @@ public class Gui extends JFrame implements MouseListener {
     }
 
     private synchronized void saveToFile() {
-        this.parser.save(this.gameObjects.stream()
-            .map(Entry::getKey)
-            .collect(Collectors.toMap(
-                t -> Map.entry(t.getPosition(), t.getDrawable().getImageSize()),
-                GameObject::getClass)
-            )
-        );
+        if (this.areAllLimitedObjectsPresent()) {
+            this.parser.save(this.gameObjects.stream()
+                .collect(Collectors.toMap(
+                    t -> new Pair<>(t.x().getPosition(), new Vector2D(t.y().getWidth(), t.y().getHeight())),
+                    t -> t.x().getClass())
+                )
+            );
+        } else {
+            System.out.println("Cannot save, some mandatory game objects are missing");
+        }
+    }
+
+    private synchronized boolean areAllLimitedObjectsPresent() {
+        return LIMITED_GAME_OBJECTS.stream().filter(a -> 
+                this.gameObjects.stream().anyMatch(t ->
+                    a.name().equals(t.x().getClass().getSimpleName().toUpperCase())
+                )
+            ).toList()
+            .equals(LIMITED_GAME_OBJECTS);
     }
 
     private synchronized void loadFromFile() {
@@ -163,12 +157,19 @@ public class Gui extends JFrame implements MouseListener {
                 .stream()
                 .map(t -> {
                     try {
-                        final GameObject g = t.getValue()
-                            .getConstructor(Vector2D.class)
-                            .newInstance(t.getKey().getKey());
-                        return Map.entry(
+                        GameObject g = null;
+                        if (t.getValue().equals(Wall.class)) {
+                            g = t.getValue()
+                                .getConstructor(Vector2D.class, Vector2D.class)
+                                .newInstance(t.getKey().x(), t.getKey().y());
+                        } else {
+                            g = t.getValue()
+                                .getConstructor(Vector2D.class)
+                                .newInstance(t.getKey().x());
+                        }
+                        return new Pair<>(
                             g,
-                            new Rectangle((int) g.getPosition().getX(), (int) g.getPosition().getY(), (int) t.getKey().getValue().getX(), (int) t.getKey().getValue().getY())
+                            new Rectangle((int) g.getPosition().getX(), (int) g.getPosition().getY(), (int) t.getKey().y().getX(), (int) t.getKey().y().getY())
                         );
                     } catch (Exception e) {
                         throw new IllegalStateException();
@@ -184,16 +185,16 @@ public class Gui extends JFrame implements MouseListener {
         final Graphics g = this.canvas.getGraphics();
         try {
             while (true) {
-                g.setColor(this.selected.getColor());
+                g.setColor(Color.BLUE);
                 g.drawImage(this.readImage(), LEFT_MARGIN, 0, WIDTH * SCALE, HEIGHT * SCALE, this.canvas);
                 for (final var entry : this.gameObjects) {
-                    if (entry.getKey() instanceof Wall) {
-                        final Rectangle t = entry.getValue();
+                    if (entry.x() instanceof Wall) {
+                        final Rectangle t = entry.y();
                         g.fillRect(t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE);
                     } else {
-                        final GameObject gameObject = entry.getKey();
+                        final GameObject gameObject = entry.x();
                         final Image image = gameObject.getDrawable().getImage();
-                        final Rectangle t = entry.getValue();
+                        final Rectangle t = entry.y();
                         if (image != null) {
                             g.drawImage(image, t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE, null);
                         }
@@ -215,7 +216,7 @@ public class Gui extends JFrame implements MouseListener {
     }
 
     private synchronized int approximateGrid(final int x) {
-        return 4 + x - (x % GRID_SIZE);
+        return x - (x % GRID_SIZE) - 4;
     }
 
     private synchronized void reset() {
@@ -246,11 +247,15 @@ public class Gui extends JFrame implements MouseListener {
 
     @Override
     public synchronized void mousePressed(final MouseEvent e) {
-        if (this.selected.equals(GameObjects.WALL)) {
+        if (this.selected.equals(GameObjects.ERASER)) {
+            final Point p = new Point(e.getX() / SCALE, e.getY() / SCALE);
+            this.removeGameObject(p);
+            this.removeWall(p);
+        } else if (this.selected.equals(GameObjects.WALL)) {
             this.startPos = e.getPoint();
         } else {
             final Point p = new Point(approximateGrid(e.getX() / SCALE), approximateGrid(e.getY() / SCALE));
-            if (this.gameObjects.stream().map(t -> t.getValue()).filter(t -> t.x == p.x && t.y == p.y).count() < 1) {
+            if (this.gameObjects.stream().map(t -> t.y()).filter(t -> t.x == p.x && t.y == p.y).count() < 1) {
                 final Rectangle rect = new Rectangle(p.x, p.y, SIZE, SIZE);
                 this.addGameObject(e.getPoint(), rect);
             }
@@ -265,19 +270,39 @@ public class Gui extends JFrame implements MouseListener {
         }
     }
 
+    private synchronized void removeGameObject(final Point p) {
+        final Vector2D position = new Vector2D(approximateGrid((int) p.getX()), approximateGrid((int) p.getY()));
+        final var gameObject = this.gameObjects.stream().filter(t -> t.x().getPosition().equals(position)).findFirst();
+        if (gameObject.isPresent()) {
+            gameObjects.remove(gameObject.get());
+        }
+    }
+
+    private synchronized void removeWall(final Point p) {
+        final var wall = this.gameObjects.stream().filter(
+            t -> p.getX() >= t.x().getPosition().getX()
+                && p.getX() <= t.x().getPosition().getX() + t.y().getWidth()
+                && p.getY() >= t.x().getPosition().getY()
+                && p.getY() <= t.x().getPosition().getY() + t.y().getHeight()
+        ).findFirst();
+        if (wall.isPresent()) {
+            gameObjects.remove(wall.get());
+        }
+    }
+
     private synchronized void addGameObject(final Point p, final Rectangle rect) {
-        final Vector2D position = new Vector2D((int) (p.getX() / SCALE), (int) (p.getY() / SCALE));
-        final GameObject gameObject = this.getGameObject(position);
+        final Vector2D position = new Vector2D(approximateGrid((int) p.getX() / SCALE), approximateGrid((int) p.getY() / SCALE));
+        final GameObject gameObject = this.getGameObject(position, new Vector2D(rect.getWidth(), rect.getHeight()));
         if (rect.width > 0 && rect.height > 0) {
             if (!LIMITED_GAME_OBJECTS.contains(this.selected) ||
                 this.howManyInstanciesOfSelected() < 1
             ) {
-                this.gameObjects.add(Map.entry(gameObject, rect));
+                this.gameObjects.add(new Pair<>(gameObject, rect));
             }
         }
     }
 
-    private GameObject getGameObject(final Vector2D position) {
+    private GameObject getGameObject(final Vector2D position, final Vector2D size) {
         return switch (this.selected) {
             case GameObjects.PLAYER -> new Player(position);
             case GameObjects.BLINKY -> new Blinky(position);
@@ -286,14 +311,19 @@ public class Gui extends JFrame implements MouseListener {
             case GameObjects.CLYDE -> new Clyde(position);
             case GameObjects.PILL -> new Pill(position);
             case GameObjects.POWERPILL -> new PowerPill(position);
+            case GameObjects.WALL -> new Wall(new Vector2D(approximate((int) this.startPos.getX() / SCALE), approximate((int) (this.startPos.getY() / SCALE))), size);
             default -> throw new IllegalStateException("Invalid game object: " + this.selected);
         };
     }
 
-    private long howManyInstanciesOfSelected() {
+    private long howManyInstanciesOf(final GameObjects g) {
         return this.gameObjects.stream()
-            .filter(t -> t.getKey().getClass().getSimpleName().toUpperCase().equals(this.selected.name()))
+            .filter(t -> t.x().getClass().getSimpleName().toUpperCase().equals(g.name()))
             .count();
+    }
+
+    private long howManyInstanciesOfSelected() {
+        return howManyInstanciesOf(this.selected);
     }
 
     @Override
