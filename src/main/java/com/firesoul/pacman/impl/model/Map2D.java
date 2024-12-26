@@ -53,7 +53,7 @@ public class Map2D implements Map {
         ) {
             this.bounds = (Vector2D) reader.readObject();
             
-            final var file = (java.util.Map<Pair<Vector2D, Vector2D>, Class<? extends GameObject>>) reader.readObject();
+            final var file = (java.util.Map<Pair<Vector2D, Vector2D>, String>) reader.readObject();
             for (var entry : file.entrySet()) {
                 gameObjects.add(this.readGameObject(entry.getKey(), entry.getValue()));
             }
@@ -64,15 +64,15 @@ public class Map2D implements Map {
         return gameObjects;
     }
 
-    private GameObject readGameObject(final Pair<Vector2D, Vector2D> details, final Class<? extends GameObject> gClass) {
+    private GameObject readGameObject(final Pair<Vector2D, Vector2D> details, final String gClass) {
         GameObject g = null;
         try {
-            if (gClass.equals(Wall.class)) {
-                g = gClass
+            if (gClass.equals(Wall.class.getName())) {
+                g = (GameObject) Class.forName(gClass)
                     .getConstructor(Vector2D.class, Vector2D.class)
                     .newInstance(details.x(), details.y());
             } else {
-                g = gClass
+                g = (GameObject) Class.forName(gClass)
                     .getConstructor(Vector2D.class)
                     .newInstance(details.x());
             }

@@ -75,6 +75,7 @@ public class Pacman {
 
     private void checkPlayerDeath() {
         if (this.player.isDead()) {
+            this.lives--;
             GameCore.log("Player is dead, lives remaining: " + this.lives);
             this.reset();
             this.liveLostTimer.restart();
@@ -178,6 +179,7 @@ public class Pacman {
 
     private void reset() {
         this.scene = new Scene2D(MAP_PATH);
+        this.ghosts.clear();
         for (final GameObject g : this.getGameObjects()) {
             if (g instanceof Player p) {
                 p.addInput(this.game.getInputController());

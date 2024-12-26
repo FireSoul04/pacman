@@ -107,7 +107,6 @@ public class Player extends SolidObject2D implements Movable {
      */
     public void die() {
         this.dead = true;
-        // this.lives--;
     }
 
     /**
@@ -116,11 +115,4 @@ public class Player extends SolidObject2D implements Movable {
     public boolean isDead() {
         return this.dead;
     }
-
-    // /**
-    //  * @return player's lives.
-    //  */
-    // public int getLives() {
-    //     return this.lives;
-    // }
 }
