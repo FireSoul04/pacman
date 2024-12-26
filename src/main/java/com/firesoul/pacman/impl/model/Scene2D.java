@@ -2,6 +2,7 @@ package com.firesoul.pacman.impl.model;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 
 import com.firesoul.pacman.api.model.GameObject;
@@ -107,7 +108,7 @@ public class Scene2D implements Room {
 
     @Override
     public List<GameObject> getGameObjects() {
-        return List.copyOf(this.gameObjects);
+        return Collections.unmodifiableList(this.gameObjects);
     }
 
     /**

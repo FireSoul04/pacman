@@ -1,18 +1,14 @@
 package com.firesoul.pacman.impl.controller;
 
 import java.io.PrintStream;
-import java.util.List;
 
 import com.firesoul.pacman.api.controller.Game;
-import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.model.Pacman;
-import com.firesoul.pacman.impl.model.Scene2D;
 import com.firesoul.pacman.impl.view.Window;
 
 public class GameCore implements Game {
 
-    private static final String MAP_PATH = "src/main/resources/map/map.txt";
     private static final String MAP_IMAGE_PATH = "src/main/resources/sprites/map/map.png";
     private static final String TITLE = "Pacman";
     private static final int WIDTH = 224;
@@ -24,7 +20,6 @@ public class GameCore implements Game {
     private final Renderer renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE, SCALE);
     private final InputController inputController = new InputController();
     private final Pacman pacman;
-    private Scene2D scene;
     private State state;
 
     public GameCore() {
@@ -34,8 +29,6 @@ public class GameCore implements Game {
 
     @Override
     public synchronized void init() {
-        this.scene = new Scene2D(MAP_PATH);
-        //this.scene = new Scene2D(WIDTH, HEIGHT);
         this.pacman.init();
         this.renderer.init(MAP_IMAGE_PATH);
         this.displayThread.start();
@@ -45,13 +38,13 @@ public class GameCore implements Game {
     @Override
     public void start() {
         this.state = State.RUNNING;
-        this.scene.wakeAll();
+        this.pacman.wakeAll();
     }
 
     @Override
     public void pause() {
         this.state = State.PAUSED;
-        this.scene.pauseAll();
+        this.pacman.pauseAll();
     }
 
     @Override
@@ -74,14 +67,6 @@ public class GameCore implements Game {
         }
     }
 
-    /**
-     * Resets the current scene objects and load the new scene.
-     */
-    public void resetScene() {
-        this.scene = new Scene2D(MAP_PATH);
-        this.pacman.reset();
-    }
-
     @Override
     public void onPause() {
         if (this.inputController.getEvent("PauseGame")) {
@@ -91,7 +76,7 @@ public class GameCore implements Game {
 
     @Override
     public void render() {
-        this.renderer.draw(this.scene.getGameObjects());
+        this.renderer.draw(this.pacman.getGameObjects());
     }
 
     @Override
@@ -112,36 +97,6 @@ public class GameCore implements Game {
     @Override
     public Renderer getRenderer() {
         return this.renderer;
-    }
-
-    /** 
-     * @return All the gameObjects in the current scene.
-     */
-    public List<GameObject> getGameObjects() {
-        return this.scene.getGameObjects();
-    }
-
-    /**
-     * Add a gameObject to the scene.
-     * @param gameObject
-     */
-    public void addGameObject(final GameObject gameObject) {
-        this.scene.addGameObject(gameObject);
-    }
-
-    /**
-     * Update all the gameObjects of the scene.
-     * @param deltaTime
-     */
-    public void updateAll(final double deltaTime) {
-        this.scene.updateAll(deltaTime);
-    }
-
-    /**
-     * @return the current scene.
-     */
-    public Scene2D getScene() {
-        return this.scene;
     }
 
     /**

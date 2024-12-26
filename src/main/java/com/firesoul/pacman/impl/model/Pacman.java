@@ -1,15 +1,14 @@
 package com.firesoul.pacman.impl.model;
 
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.GameCore;
 import com.firesoul.pacman.impl.model.entities.*;
-import com.firesoul.pacman.impl.model.entities.ghosts.*;
 import com.firesoul.pacman.impl.util.TimerImpl;
-import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Pacman {
 
@@ -21,30 +20,26 @@ public class Pacman {
         RIGHT
     }
 
+    private static final String MAP_PATH = "src/main/resources/map/map.txt";
+
     private final GameCore game;
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
-    // Meanwhile we don't have a proper way to load the ghosts from a file
-    private List<Ghost> ghosts;
+    private final List<Ghost> ghosts = new ArrayList<>();
     private Player player;
+    private Scene2D scene;
     
     private int level;
 
     public Pacman(final GameCore game) {
         this.game = game;
+        this.scene = new Scene2D(MAP_PATH);
     }
 
     public void init() {
         this.level = 1;
         this.nextLevelTimer.start();
-        // this.player = new Player(this.game.getScene(), this.game.getInputController());
-        // this.ghosts = List.of(
-        //     new Blinky(this.game.getScene()),
-        //     new Inky(this.game.getScene()),
-        //     new Pinky(this.game.getScene()),
-        //     new Clyde(this.game.getScene())
-        // );
-        this.reset();
+        this.createScene();
     }
 
     public void update(final double deltaTime) {
@@ -54,7 +49,7 @@ public class Pacman {
             this.checkPlayerDeath();
             this.checkDeadGhosts();
             this.checkGameOver();
-            game.updateAll(deltaTime);
+            this.updateAll(deltaTime);
         }
         this.nextLevelTimer.update();
         this.liveLostTimer.update();
@@ -72,7 +67,7 @@ public class Pacman {
         if (this.isLevelCompleted()) {
             GameCore.log("Level " + this.level + " completed!");
             this.level++;
-            this.game.resetScene();
+            this.reset();
             this.nextLevelTimer.restart();
         }
     }
@@ -80,7 +75,7 @@ public class Pacman {
     private void checkPlayerDeath() {
         if (this.player.isDead()) {
             GameCore.log("Player is dead, lives remaining: " + this.player.getLives());
-            this.game.resetScene();
+            this.reset();
             this.liveLostTimer.restart();
         }
     }
@@ -105,7 +100,7 @@ public class Pacman {
 
     private long howManyInstancesOf(final Class<?> clazz) {
         int counter = 0;
-        for (final GameObject g : this.game.getGameObjects()) {
+        for (final GameObject g : this.getGameObjects()) {
             if (g.getClass().equals(clazz)) {
                 counter++;
             }
@@ -114,7 +109,7 @@ public class Pacman {
     }
 
     private void checkDeadGhosts() {
-        for (final GameObject g : this.game.getGameObjects()) {
+        for (final GameObject g : this.getGameObjects()) {
             if (g instanceof Ghost gh && gh.isDead()) {
                 g.disable();
             }
@@ -122,14 +117,51 @@ public class Pacman {
     }
 
     /**
-     * Set all the ghosts vulnerable
+     * Set all the ghosts vulnerable.
      */
     public void setGhostVulnerable() {
-        for (final GameObject g : this.game.getGameObjects()) {
+        for (final GameObject g : this.getGameObjects()) {
             if (g instanceof Ghost gh) {
                 gh.setVulnerable();
             }
         }
+    }
+
+    /**
+     * Get all the gameObjects of the scene.
+     */
+    public List<GameObject> getGameObjects() {
+        return this.scene.getGameObjects();
+    }
+
+    /**
+     * Add a gameObject to the scene.
+     * @param gameObject
+     */
+    public void addGameObject(final GameObject gameObject) {
+        this.scene.addGameObject(gameObject);
+    }
+
+    /**
+     * Update all the gameObjects of the scene
+     * @param deltaTime
+     */
+    public void updateAll(final double deltaTime) {
+        this.scene.updateAll(deltaTime);
+    }
+
+    /**
+     * Wake all the gameObjects of the scene
+     */
+    public void wakeAll() {
+        this.scene.wakeAll();
+    }
+
+    /**
+     * Pause all the gameObjects of the scene
+     */
+    public void pauseAll() {
+        this.scene.pauseAll();
     }
 
     /**
@@ -139,19 +171,40 @@ public class Pacman {
         return this.level;
     }
 
-    /**
-     * Resets all the gameObjects of the scene.
-     */
-    public void reset() {
-        // this.player.reset();
-        // this.game.addGameObject(this.player);
-        // for (final Ghost ghost : this.ghosts) {
-        //     ghost.reset();
-        //     this.game.addGameObject(ghost);
-        // }
-        // this.game.addGameObject(new PowerPill(new Vector2D(60, 16), this));
-        // for (int i = 0; i < 10; i++) {
-        //     this.game.addGameObject(new Pill(new Vector2D(100 + i * 16, 16)));
-        // }
+    private void reset() {
+        Player oldPlayer = this.loadGameObjects(p -> {
+            this.player.addInput(this.game.getInputController());
+            this.player.reset();
+        });
+        this.scene.removeGameObject(oldPlayer);
+        this.scene.addGameObject(this.player);
+    }
+
+    private void createScene() {
+        this.loadGameObjects(p -> {
+            p.addInput(this.game.getInputController());
+            this.player = p;
+        });
+        if (this.player == null) {
+            throw new IllegalStateException("Cannot find player in this scene");
+        } else if (this.ghosts.size() != 4) {
+            throw new IllegalStateException("One or more ghosts are missing in this scene");
+        }
+    }
+
+    private Player loadGameObjects(java.util.function.Consumer<Player> fun) {
+        Player player = null;
+        this.scene = new Scene2D(MAP_PATH);
+        for (final GameObject g : this.getGameObjects()) {
+            if (g instanceof Player p) {
+                player = p;
+                fun.accept(p);
+            } else if (g instanceof Ghost gh) {
+                this.ghosts.add(gh);
+            } else if (g instanceof PowerPill pl) {
+                pl.connectToGameLogic(this);
+            }
+        }
+        return player;
     }
 }

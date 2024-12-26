@@ -6,8 +6,10 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.firesoul.editor.gui.Pair;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Map;
+import com.firesoul.pacman.impl.model.entities.Wall;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Map2D implements Map {
@@ -43,18 +45,41 @@ public class Map2D implements Map {
     
     @SuppressWarnings("unchecked")
     private List<GameObject> getMap(final String mapPath) {
-        final List<GameObject> map = new ArrayList<>();
+        final List<GameObject> gameObjects = new ArrayList<>();
         try (
             final ObjectInputStream reader = new ObjectInputStream(
                 new FileInputStream(this.mapPath)
             )
         ) {
             this.bounds = (Vector2D) reader.readObject();
-            map.addAll((List<GameObject>) reader.readObject());
+            
+            final var file = (java.util.Map<Pair<Vector2D, Vector2D>, Class<? extends GameObject>>) reader.readObject();
+            for (var entry : file.entrySet()) {
+                gameObjects.add(this.readGameObject(entry.getKey(), entry.getValue()));
+            }
         } catch (final IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("Cannot read file: " + e);
             System.exit(1);
         }
-        return map;
+        return gameObjects;
+    }
+
+    private GameObject readGameObject(final Pair<Vector2D, Vector2D> details, final Class<? extends GameObject> gClass) {
+        GameObject g = null;
+        try {
+            if (gClass.equals(Wall.class)) {
+                g = gClass
+                    .getConstructor(Vector2D.class, Vector2D.class)
+                    .newInstance(details.x(), details.y());
+            } else {
+                g = gClass
+                    .getConstructor(Vector2D.class)
+                    .newInstance(details.x());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+        return g;
     }
 }
