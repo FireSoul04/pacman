@@ -9,11 +9,13 @@ public class Pinky extends Ghost {
      * Creates Pinky, the pink ghost.
      */
     public Pinky(final Vector2D position) {
-        super(position, "pinky");
+        super(position, "pinky", 2);
     }
 
     @Override
     protected void move() {
-        
+        if (!this.canMove(this.getDirectionFromVector(this.getNextDirection()))) {
+            this.setNextDirection(this.getCurrentDirection().invert());
+        }
     }
 }

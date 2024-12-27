@@ -10,6 +10,7 @@ import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
 import com.firesoul.pacman.impl.view.DirectionalAnimation2D;
 import com.firesoul.pacman.impl.model.Pacman.Directions;
+import com.firesoul.pacman.impl.model.Pacman.OutsideCageNotifier;
 
 public abstract class Ghost extends SolidObject2D implements Movable {
 
@@ -18,47 +19,94 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.2);
     private static final Vector2D SPRITE_SIZE = new Vector2D(16, 16);
     private static final Vector2D SIZE = SPRITE_SIZE.dot(0.5);
+    private static final Vector2D CAGE_CENTER_POSITION = new Vector2D(112, 112);
 
     private final DirectionalAnimation2D movementAnimations;
-    private final Vector2D startPosition;
     private final Animation2D vulnerableAnimation = new Animation2D("vulnerable", ANIMATION_SPEED);
     private final Animation2D vulnerableAnimationBlinking = new Animation2D("vulnerable_blinking", ANIMATION_SPEED);
+    private final Timer insideCageTimer;
     private final Timer vulnerabiltyTimer = new TimerImpl(VULNERABILITY_TIME);
-    private Vector2D currentDirection = Vector2D.right();
-    private Vector2D nextDirection = Vector2D.right();
+    private final Vector2D startPosition;
+    private Vector2D currentDirection = Vector2D.up();
+    private Vector2D nextDirection = Vector2D.up();
+    private OutsideCageNotifier outsideCageNotifier;
     private double speed = 1.0;
     private boolean dead = false;
     private boolean vulnerable = false;
+    private boolean roam = false;
+    private boolean insideCage = true;
 
     /**
      * Create a ghost.
      * @param position
-     * @param speed
+     * @param name
      */
-    public Ghost(final Vector2D position, final String name) {
+    public Ghost(final Vector2D position, final String name, final double insideCageTime) {
         super(position, SPRITE_SIZE, SIZE);
         this.startPosition = position;
+        this.insideCageTimer = new TimerImpl(Timer.secondsToMillis(insideCageTime));
         this.movementAnimations = new DirectionalAnimation2D(name, ANIMATION_SPEED);
         this.setDrawable(this.movementAnimations.getAnimation(Directions.RIGHT));
+        this.insideCageTimer.start();
     }
 
     @Override
     public void update(final double deltaTime) {
-        this.move();
-        if (this.canMove(this.getDirectionFromVector(this.nextDirection))) {
-            this.currentDirection = this.nextDirection;
+        if (this.insideCage) {
+            this.exitCage();
+        } else {
+            this.move();
+            this.goToThatDirection(this.nextDirection);
         }
         final Vector2D newPosition = this.getPosition()
             .add(this.currentDirection.dot(speed)
             .dot(deltaTime))
             .wrap(SPRITE_SIZE.invert(), this.getScene().getDimensions().add(SPRITE_SIZE));
         this.setPosition(newPosition);
+        this.updateTimers();
+        this.moveColliders();
+        this.animate(this.currentDirection);
+    }
+
+    private void exitCage() {
+        if (this.roam) {
+            final Vector2D distanceToExit = this.getPosition().sub(this.outsideCageNotifier.getPosition());
+            final double roundedX = Math.round(distanceToExit.getX());
+            if (roundedX < 0) {
+                this.goToThatDirection(Vector2D.right());
+            } else if (roundedX > 0) {
+                this.goToThatDirection(Vector2D.left());
+            } else {
+                this.currentDirection = Vector2D.up();
+            }
+        } else {
+            this.goToThatDirectionOrElse(this.nextDirection, this.nextDirection.invert());
+        }
+    }
+
+    private void goToThatDirection(final Vector2D direction) {
+        if (this.canMove(this.getDirectionFromVector(direction))) {
+            this.currentDirection = direction;
+        }
+    }
+
+    private void goToThatDirectionOrElse(final Vector2D direction, final Vector2D alternativeDirection) {
+        if (this.canMove(this.getDirectionFromVector(direction))) {
+            this.currentDirection = direction;
+        } else {
+            this.nextDirection = alternativeDirection;
+        }
+    }
+
+    private void updateTimers() {
         this.vulnerabiltyTimer.update();
         if (this.vulnerabiltyTimer.isExpired()) {
             this.vulnerable = false;
         }
-        this.moveColliders();
-        this.animate(this.currentDirection);
+        this.insideCageTimer.update();
+        if (this.insideCageTimer.isExpired()) {
+            this.roam = true;
+        }
     }
 
     /**
@@ -75,6 +123,8 @@ public abstract class Ghost extends SolidObject2D implements Movable {
             }
         } else if (gameObject instanceof Wall) {
             this.checkMove();
+        } else if (gameObject instanceof OutsideCageNotifier) {
+            this.insideCage = false;
         }
     }
 
@@ -86,6 +136,9 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         if (this.isVulnerable()) {
             this.vulnerabiltyTimer.pause();
         }
+        if (this.isInsideCage()) {
+            this.insideCageTimer.pause();
+        }
     }
 
     /**
@@ -96,24 +149,58 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         if (this.isVulnerable()) {
             this.vulnerabiltyTimer.start();
         }
+        if (this.isInsideCage()) {
+            this.insideCageTimer.start();
+        }
     }
 
     /**
-     * Go to start position
+     * Go to start position.
      */
     @Override
     public void reset() {
         this.dead = false;
+        this.vulnerable = false;
+        this.roam = false;
+        this.insideCage = true;
         this.changeVariant(Vector2D.right());
         this.setPosition(this.startPosition);
+        this.moveColliders();
+        this.insideCageTimer.restart();
+    }
+
+    /*
+     * Go to the starting cage.
+     */
+    public void goToCage() {
+        this.dead = false;
+        this.vulnerable = false;
+        this.roam = true;
+        this.insideCage = true;
+        this.currentDirection = Vector2D.up();
+        this.setPosition(CAGE_CENTER_POSITION);
         this.moveColliders();
     }
 
     /**
-     * @return If pacman can eat ghosts.
+     * @param outsideCageNotifier that notifies a ghost when it's outside of the cage
+     */
+    public void addOutsideCageNotifier(final OutsideCageNotifier outsideCageNotifier) {
+        this.outsideCageNotifier = outsideCageNotifier;
+    }
+
+    /**
+     * @return If pacman can eat ghosts
      */
     public boolean isVulnerable() {
         return this.vulnerable;
+    }
+
+    /**
+     * @return If ghost is inside the starting cage
+     */
+    public boolean isInsideCage() {
+        return this.insideCage;
     }
 
     /**

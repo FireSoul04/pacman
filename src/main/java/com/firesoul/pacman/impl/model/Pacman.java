@@ -2,13 +2,18 @@ package com.firesoul.pacman.impl.model;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.firesoul.pacman.api.model.GameObject;
+import com.firesoul.pacman.api.model.entities.Collidable;
+import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.GameCore;
 import com.firesoul.pacman.impl.model.entities.*;
+import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
+import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Pacman {
 
@@ -20,12 +25,32 @@ public class Pacman {
         RIGHT
     }
 
+    public class OutsideCageNotifier extends GameObject2D implements Collidable {
+        private final Collider collider;
+
+        public OutsideCageNotifier(final Vector2D position) {
+            super(position.add(Vector2D.up()));
+            this.collider = new BoxCollider2D(this, new Vector2D(8, 1), false);
+        }
+
+        @Override
+        public void onCollide(final Collider collider, final Collider other) {
+        }
+
+        @Override
+        public List<Collider> getColliders() {
+            return Collections.unmodifiableList(List.of(this.collider));
+        }
+    }
+
     private static final int MAX_LIVES = 3;
     private static final String MAP_PATH = "src/main/resources/map/map.txt";
+    private static final Vector2D EXIT_POSITION = new Vector2D(112, 84);
 
     private final GameCore game;
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
+    private final OutsideCageNotifier outsideCageNotifier = new OutsideCageNotifier(EXIT_POSITION);
     private final List<Ghost> ghosts = new ArrayList<>();
     private int lives = MAX_LIVES;
     private Player player;
@@ -113,7 +138,7 @@ public class Pacman {
     private void checkDeadGhosts() {
         for (final GameObject g : this.getGameObjects()) {
             if (g instanceof Ghost gh && gh.isDead()) {
-                g.disable();
+                gh.goToCage();
             }
         }
     }
@@ -179,12 +204,14 @@ public class Pacman {
 
     private void createScene() {
         this.scene = new Scene2D(MAP_PATH);
+        this.addGameObject(this.outsideCageNotifier);
         this.ghosts.clear();
         for (final GameObject g : this.getGameObjects()) {
             if (g instanceof Player p) {
                 p.addInput(this.game.getInputController());
                 this.player = p;
             } else if (g instanceof Ghost gh) {
+                gh.addOutsideCageNotifier(this.outsideCageNotifier);
                 this.ghosts.add(gh);
             } else if (g instanceof PowerPill pl) {
                 pl.connectToGameLogic(this);

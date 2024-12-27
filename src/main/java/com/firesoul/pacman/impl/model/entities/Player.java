@@ -110,7 +110,7 @@ public class Player extends SolidObject2D implements Movable {
     @Override
     public void reset() {
         this.dead = false;
-        this.changeVariant(Vector2D.right());
+        this.animate(Vector2D.right());
         this.setPosition(this.startPosition);
         this.moveColliders();
     }
