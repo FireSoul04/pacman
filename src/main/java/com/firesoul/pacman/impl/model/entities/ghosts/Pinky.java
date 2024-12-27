@@ -9,7 +9,7 @@ public class Pinky extends Ghost {
      * Creates Pinky, the pink ghost.
      */
     public Pinky(final Vector2D position) {
-        super(position, "pinky", 2);
+        super(position, "pinky", 4, Vector2D.down());
     }
 
     @Override

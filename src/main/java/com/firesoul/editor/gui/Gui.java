@@ -216,7 +216,7 @@ public class Gui extends JFrame implements MouseListener {
     }
 
     private synchronized int approximateGrid(final int x) {
-        return x - (x % GRID_SIZE) - 4;
+        return x - (x % (LIMITED_GAME_OBJECTS.stream().anyMatch(t -> t.equals(this.selected)) ? GRID_SIZE / 2 : GRID_SIZE)) - 4;
     }
 
     private synchronized void reset() {

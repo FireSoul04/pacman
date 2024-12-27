@@ -20,7 +20,7 @@ public class Clyde extends Ghost {
      * Creates Clyde, the orange ghost.
      */
     public Clyde(final Vector2D position) {
-        super(position, "clyde", 6);
+        super(position, "clyde", 8, Vector2D.up());
     }
 
     @Override

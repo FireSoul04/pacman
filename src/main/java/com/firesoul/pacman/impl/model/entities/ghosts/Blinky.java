@@ -21,7 +21,7 @@ public class Blinky extends Ghost {
      * Creates Blinky, the red ghost.
      */
     public Blinky(final Vector2D position) {
-        super(position, "blinky", 0);
+        super(position, "blinky", 0, Vector2D.right());
     }
 
     @Override

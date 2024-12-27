@@ -8,7 +8,7 @@ public class Inky extends Ghost {
      * Creates Inky, the cyan ghost.
      */
     public Inky(final Vector2D position) {
-        super(position, "inky", 4);
+        super(position, "inky", 6, Vector2D.up());
     }
 
     @Override
