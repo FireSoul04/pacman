@@ -1,5 +1,7 @@
 package com.firesoul.pacman.api.model.entities;
 
+import java.util.Set;
+
 import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.util.Vector2D;
 
@@ -45,6 +47,11 @@ public interface Collider {
      * @return if last frame was overlapping
      */
     boolean hasCollidedLastFrame();
+
+    /**
+     * @return colliders that collided last frame
+     */
+    Set<Collider> collidedGameObjects();
 
     /**
      * Update the position based on the position of this game object.

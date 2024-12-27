@@ -70,11 +70,11 @@ public class Map2D implements Map {
             if (gClass.equals(Wall.class.getName())) {
                 g = (GameObject) Class.forName(gClass)
                     .getConstructor(Vector2D.class, Vector2D.class)
-                    .newInstance(details.x(), details.y());
+                    .newInstance(details.x().sub(new Vector2D(16, 0)), details.y());
             } else {
                 g = (GameObject) Class.forName(gClass)
                     .getConstructor(Vector2D.class)
-                    .newInstance(details.x());
+                    .newInstance(details.x().add(new Vector2D(-8, 8)));
             }
         } catch (Exception e) {
             e.printStackTrace();

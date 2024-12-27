@@ -1,6 +1,8 @@
 package com.firesoul.pacman.impl.model.entities.colliders;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.ColliderLayout;
@@ -14,6 +16,7 @@ public class BoxCollider2D implements Collider, Serializable {
     private Vector2D position;
     private Vector2D dimensions;
     private boolean collided = false;
+    private Set<Collider> collidersColliding = new HashSet<>();
 
     /**
      * Creates a new collider with a box form with the given dimensions. It position in the center of the image by default.
@@ -50,6 +53,7 @@ public class BoxCollider2D implements Collider, Serializable {
     @Override
     public void update() {
         this.position = this.layout.positionRelativeTo(this.gameObject, this.dimensions);
+        this.collidersColliding.clear();
     }
 
     @Override
@@ -60,6 +64,11 @@ public class BoxCollider2D implements Collider, Serializable {
     @Override
     public boolean hasCollidedLastFrame() {
         return this.collided;
+    }
+
+    @Override
+    public Set<Collider> collidedGameObjects() {
+        return this.collidersColliding;
     }
 
     @Override
@@ -85,6 +94,9 @@ public class BoxCollider2D implements Collider, Serializable {
             && c1.getX() + d1.getX() > c2.getX()
             && c1.getY() < c2.getY() + d2.getY()
             && c1.getY() + d1.getY() > c2.getY();
+        if (this.collided) {
+            this.collidersColliding.add(other);
+        }
         return this.collided;
     }
 }

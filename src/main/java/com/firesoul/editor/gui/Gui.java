@@ -196,7 +196,7 @@ public class Gui extends JFrame implements MouseListener {
                         final Image image = gameObject.getDrawable().getImage();
                         final Rectangle t = entry.y();
                         if (image != null) {
-                            g.drawImage(image, t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE, null);
+                            g.drawImage(image, t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE, this.canvas);
                         }
                     }
                 }
