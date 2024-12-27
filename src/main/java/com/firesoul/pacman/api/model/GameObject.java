@@ -39,6 +39,11 @@ public interface GameObject extends Serializable {
     void wake();
 
     /**
+     * Reset the game object
+     */
+    void reset();
+
+    /**
      * Disable the game object.
      */
     void disable();

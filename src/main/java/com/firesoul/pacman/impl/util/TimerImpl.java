@@ -37,7 +37,7 @@ public class TimerImpl implements Timer {
         if (this.pauseTime == 0) {
             this.pauseTime = temp;
         }
-        if (!this.isCounting && !this.isStopped) {
+        if (!this.isStopped) {
             this.startTime = temp - Timer.getTime(this.pauseTime);
             this.isCounting = true;
         }

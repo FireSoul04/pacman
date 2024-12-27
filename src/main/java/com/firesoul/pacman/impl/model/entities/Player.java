@@ -17,6 +17,7 @@ public class Player extends SolidObject2D implements Movable {
     private static final Vector2D SPRITE_SIZE = new Vector2D(16, 16);
     private static final Vector2D SIZE = SPRITE_SIZE.dot(0.5);
 
+    private final Vector2D startPosition;
     private final DirectionalAnimation2D animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
     private InputController input;
     private Vector2D currentDirection = Vector2D.right();
@@ -26,6 +27,7 @@ public class Player extends SolidObject2D implements Movable {
 
     public Player(final Vector2D position) {
         super(position, SPRITE_SIZE, SIZE);
+        this.startPosition = position;
         this.setDrawable(this.getAnimation(Directions.RIGHT));
     }
 
@@ -100,6 +102,17 @@ public class Player extends SolidObject2D implements Movable {
 
     @Override
     public void wake() {
+    }
+
+    /**
+     * Go to start position
+     */
+    @Override
+    public void reset() {
+        this.dead = false;
+        this.changeVariant(Vector2D.right());
+        this.setPosition(this.startPosition);
+        this.moveColliders();
     }
 
     /**

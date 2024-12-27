@@ -20,6 +20,7 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     private static final Vector2D SIZE = SPRITE_SIZE.dot(0.5);
 
     private final DirectionalAnimation2D movementAnimations;
+    private final Vector2D startPosition;
     private final Animation2D vulnerableAnimation = new Animation2D("vulnerable", ANIMATION_SPEED);
     private final Animation2D vulnerableAnimationBlinking = new Animation2D("vulnerable_blinking", ANIMATION_SPEED);
     private final Timer vulnerabiltyTimer = new TimerImpl(VULNERABILITY_TIME);
@@ -36,6 +37,7 @@ public abstract class Ghost extends SolidObject2D implements Movable {
      */
     public Ghost(final Vector2D position, final String name) {
         super(position, SPRITE_SIZE, SIZE);
+        this.startPosition = position;
         this.movementAnimations = new DirectionalAnimation2D(name, ANIMATION_SPEED);
         this.setDrawable(this.movementAnimations.getAnimation(Directions.RIGHT));
     }
@@ -94,6 +96,17 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         if (this.isVulnerable()) {
             this.vulnerabiltyTimer.start();
         }
+    }
+
+    /**
+     * Go to start position
+     */
+    @Override
+    public void reset() {
+        this.dead = false;
+        this.changeVariant(Vector2D.right());
+        this.setPosition(this.startPosition);
+        this.moveColliders();
     }
 
     /**

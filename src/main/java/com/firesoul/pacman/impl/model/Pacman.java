@@ -40,7 +40,7 @@ public class Pacman {
     public void init() {
         this.level = 1;
         this.nextLevelTimer.start();
-        this.reset();
+        this.createScene();
     }
 
     public void update(final double deltaTime) {
@@ -68,7 +68,7 @@ public class Pacman {
         if (this.isLevelCompleted()) {
             GameCore.log("Level " + this.level + " completed!");
             this.level++;
-            this.reset();
+            this.createScene();
             this.nextLevelTimer.restart();
         }
     }
@@ -100,7 +100,7 @@ public class Pacman {
         return this.howManyInstancesOf(Pill.class) == 0;
     }
 
-    private long howManyInstancesOf(final Class<?> clazz) {
+    private int howManyInstancesOf(final Class<?> clazz) {
         int counter = 0;
         for (final GameObject g : this.getGameObjects()) {
             if (g.getClass().equals(clazz)) {
@@ -177,7 +177,7 @@ public class Pacman {
         this.lives--;
     }
 
-    private void reset() {
+    private void createScene() {
         this.scene = new Scene2D(MAP_PATH);
         this.ghosts.clear();
         for (final GameObject g : this.getGameObjects()) {
@@ -194,6 +194,12 @@ public class Pacman {
             throw new IllegalStateException("Cannot find player in this scene");
         } else if (this.ghosts.size() != 4) {
             throw new IllegalStateException("One or more ghosts are missing in this scene");
+        }
+    }
+
+    private void reset() {
+        for (final GameObject g : this.getGameObjects()) {
+            g.reset();
         }
     }
 }

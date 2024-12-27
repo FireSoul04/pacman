@@ -100,6 +100,13 @@ public class GameObject2D implements GameObject {
     }
 
     /**
+     * Default method doesn't do anything. Override to make use of this.
+     */
+    @Override
+    public void reset() {
+    }
+
+    /**
      * Set the position of entity.
      * @param position
      */
