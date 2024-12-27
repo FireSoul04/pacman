@@ -11,20 +11,41 @@ import com.firesoul.pacman.impl.util.Vector2D;
 
 public class BoxCollider2D implements Collider, Serializable {
 
-    private GameObject2D gameObject;
-    private ColliderLayout layout;
+    private final GameObject2D gameObject;
+    private final ColliderLayout layout;
+    private final Vector2D dimensions;
+    private final boolean solid;
     private Vector2D position;
-    private Vector2D dimensions;
     private boolean collided = false;
     private Set<Collider> collidersColliding = new HashSet<>();
+
+    /**
+     * Creates a new collider with a box form with the given dimensions and not solid. It position in the center of the image by default.
+     * @param gameObject attached to
+     * @param dimensions of the box
+     */
+    public BoxCollider2D(final GameObject2D gameObject, final Vector2D dimensions) {
+        this(gameObject, dimensions, false);
+    }
 
     /**
      * Creates a new collider with a box form with the given dimensions. It position in the center of the image by default.
      * @param gameObject attached to
      * @param dimensions of the box
+     * @param solid if the object is solid
      */
-    public BoxCollider2D(final GameObject2D gameObject, final Vector2D dimensions) {
-        this(gameObject, dimensions, new ColliderCenterLayout());
+    public BoxCollider2D(final GameObject2D gameObject, final Vector2D dimensions, final boolean solid) {
+        this(gameObject, dimensions, new ColliderCenterLayout(), solid);
+    }
+
+    /**
+     * Creates a new collider with a box form and not solid.
+     * @param gameObject attached to
+     * @param dimensions of the box
+     * @param layout that decide how to follow the game object when it moves
+     */
+    public BoxCollider2D(final GameObject2D gameObject, final Vector2D dimensions, final ColliderLayout layout) {
+        this(gameObject, dimensions, layout, false);
     }
 
     /**
@@ -32,11 +53,13 @@ public class BoxCollider2D implements Collider, Serializable {
      * @param gameObject attached to
      * @param dimensions of the box
      * @param layout that decide how to follow the game object when it moves
+     * @param solid if the object is solid
      */
-    public BoxCollider2D(final GameObject2D gameObject, final Vector2D dimensions, final ColliderLayout layout) {
+    public BoxCollider2D(final GameObject2D gameObject, final Vector2D dimensions, final ColliderLayout layout, final boolean solid) {
         this.gameObject = gameObject;
         this.dimensions = dimensions;
         this.layout = layout;
+        this.solid = solid;
         this.position = layout.positionRelativeTo(gameObject, dimensions);
     }
 
@@ -69,6 +92,11 @@ public class BoxCollider2D implements Collider, Serializable {
     @Override
     public Set<Collider> collidedGameObjects() {
         return this.collidersColliding;
+    }
+
+    @Override
+    public boolean isSolid() {
+        return this.solid;
     }
 
     @Override

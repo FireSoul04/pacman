@@ -54,6 +54,11 @@ public interface Collider {
     Set<Collider> collidedGameObjects();
 
     /**
+     * @return if this collider is solid
+     */
+    boolean isSolid();
+
+    /**
      * Update the position based on the position of this game object.
      */
     void update();

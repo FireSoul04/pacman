@@ -22,7 +22,7 @@ public class EntityTest extends GameObject2D implements Movable, Collidable {
     public EntityTest(final Vector2D position, final Vector2D speed) {
         super(position);
         this.speed = speed;
-        this.collider = new BoxCollider2D(this, HITBOX_SIZE);
+        this.collider = new BoxCollider2D(this, HITBOX_SIZE, true);
     }
 
     public void setTestFunction(final BiConsumer<EntityTest, Double> test) {

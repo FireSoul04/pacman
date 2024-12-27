@@ -16,7 +16,7 @@ public class Wall extends GameObject2D implements Collidable {
 
     public Wall(final Vector2D position, final Vector2D size) {
         super(position);
-        this.collider = new BoxCollider2D(this, size, new ColliderSurfaceLayout());
+        this.collider = new BoxCollider2D(this, size, new ColliderSurfaceLayout(), true);
         this.setVisible(false);
     }
 

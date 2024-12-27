@@ -24,13 +24,21 @@ public class SolidObject2D extends GameObject2D implements Collidable {
         this.colliders = new HashMap<>(Map.of(
             Directions.NONE, new BoxCollider2D(this, objectSize, new ColliderCenterLayout()),
             Directions.UP, new BoxCollider2D(this, sizeHorizontal, 
-                (g, s) -> g.getPosition().add(Vector2D.up()).sub(objectSize).add(new Vector2D(0.5, 0.5))),
+                (g, s) -> g.getPosition().add(Vector2D.up()).sub(objectSize).add(new Vector2D(0.5, 0.5)),
+                true
+            ),
             Directions.DOWN, new BoxCollider2D(this, sizeHorizontal, 
-                (g, s) -> g.getPosition().add(Vector2D.down()).add(sizeVertical.sub(new Vector2D(0.5, 0.5))).sub(objectSize)),
+                (g, s) -> g.getPosition().add(Vector2D.down()).add(sizeVertical.sub(new Vector2D(0.5, 0.5))).sub(objectSize),
+                true
+            ),
             Directions.LEFT, new BoxCollider2D(this, sizeVertical, 
-                (g, s) -> g.getPosition().add(Vector2D.left()).sub(objectSize).add(new Vector2D(0.5, 0.5))),
+                (g, s) -> g.getPosition().add(Vector2D.left()).sub(objectSize).add(new Vector2D(0.5, 0.5)),
+                true
+            ),
             Directions.RIGHT, new BoxCollider2D(this, sizeVertical, 
-                (g, s) -> g.getPosition().add(Vector2D.right()).add(sizeHorizontal.sub(new Vector2D(0.5, 0.5))).sub(objectSize))
+                (g, s) -> g.getPosition().add(Vector2D.right()).add(sizeHorizontal.sub(new Vector2D(0.5, 0.5))).sub(objectSize),
+                true
+            )
         ));
     }
 
@@ -64,7 +72,7 @@ public class SolidObject2D extends GameObject2D implements Collidable {
     public void checkMove() {
         this.colliders.forEach((k, v) -> {
             if (!k.equals(Directions.NONE)) {
-                if (v.hasCollidedLastFrame()) {
+                if (v.hasCollidedLastFrame() && v.collidedGameObjects().stream().anyMatch(Collider::isSolid)) {
                     this.move.add(k);
                 }
             }
