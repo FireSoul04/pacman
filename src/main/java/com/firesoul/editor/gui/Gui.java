@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.firesoul.pacman.api.model.GameObject;
+import com.firesoul.pacman.impl.model.MapNode;
 import com.firesoul.pacman.impl.model.entities.Pill;
 import com.firesoul.pacman.impl.model.entities.Player;
 import com.firesoul.pacman.impl.model.entities.PowerPill;
@@ -59,6 +60,7 @@ public class Gui extends JFrame implements MouseListener {
         PILL,
         POWERPILL,
         WALL,
+        MAPNODE,
         ERASER;
 
         public static List<String> getAll() {
@@ -71,6 +73,7 @@ public class Gui extends JFrame implements MouseListener {
                 "Pill",
                 "Powerpill",
                 "Wall",
+                "MapNode",
                 "Eraser"
             );
         }
@@ -185,12 +188,16 @@ public class Gui extends JFrame implements MouseListener {
         final Graphics g = this.canvas.getGraphics();
         try {
             while (true) {
-                g.setColor(Color.BLUE);
                 g.drawImage(this.readImage(), LEFT_MARGIN, 0, WIDTH * SCALE, HEIGHT * SCALE, this.canvas);
                 for (final var entry : this.gameObjects) {
                     if (entry.x() instanceof Wall) {
+                        g.setColor(Color.BLUE);
                         final Rectangle t = entry.y();
                         g.fillRect(t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE);
+                    } else if (entry.x() instanceof MapNode) {
+                        g.setColor(Color.RED);
+                        final Rectangle t = entry.y();
+                        g.drawRect(t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE);
                     } else {
                         final GameObject gameObject = entry.x();
                         final Image image = gameObject.getDrawable().getImage();
@@ -255,7 +262,7 @@ public class Gui extends JFrame implements MouseListener {
             this.startPos = e.getPoint();
         } else {
             final Point p = new Point(approximateGrid(e.getX() / SCALE), approximateGrid(e.getY() / SCALE));
-            if (this.gameObjects.stream().map(t -> t.y()).filter(t -> t.x == p.x && t.y == p.y).count() < 1) {
+            if (this.selected.equals(GameObjects.MAPNODE) || this.gameObjects.stream().map(t -> t.y()).filter(t -> t.x == p.x && t.y == p.y).count() < 1) {
                 final Rectangle rect = new Rectangle(p.x, p.y, SIZE, SIZE);
                 this.addGameObject(e.getPoint(), rect);
             }
@@ -295,7 +302,8 @@ public class Gui extends JFrame implements MouseListener {
         final GameObject gameObject = this.getGameObject(position, new Vector2D(rect.getWidth(), rect.getHeight()));
         if (rect.width > 0 && rect.height > 0) {
             if (!LIMITED_GAME_OBJECTS.contains(this.selected) ||
-                this.howManyInstanciesOfSelected() < 1
+                this.howManyInstanciesOfSelected() < 1 ||
+                gameObject instanceof MapNode
             ) {
                 this.gameObjects.add(new Pair<>(gameObject, rect));
             }
@@ -311,6 +319,7 @@ public class Gui extends JFrame implements MouseListener {
             case GameObjects.CLYDE -> new Clyde(position);
             case GameObjects.PILL -> new Pill(position);
             case GameObjects.POWERPILL -> new PowerPill(position);
+            case GameObjects.MAPNODE -> new MapNode(position);
             case GameObjects.WALL -> new Wall(new Vector2D(approximate((int) this.startPos.getX() / SCALE), approximate((int) (this.startPos.getY() / SCALE))), size);
             default -> throw new IllegalStateException("Invalid game object: " + this.selected);
         };

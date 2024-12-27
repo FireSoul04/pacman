@@ -1,6 +1,5 @@
 package com.firesoul.pacman.impl.model.entities;
 
-import java.util.Collections;
 import java.util.List;
 
 import com.firesoul.pacman.api.model.entities.Collidable;
@@ -33,6 +32,6 @@ public class Pill extends GameObject2D implements Collidable {
 
     @Override
     public List<Collider> getColliders() {
-        return Collections.unmodifiableList(List.of(this.collider));
+        return List.of(this.collider);
     }
 }

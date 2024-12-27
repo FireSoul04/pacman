@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.firesoul.pacman.api.model.GameObject;
+import com.firesoul.pacman.api.model.Graph;
 import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.util.Timer;
@@ -62,6 +63,7 @@ public class Pacman {
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final OutsideCageNotifier outsideCageNotifier = new OutsideCageNotifier(EXIT_POSITION);
     private final List<Ghost> ghosts = new ArrayList<>();
+    private final Graph<MapNode> map = new GraphImpl<>();
     private int lives = MAX_LIVES;
     private Player player;
     private Scene2D scene;
@@ -234,6 +236,8 @@ public class Pacman {
                 this.ghosts.add(gh);
             } else if (g instanceof PowerPill pl) {
                 pl.connectToGameLogic(this);
+            } else if (g instanceof MapNode n) {
+                map.addNode(n);
             }
         }
         if (this.player == null) {
