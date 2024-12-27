@@ -163,9 +163,10 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         this.vulnerable = false;
         this.roam = false;
         this.insideCage = true;
+        this.currentDirection = Vector2D.up();
+        this.nextDirection = Vector2D.up();
         this.changeVariant(Vector2D.right());
         this.setPosition(this.startPosition);
-        this.moveColliders();
         this.insideCageTimer.restart();
     }
 
@@ -179,7 +180,6 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         this.insideCage = true;
         this.currentDirection = Vector2D.up();
         this.setPosition(CAGE_CENTER_POSITION);
-        this.moveColliders();
     }
 
     /**
