@@ -100,13 +100,13 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         System.out.println(this.pacman.findPathToCage(this.getPosition()));
     }
 
-    private void goToDirection(final Vector2D direction) {
+    public void goToDirection(final Vector2D direction) {
         if (this.canMove(this.getDirectionFromVector(direction))) {
             this.currentDirection = direction;
         }
     }
 
-    private void goToDirectionOrElse(final Vector2D direction, final Vector2D alternativeDirection) {
+    public void goToDirectionOrElse(final Vector2D direction, final Vector2D alternativeDirection) {
         if (this.canMove(this.getDirectionFromVector(direction))) {
             this.currentDirection = direction;
         } else {

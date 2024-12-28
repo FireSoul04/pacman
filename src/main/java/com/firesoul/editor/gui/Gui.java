@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
@@ -23,6 +24,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.firesoul.pacman.api.model.GameObject;
+import com.firesoul.pacman.api.model.Graph;
+import com.firesoul.pacman.impl.model.GraphImpl;
 import com.firesoul.pacman.impl.model.MapNode;
 import com.firesoul.pacman.impl.model.entities.Pill;
 import com.firesoul.pacman.impl.model.entities.Player;
@@ -61,6 +64,7 @@ public class Gui extends JFrame implements MouseListener {
         POWERPILL,
         WALL,
         MAPNODE,
+        LINKNODES,
         ERASER;
 
         public static List<String> getAll() {
@@ -74,6 +78,7 @@ public class Gui extends JFrame implements MouseListener {
                 "Powerpill",
                 "Wall",
                 "MapNode",
+                "LinkNodes",
                 "Eraser"
             );
         }
@@ -81,6 +86,8 @@ public class Gui extends JFrame implements MouseListener {
 
     private final ConcurrentLinkedQueue<Pair<GameObject, Rectangle>> gameObjects = new ConcurrentLinkedQueue<>();
     private final FileParser parser = new FileParser(WIDTH, HEIGHT, MAP_PATH);
+    private final List<MapNode> selectedNodes = new LinkedList<>();
+    private final Graph<MapNode> mapNodes = new GraphImpl<>();
     private final JPanel buttonFrame;
     private final JPanel editorFrame;
     private final JLabel labelSelected;
@@ -128,6 +135,10 @@ public class Gui extends JFrame implements MouseListener {
             .filter(t -> t instanceof JButton)
             .map(t -> (JButton) t)
             .forEach(t -> t.addActionListener(e -> this.selected = GameObjects.valueOf(t.getText().toUpperCase())));
+
+        final JButton link = new JButton("Link");
+        link.addActionListener(t -> this.linkNodes());
+        this.editorFrame.add(link);
         this.editorFrame.add(this.labelSelected);
     }
 
@@ -137,7 +148,11 @@ public class Gui extends JFrame implements MouseListener {
                 .collect(Collectors.toMap(
                     t -> new Pair<>(t.x().getPosition(), new Vector2D(t.y().getWidth(), t.y().getHeight())),
                     t -> t.x().getClass().getName())
-                )
+                ), this.mapNodes.edges()
+                    .entrySet()
+                    .stream()
+                    .map(t -> new Pair<>(t.getKey().getPosition(), t.getValue().stream().map(a -> a.getPosition()).toList()))
+                    .toList()
             );
         } else {
             System.out.println("Cannot save, some mandatory game objects are missing");
@@ -179,6 +194,16 @@ public class Gui extends JFrame implements MouseListener {
                     }
                 }).toList()
             );
+            for (final var node : this.parser.getMapNodes()) {
+                final var x = new MapNode(node.x());
+                this.mapNodes.addNode(x);
+                for (final var elem : node.y()) {
+                    final var y = new MapNode(elem);
+                    this.mapNodes.addNode(y);
+                    this.mapNodes.addEdge(x, y, this.distance(node.x(), elem));
+                }
+            }
+            System.out.println(this.parser.getMapNodes());
         } catch (IllegalStateException e) {
             System.out.println("Cannot load from file");
         }
@@ -194,10 +219,6 @@ public class Gui extends JFrame implements MouseListener {
                         g.setColor(Color.BLUE);
                         final Rectangle t = entry.y();
                         g.fillRect(t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE);
-                    } else if (entry.x() instanceof MapNode) {
-                        g.setColor(Color.RED);
-                        final Rectangle t = entry.y();
-                        g.drawRect(t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE);
                     } else {
                         final GameObject gameObject = entry.x();
                         final Image image = gameObject.getDrawable().getImage();
@@ -207,7 +228,23 @@ public class Gui extends JFrame implements MouseListener {
                         }
                     }
                 }
+                g.setColor(Color.RED);
+                for (final var node : this.mapNodes.edges().entrySet()) {
+                    final int x1 = (int) node.getKey().getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
+                    final int y1 = (int) node.getKey().getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
+                    final Rectangle t = new Rectangle((int) node.getKey().getPosition().dot(SCALE).getX(), (int) node.getKey().getPosition().dot(SCALE).getY(), SIZE, SIZE);
+                    g.drawRect(t.x, t.y, t.width * SCALE, t.height * SCALE);
+                    for (final var edge : node.getValue()) {
+                        final int x2 = (int) edge.getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
+                        final int y2 = (int) edge.getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
+                        g.drawLine(x1, y1, x2, y2);
+                    }
+                }
                 this.labelSelected.setText(this.selected.name().toLowerCase());
+                try {
+                    Thread.sleep(10);
+                } catch (Exception e) {
+                }
             }
         } catch (IOException e) {}
     }
@@ -260,6 +297,22 @@ public class Gui extends JFrame implements MouseListener {
             this.removeWall(p);
         } else if (this.selected.equals(GameObjects.WALL)) {
             this.startPos = e.getPoint();
+        } else if (this.selected.equals(GameObjects.LINKNODES)) {
+            final Vector2D p = new Vector2D(approximateGrid(e.getX() / SCALE), approximateGrid(e.getY() / SCALE));
+            if (this.mapNodes.nodes().stream()
+                .map(GameObject::getPosition)
+                .anyMatch(t -> t.equals(p))
+                && this.selectedNodes.size() < 2
+            ) {
+                final MapNode node = this.mapNodes.nodes().stream()
+                    .filter(t -> t.getPosition().equals(p))
+                    .findFirst()
+                    .get();
+                this.selectedNodes.add(node);
+            }
+        } else if (this.selected.equals(GameObjects.MAPNODE)) {
+            final Vector2D p = new Vector2D(approximateGrid(e.getX() / SCALE), approximateGrid(e.getY() / SCALE));
+            this.mapNodes.addNode(new MapNode(p));
         } else {
             final Point p = new Point(approximateGrid(e.getX() / SCALE), approximateGrid(e.getY() / SCALE));
             if (this.selected.equals(GameObjects.MAPNODE) || this.gameObjects.stream().map(t -> t.y()).filter(t -> t.x == p.x && t.y == p.y).count() < 1) {
@@ -302,10 +355,11 @@ public class Gui extends JFrame implements MouseListener {
         final GameObject gameObject = this.getGameObject(position, new Vector2D(rect.getWidth(), rect.getHeight()));
         if (rect.width > 0 && rect.height > 0) {
             if (!LIMITED_GAME_OBJECTS.contains(this.selected) ||
-                this.howManyInstanciesOfSelected() < 1 ||
-                gameObject instanceof MapNode
+                this.howManyInstanciesOfSelected() < 1
             ) {
                 this.gameObjects.add(new Pair<>(gameObject, rect));
+            } else if (gameObject instanceof MapNode node) {
+                this.mapNodes.addNode(node);
             }
         }
     }
@@ -319,10 +373,21 @@ public class Gui extends JFrame implements MouseListener {
             case GameObjects.CLYDE -> new Clyde(position);
             case GameObjects.PILL -> new Pill(position);
             case GameObjects.POWERPILL -> new PowerPill(position);
-            case GameObjects.MAPNODE -> new MapNode(position);
             case GameObjects.WALL -> new Wall(new Vector2D(approximate((int) this.startPos.getX() / SCALE), approximate((int) (this.startPos.getY() / SCALE))), size);
             default -> throw new IllegalStateException("Invalid game object: " + this.selected);
         };
+    }
+
+    private void linkNodes() {
+        if (this.selectedNodes.size() == 2) {
+            final MapNode src = this.selectedNodes.removeFirst();
+            final MapNode dst = this.selectedNodes.removeFirst();
+            this.mapNodes.addEdge(src, dst, this.distance(src.getPosition(), dst.getPosition()));
+        }
+    }
+
+    private double distance(final Vector2D v1, final Vector2D v2) {
+        return Math.sqrt((v1.getX() - v2.getX()) * (v1.getX() - v2.getX()) + (v1.getY() - v2.getY()) * (v1.getY() - v2.getY()));
     }
 
     private long howManyInstanciesOf(final GameObjects g) {

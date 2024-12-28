@@ -3,6 +3,7 @@ package com.firesoul.pacman.impl.model;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -148,20 +149,20 @@ public class Pacman {
 
     public List<Vector2D> findPathToCage(final Vector2D position) {
         final List<Vector2D> path = new LinkedList<>();
-        double distanceToCage = 0;
-        this.dummy.setPosition(new Vector2D(Math.round(position.getX()), Math.round(position.getY())));
-        do {
-            distanceToCage = this.distance(this.dummy.getPosition(), CAGE_CENTER_POSITION);
-            Vector2D direction = Vector2D.zero();
-            this.dummy.setPosition(this.dummy.getPosition().add(direction));
-            // path.add(direction);
-        } while (distanceToCage > 0);
+        // double distanceToCage = 0;
+        // this.dummy.setPosition(new Vector2D(Math.round(position.getX()), Math.round(position.getY())));
+        // do {
+        //     distanceToCage = this.distance(this.dummy.getPosition(), CAGE_CENTER_POSITION);
+        //     Vector2D direction = Vector2D.zero();
+        //     this.dummy.setPosition(this.dummy.getPosition().add(direction));
+        //     // path.add(direction);
+        // } while (distanceToCage > 0);
         return path;
     }
 
-    private double distance(final Vector2D v1, final Vector2D v2) {
-        return Math.sqrt((v1.getX() - v2.getX()) * (v1.getX() - v2.getX()) + (v1.getY() - v2.getY()) * (v1.getY() - v2.getY()));
-    }
+    // private double distance(final Vector2D v1, final Vector2D v2) {
+    //     return Math.sqrt((v1.getX() - v2.getX()) * (v1.getX() - v2.getX()) + (v1.getY() - v2.getY()) * (v1.getY() - v2.getY()));
+    // }
 
     /**
      * Set all the ghosts vulnerable.
