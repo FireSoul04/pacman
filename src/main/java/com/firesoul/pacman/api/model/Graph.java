@@ -29,6 +29,14 @@ public interface Graph<T> {
             this.edges.put(node, weight);
         }
 
+        public void removeEdge(final Node<T> node) {
+            this.edges.remove(node);
+        }
+
+        public void removeEdges() {
+            this.edges.clear();
+        }
+
         public double getWeight() {
             return weight;
         }
@@ -55,6 +63,8 @@ public interface Graph<T> {
     }
 
     void addNode(T node);
+
+    void removeNode(T node);
 
     void addEdge(T source, T destination, double weight);
 

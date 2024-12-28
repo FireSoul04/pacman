@@ -203,7 +203,6 @@ public class Gui extends JFrame implements MouseListener {
                     this.mapNodes.addEdge(x, y, this.distance(node.x(), elem));
                 }
             }
-            System.out.println(this.parser.getMapNodes());
         } catch (IllegalStateException e) {
             System.out.println("Cannot load from file");
         }
@@ -295,6 +294,7 @@ public class Gui extends JFrame implements MouseListener {
             final Point p = new Point(e.getX() / SCALE, e.getY() / SCALE);
             this.removeGameObject(p);
             this.removeWall(p);
+            this.removeNode(p);
         } else if (this.selected.equals(GameObjects.WALL)) {
             this.startPos = e.getPoint();
         } else if (this.selected.equals(GameObjects.LINKNODES)) {
@@ -312,7 +312,9 @@ public class Gui extends JFrame implements MouseListener {
             }
         } else if (this.selected.equals(GameObjects.MAPNODE)) {
             final Vector2D p = new Vector2D(approximateGrid(e.getX() / SCALE), approximateGrid(e.getY() / SCALE));
-            this.mapNodes.addNode(new MapNode(p));
+            if (this.mapNodes.nodes().stream().noneMatch(t -> t.getPosition().equals(p))) {
+                this.mapNodes.addNode(new MapNode(p));
+            }
         } else {
             final Point p = new Point(approximateGrid(e.getX() / SCALE), approximateGrid(e.getY() / SCALE));
             if (this.selected.equals(GameObjects.MAPNODE) || this.gameObjects.stream().map(t -> t.y()).filter(t -> t.x == p.x && t.y == p.y).count() < 1) {
@@ -383,6 +385,13 @@ public class Gui extends JFrame implements MouseListener {
             final MapNode src = this.selectedNodes.removeFirst();
             final MapNode dst = this.selectedNodes.removeFirst();
             this.mapNodes.addEdge(src, dst, this.distance(src.getPosition(), dst.getPosition()));
+        }
+    }
+
+    private void removeNode(final Point p) {
+        final var node = this.mapNodes.nodes().stream().filter(t -> t.getPosition().equals(new Vector2D(approximateGrid((int) p.getX()), approximateGrid((int) p.getY())))).findFirst();
+        if (node.isPresent()) {
+            this.mapNodes.removeNode(node.get());
         }
     }
 
