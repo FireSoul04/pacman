@@ -2,7 +2,9 @@ package com.firesoul.pacman.api.model;
 
 import java.util.List;
 
-public interface Room {
+import com.firesoul.pacman.impl.model.MapNode;
+
+public interface Scene {
 
     /**
      * Update all game objects in the room.
@@ -21,18 +23,23 @@ public interface Room {
 
     /**
      * Add a game object to the room.
-     * @param gameObject to add.
+     * @param gameObject to add
      */
     void addGameObject(GameObject gameObject);
 
     /**
      * Remove a game object from the room.
-     * @param gameObject to remove.
+     * @param gameObject to remove
      */
     void removeGameObject(GameObject gameObject);
 
     /**
-     * @return Get all game objects in the room.
+     * @return all game objects in the room
      */
     List<GameObject> getGameObjects();
+
+    /**
+     * @return the nodes of the map
+     */
+    Graph<MapNode> getMapNodes();
 }

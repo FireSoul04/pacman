@@ -64,7 +64,7 @@ public class Pacman {
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final OutsideCageNotifier outsideCageNotifier = new OutsideCageNotifier(EXIT_POSITION);
     private final List<Ghost> ghosts = new ArrayList<>();
-    private final Graph<MapNode> map = new GraphImpl<>();
+    private Graph<MapNode> map = new GraphImpl<>();
     private int lives = MAX_LIVES;
     private Player player;
     private Scene2D scene;
@@ -160,10 +160,6 @@ public class Pacman {
         return path;
     }
 
-    // private double distance(final Vector2D v1, final Vector2D v2) {
-    //     return Math.sqrt((v1.getX() - v2.getX()) * (v1.getX() - v2.getX()) + (v1.getY() - v2.getY()) * (v1.getY() - v2.getY()));
-    // }
-
     /**
      * Set all the ghosts vulnerable.
      */
@@ -226,6 +222,7 @@ public class Pacman {
     private void createScene() {
         this.scene = new Scene2D(MAP_PATH);
         this.addGameObject(this.outsideCageNotifier);
+        this.map = this.scene.getMapNodes();
         this.ghosts.clear();
         for (final GameObject g : this.getGameObjects()) {
             if (g instanceof Player p) {
@@ -237,8 +234,6 @@ public class Pacman {
                 this.ghosts.add(gh);
             } else if (g instanceof PowerPill pl) {
                 pl.connectToGameLogic(this);
-            } else if (g instanceof MapNode n) {
-                map.addNode(n);
             }
         }
         if (this.player == null) {
@@ -254,5 +249,9 @@ public class Pacman {
         for (final GameObject g : this.getGameObjects()) {
             g.reset();
         }
+    }
+
+    public static double distance(final Vector2D v1, final Vector2D v2) {
+        return Math.sqrt((v1.getX() - v2.getX()) * (v1.getX() - v2.getX()) + (v1.getY() - v2.getY()) * (v1.getY() - v2.getY()));
     }
 }

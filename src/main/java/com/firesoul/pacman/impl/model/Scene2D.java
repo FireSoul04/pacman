@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
+import com.firesoul.editor.gui.Pair;
 import com.firesoul.pacman.api.model.GameObject;
-import com.firesoul.pacman.api.model.Room;
+import com.firesoul.pacman.api.model.Graph;
+import com.firesoul.pacman.api.model.Scene;
 import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
@@ -17,7 +19,7 @@ import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Invisible2D;
 
-public class Scene2D implements Room {
+public class Scene2D implements Scene {
 
     private static final int DEFAULT_WIDTH = 224;
     private static final int DEFAULT_HEIGHT = 288;
@@ -25,7 +27,8 @@ public class Scene2D implements Room {
     private final Timer collisionTimer = new TimerImpl(Timer.secondsToMillis(1 / 60));
     private final List<GameObject> gameObjects = new ArrayList<GameObject>();
     private final List<Collidable> cachedCollidables = new ArrayList<Collidable>();
-    private final Map2D map;
+    private final Graph<MapNode> mapNodes = new GraphImpl<>();
+    private final Vector2D dimensions;
     private Pacman pacman;
 
     /**
@@ -36,12 +39,8 @@ public class Scene2D implements Room {
     }
 
     public Scene2D(final int width, final int height) {
-        this.map = new Map2D(width, height);
+        this.dimensions = new Vector2D(width, height);
         this.collisionTimer.start();
-    }
-
-    public void connectToGameLogic(final Pacman pacman) {
-        this.pacman = pacman;
     }
 
     /**
@@ -51,15 +50,22 @@ public class Scene2D implements Room {
      * @param blockMapPath the path to the block map
      */
     public Scene2D(final String mapPath) {
-        this.map = new Map2D(mapPath);
+        final Map2D map = new Map2D(mapPath);
+        this.dimensions = map.getDimensions();
         this.collisionTimer.start();
-        
-        for (final GameObject g : this.map.getGameObjects()) {
+        for (final var node : map.getMapNodes()) {
+            this.addNode(node);
+        }
+        for (final GameObject g : map.getGameObjects()) {
             if (g instanceof Wall w) {
                 w.setDrawable(new Invisible2D(w.getColliders().get(0).getDimensions()));
             }
             this.addGameObject(g);
         }
+    }
+
+    public void connectToGameLogic(final Pacman pacman) {
+        this.pacman = pacman;
     }
 
     @Override
@@ -111,11 +117,26 @@ public class Scene2D implements Room {
         return Collections.unmodifiableList(this.gameObjects);
     }
 
+    @Override
+    public Graph<MapNode> getMapNodes() {
+        return this.mapNodes;
+    }
+
+    private void addNode(final Pair<Vector2D, List<Vector2D>> node) {
+        final MapNode x = new MapNode(node.x());
+        this.mapNodes.addNode(x);
+        for (final var elem : node.y()) {
+            final var y = new MapNode(elem);
+            this.mapNodes.addNode(y);
+            this.mapNodes.addEdge(x, y, Pacman.distance(node.x(), elem));
+        }
+    }
+
     /**
      * @return the dimensions of the room.
      */
     public Vector2D getDimensions() {
-        return this.map.getDimensions();
+        return this.dimensions;
     }
 
     /**

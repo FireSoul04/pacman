@@ -27,6 +27,7 @@ import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Graph;
 import com.firesoul.pacman.impl.model.GraphImpl;
 import com.firesoul.pacman.impl.model.MapNode;
+import com.firesoul.pacman.impl.model.Pacman;
 import com.firesoul.pacman.impl.model.entities.Pill;
 import com.firesoul.pacman.impl.model.entities.Player;
 import com.firesoul.pacman.impl.model.entities.PowerPill;
@@ -200,7 +201,7 @@ public class Gui extends JFrame implements MouseListener {
                 for (final var elem : node.y()) {
                     final var y = new MapNode(elem);
                     this.mapNodes.addNode(y);
-                    this.mapNodes.addEdge(x, y, this.distance(node.x(), elem));
+                    this.mapNodes.addEdge(x, y, Pacman.distance(node.x(), elem));
                 }
             }
         } catch (IllegalStateException e) {
@@ -384,7 +385,7 @@ public class Gui extends JFrame implements MouseListener {
         if (this.selectedNodes.size() == 2) {
             final MapNode src = this.selectedNodes.removeFirst();
             final MapNode dst = this.selectedNodes.removeFirst();
-            this.mapNodes.addEdge(src, dst, this.distance(src.getPosition(), dst.getPosition()));
+            this.mapNodes.addEdge(src, dst, Pacman.distance(src.getPosition(), dst.getPosition()));
         }
     }
 
@@ -393,10 +394,6 @@ public class Gui extends JFrame implements MouseListener {
         if (node.isPresent()) {
             this.mapNodes.removeNode(node.get());
         }
-    }
-
-    private double distance(final Vector2D v1, final Vector2D v2) {
-        return Math.sqrt((v1.getX() - v2.getX()) * (v1.getX() - v2.getX()) + (v1.getY() - v2.getY()) * (v1.getY() - v2.getY()));
     }
 
     private long howManyInstanciesOf(final GameObjects g) {
