@@ -2,10 +2,9 @@ package com.firesoul.pacman.impl.model;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
+import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
 import com.firesoul.pacman.api.model.Graph;
@@ -56,26 +55,33 @@ public class GraphImpl<T> implements Graph<T> {
 
     @Override
     public List<T> findShortestPath(final T source, final T destination) {
-        final List<T> path = new LinkedList<>();
-        final Queue<Node<T>> queue = new LinkedList<>();
         this.nodes.get(source).setWeight(0);
-        queue.add(Graph.node(source));
+        final Map<T, Node<T>> path = new LinkedHashMap<>();
+        final PriorityQueue<Node<T>> queue = new PriorityQueue<>(this.nodes.values());
         while (!queue.isEmpty()) {
-            final Node<T> src = queue.stream().min((a, b) -> Double.compare(a.getWeight(), b.getWeight())).get();
-            path.add(src.node());
+            final Node<T> src = queue.remove();
+            path.put(src.node(), src);
             for (final var edge : src.edges().entrySet()) {
                 final Node<T> dst = edge.getKey();
                 final double weight = edge.getValue();
                 this.relax(src, dst, weight);
             }
         }
-        return path;
+
+        Node<T> dst = path.get(destination);
+        while (dst.getFather() != null) {
+            System.out.println(dst.node());
+            dst = dst.getFather();
+        }
+
+        return List.of();
     }
 
     private void relax(final Node<T> source, final Node<T> destination, final double weight) {
-        final double newWeight = destination.getWeight() + weight;
-        if (source.getWeight() > newWeight) {
-            source.setWeight(newWeight);
+        final double newWeight = source.getWeight() + weight;
+        if (destination.getWeight() > newWeight) {
+            destination.setWeight(newWeight);
+            destination.setFather(source);
         }
     }
 }

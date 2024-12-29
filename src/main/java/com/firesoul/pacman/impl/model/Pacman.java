@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.firesoul.editor.gui.Pair;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Graph;
 import com.firesoul.pacman.api.model.entities.Collidable;
@@ -51,14 +52,6 @@ public class Pacman {
     private static final Vector2D EXIT_POSITION = new Vector2D(112, 84);
     private static final Vector2D CAGE_CENTER_POSITION = new Vector2D(112, 112);
     
-    private final Ghost dummy = new Ghost(Vector2D.zero(), "blinky", 0, Vector2D.zero()) {
-        @Override
-        protected void move() {
-        }
-        @Override
-        public void update(final double deltaTime) {
-        }
-    };
     private final GameCore game;
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
@@ -79,6 +72,8 @@ public class Pacman {
         this.level = 1;
         this.nextLevelTimer.start();
         this.createScene();
+        // System.out.println(this.map.edges().entrySet().stream().map(t -> new Pair<Vector2D, List<Vector2D>>(t.getKey().getPosition(), t.getValue().stream().map(a -> a.getPosition()).toList())).toList());
+        System.out.println(this.map.findShortestPath(this.map.nodes().get(0), this.map.nodes().get(19)).stream().map(t -> t.getPosition()).toList());
     }
 
     public void update(final double deltaTime) {
@@ -149,6 +144,7 @@ public class Pacman {
 
     public List<Vector2D> findPathToCage(final Vector2D position) {
         final List<Vector2D> path = new LinkedList<>();
+
         // double distanceToCage = 0;
         // this.dummy.setPosition(new Vector2D(Math.round(position.getX()), Math.round(position.getY())));
         // do {
@@ -164,10 +160,8 @@ public class Pacman {
      * Set all the ghosts vulnerable.
      */
     public void setGhostVulnerable() {
-        for (final GameObject g : this.getGameObjects()) {
-            if (g instanceof Ghost gh) {
-                gh.setVulnerable();
-            }
+        for (final Ghost g : this.ghosts) {
+            g.setVulnerable();
         }
     }
 
@@ -241,8 +235,6 @@ public class Pacman {
         } else if (this.ghosts.size() != 4) {
             throw new IllegalStateException("One or more ghosts are missing in this scene");
         }
-        this.dummy.setVisible(false);
-        this.addGameObject(this.dummy);
     }
 
     private void reset() {

@@ -7,14 +7,23 @@ import java.util.Map;
 
 public interface Graph<T> {
 
-    public static class Node<T> {
+    static <T> Node<T> node(T node) {
+        return new Node<>(node);
+    }
+
+    public static class Node<T> implements Comparable<Node<T>> {
         private final Map<Node<T>, Double> edges = new LinkedHashMap<>();
         private final T node;
         private double weight;
+        private Node<T> father = null;
 
         private Node(final T node, final double weight) {
             this.node = node;
             this.weight = weight;
+        }
+
+        private Node(final T node) {
+            this(node, Double.POSITIVE_INFINITY);
         }
         
         public T node() {
@@ -44,21 +53,18 @@ public interface Graph<T> {
         public void setWeight(final double weight) {
             this.weight = weight;
         }
+        
+        public Node<T> getFather() {
+            return father;
+        }
 
-        @Override
-        public int hashCode() {
-            return node.hashCode();
+        public void setFather(final Node<T> father) {
+            this.father = father;
         }
 
         @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o instanceof Node n) {
-                return this.node.equals(n.node);
-            }
-            return false;
+        public int compareTo(final Node<T> o) {
+            return Double.compare(this.getWeight(), o.getWeight());
         }
     }
 
@@ -77,8 +83,4 @@ public interface Graph<T> {
     void clear();
 
     List<T> findShortestPath(T source, T destination);
-
-    static <T> Node<T> node(T node) {
-        return new Node<>(node, Double.POSITIVE_INFINITY);
-    }
 }
