@@ -2,6 +2,7 @@ package com.firesoul.pacman.impl.model;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -29,8 +30,8 @@ public class GraphImpl<T> implements Graph<T> {
         if (!this.nodes.containsKey(source)) {
             throw new IllegalStateException("Cannot add an edge to a non existant node");
         }
-        this.nodes.get(source).addEdge(Graph.node(destination), weight);
-        this.nodes.get(destination).addEdge(Graph.node(source), weight);
+        this.nodes.get(source).addEdge(destination, weight);
+        this.nodes.get(destination).addEdge(source, weight);
     }
 
     @Override
@@ -40,12 +41,12 @@ public class GraphImpl<T> implements Graph<T> {
 
     @Override
     public Map<T, List<T>> edges() {
-        return Collections.unmodifiableMap(this.nodes.values().stream().collect(Collectors.toMap(Node::node, t -> t.edges().keySet().stream().map(Node::node).toList())));
+        return Collections.unmodifiableMap(this.nodes.values().stream().collect(Collectors.toMap(Node::node, t -> t.edges().keySet().stream().toList())));
     }
 
     @Override
     public List<T> edges(final T source) {
-        return Collections.unmodifiableList(this.nodes.values().stream().filter(t -> t.node().equals(source)).flatMap(t -> t.edges().entrySet().stream()).map(t -> t.getKey().node()).toList());
+        return Collections.unmodifiableList(this.nodes.values().stream().filter(t -> t.node().equals(source)).flatMap(t -> t.edges().entrySet().stream()).map(t -> t.getKey()).toList());
     }
 
     @Override
@@ -56,32 +57,33 @@ public class GraphImpl<T> implements Graph<T> {
     @Override
     public List<T> findShortestPath(final T source, final T destination) {
         this.nodes.get(source).setWeight(0);
-        final Map<T, Node<T>> path = new LinkedHashMap<>();
+        final Map<T, Node<T>> solutions = new LinkedHashMap<>();
         final PriorityQueue<Node<T>> queue = new PriorityQueue<>(this.nodes.values());
         while (!queue.isEmpty()) {
             final Node<T> src = queue.remove();
-            path.put(src.node(), src);
+            solutions.put(src.node(), src);
             for (final var edge : src.edges().entrySet()) {
-                final Node<T> dst = edge.getKey();
+                final Node<T> dst = this.nodes.get(edge.getKey());
                 final double weight = edge.getValue();
                 this.relax(src, dst, weight);
             }
         }
 
-        Node<T> dst = path.get(destination);
+        final List<T> path = new LinkedList<>();
+        Node<T> dst = solutions.get(destination);
         while (dst.getFather() != null) {
-            System.out.println(dst.node());
-            dst = dst.getFather();
+            path.add(dst.node());
+            dst = solutions.get(dst.getFather());
         }
-
-        return List.of();
+        path.add(source);
+        return path.reversed();
     }
 
     private void relax(final Node<T> source, final Node<T> destination, final double weight) {
         final double newWeight = source.getWeight() + weight;
         if (destination.getWeight() > newWeight) {
             destination.setWeight(newWeight);
-            destination.setFather(source);
+            destination.setFather(source.node());
         }
     }
 }

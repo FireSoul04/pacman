@@ -12,10 +12,10 @@ public interface Graph<T> {
     }
 
     public static class Node<T> implements Comparable<Node<T>> {
-        private final Map<Node<T>, Double> edges = new LinkedHashMap<>();
+        private final Map<T, Double> edges = new LinkedHashMap<>();
         private final T node;
         private double weight;
-        private Node<T> father = null;
+        private T father = null;
 
         private Node(final T node, final double weight) {
             this.node = node;
@@ -30,15 +30,15 @@ public interface Graph<T> {
             return node;
         }
         
-        public Map<Node<T>, Double> edges() {
+        public Map<T, Double> edges() {
             return Collections.unmodifiableMap(this.edges);
         }
 
-        public void addEdge(final Node<T> node, final double weight) {
+        public void addEdge(final T node, final double weight) {
             this.edges.put(node, weight);
         }
 
-        public void removeEdge(final Node<T> node) {
+        public void removeEdge(final T node) {
             this.edges.remove(node);
         }
 
@@ -54,11 +54,11 @@ public interface Graph<T> {
             this.weight = weight;
         }
         
-        public Node<T> getFather() {
+        public T getFather() {
             return father;
         }
 
-        public void setFather(final Node<T> father) {
+        public void setFather(final T father) {
             this.father = father;
         }
 
