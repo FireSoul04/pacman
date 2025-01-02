@@ -65,5 +65,6 @@ public class TestGraph {
     @Test
     void dijkstra() {
         assertEquals(List.of("node1", "node4", "node6"), graph.findShortestPath("node1", "node6"));
+        assertEquals(List.of(), graph.findShortestPath("node2", "node6"));
     }
 }

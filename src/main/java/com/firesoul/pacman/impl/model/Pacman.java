@@ -72,8 +72,13 @@ public class Pacman {
         this.level = 1;
         this.nextLevelTimer.start();
         this.createScene();
-        // System.out.println(this.map.edges().entrySet().stream().map(t -> new Pair<Vector2D, List<Vector2D>>(t.getKey().getPosition(), t.getValue().stream().map(a -> a.getPosition()).toList())).toList());
-        System.out.println(this.map.findShortestPath(this.map.nodes().get(0), this.map.nodes().get(19)).stream().map(t -> t.getPosition()).toList());
+        for (final var src : this.map.nodes()) {
+            for (final var dst : this.map.nodes()) {
+                if (!src.equals(dst)) {
+                    System.out.println(this.map.findShortestPath(src, dst).stream().map(GameObject::getPosition).toList());
+                }
+            }
+        }
     }
 
     public void update(final double deltaTime) {

@@ -68,15 +68,7 @@ public class GraphImpl<T> implements Graph<T> {
                 this.relax(src, dst, weight);
             }
         }
-
-        final List<T> path = new LinkedList<>();
-        Node<T> dst = solutions.get(destination);
-        while (dst.getFather() != null) {
-            path.add(dst.node());
-            dst = solutions.get(dst.getFather());
-        }
-        path.add(source);
-        return path.reversed();
+        return computePath(solutions.get(source), solutions.get(destination), solutions).stream().map(t -> t.node()).toList();
     }
 
     private void relax(final Node<T> source, final Node<T> destination, final double weight) {
@@ -85,5 +77,22 @@ public class GraphImpl<T> implements Graph<T> {
             destination.setWeight(newWeight);
             destination.setFather(source.node());
         }
+    }
+
+    private List<Node<T>> computePath(final Node<T> source, final Node<T> destination, final Map<T, Node<T>> solutions) {
+        final List<Node<T>> ret;
+        if (destination == null) {
+            ret = new LinkedList<>();
+        } else if (source.equals(destination)) {
+            ret = new LinkedList<>();
+            ret.add(source);
+        } else {
+            final Node<T> father = solutions.get(destination.getFather());
+            ret = computePath(source, father, solutions);
+            if (father != null) {
+                ret.add(destination);
+            }
+        }
+        return ret;
     }
 }
