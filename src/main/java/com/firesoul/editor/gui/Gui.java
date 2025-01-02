@@ -1,13 +1,6 @@
 package com.firesoul.editor.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Point;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -18,24 +11,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 
-import com.firesoul.pacman.api.model.GameObject;
-import com.firesoul.pacman.api.model.Graph;
-import com.firesoul.pacman.impl.model.GraphImpl;
-import com.firesoul.pacman.impl.model.MapNode;
-import com.firesoul.pacman.impl.model.Pacman;
-import com.firesoul.pacman.impl.model.entities.Pill;
-import com.firesoul.pacman.impl.model.entities.Player;
-import com.firesoul.pacman.impl.model.entities.PowerPill;
-import com.firesoul.pacman.impl.model.entities.Wall;
-import com.firesoul.pacman.impl.model.entities.ghosts.Blinky;
-import com.firesoul.pacman.impl.model.entities.ghosts.Clyde;
-import com.firesoul.pacman.impl.model.entities.ghosts.Inky;
-import com.firesoul.pacman.impl.model.entities.ghosts.Pinky;
+import com.firesoul.pacman.api.model.*;
+import com.firesoul.pacman.impl.model.*;
+import com.firesoul.pacman.impl.model.entities.*;
+import com.firesoul.pacman.impl.model.entities.ghosts.*;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Gui extends JFrame implements MouseListener {
@@ -152,7 +133,7 @@ public class Gui extends JFrame implements MouseListener {
                 ), this.mapNodes.edges()
                     .entrySet()
                     .stream()
-                    .map(t -> new Pair<>(t.getKey().getPosition(), t.getValue().stream().map(a -> a.getPosition()).toList()))
+                    .map(t -> new Pair<>(t.getKey().getPosition(), t.getValue().keySet().stream().map(a -> a.getPosition()).toList()))
                     .toList()
             );
         } else {
@@ -234,7 +215,7 @@ public class Gui extends JFrame implements MouseListener {
                     final int y1 = (int) node.getKey().getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
                     final Rectangle t = new Rectangle((int) node.getKey().getPosition().dot(SCALE).getX(), (int) node.getKey().getPosition().dot(SCALE).getY(), SIZE, SIZE);
                     g.drawRect(t.x, t.y, t.width * SCALE, t.height * SCALE);
-                    for (final var edge : node.getValue()) {
+                    for (final var edge : node.getValue().keySet()) {
                         final int x2 = (int) edge.getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
                         final int y2 = (int) edge.getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
                         g.drawLine(x1, y1, x2, y2);

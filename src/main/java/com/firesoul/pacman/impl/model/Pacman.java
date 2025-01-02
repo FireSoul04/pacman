@@ -10,6 +10,7 @@ import java.util.List;
 import com.firesoul.editor.gui.Pair;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Graph;
+import com.firesoul.pacman.api.model.GraphOperators;
 import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.util.Timer;
@@ -73,10 +74,8 @@ public class Pacman {
         this.nextLevelTimer.start();
         this.createScene();
         for (final var src : this.map.nodes()) {
-            for (final var dst : this.map.nodes()) {
-                if (!src.equals(dst)) {
-                    System.out.println(this.map.findShortestPath(src, dst).stream().map(GameObject::getPosition).toList());
-                }
+            if (src.getPosition().getX() == 108) {
+                System.out.println(src.getPosition());
             }
         }
     }
