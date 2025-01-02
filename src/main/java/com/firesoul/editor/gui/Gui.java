@@ -5,71 +5,28 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.ConcurrentModificationException;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import com.firesoul.editor.gui.LogicImpl.GameObjects;
 import com.firesoul.pacman.api.model.*;
-import com.firesoul.pacman.impl.model.*;
 import com.firesoul.pacman.impl.model.entities.*;
-import com.firesoul.pacman.impl.model.entities.ghosts.*;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Gui extends JFrame implements MouseListener {
 
+    private static final int SCALE = 3;
+    private static final int LEFT_MARGIN = 48;
     private static final int SIZE = 16;
     private static final int GRID_SIZE = 8;
-    private static final int LEFT_MARGIN = 48;
     private static final int WIDTH = 224;
     private static final int HEIGHT = 248;
-    private static final int SCALE = 3;
-    private static final String MAP_PATH = "src/main/resources/map/map.txt";
-    private static final List<GameObjects> LIMITED_GAME_OBJECTS = List.of(
-        GameObjects.PLAYER,
-        GameObjects.BLINKY,
-        GameObjects.PINKY,
-        GameObjects.INKY,
-        GameObjects.CLYDE
-    );
 
-    private enum GameObjects {
-        PLAYER,
-        BLINKY,
-        PINKY,
-        INKY,
-        CLYDE,
-        PILL,
-        POWERPILL,
-        WALL,
-        MAPNODE,
-        LINKNODES,
-        ERASER;
-
-        public static List<String> getAll() {
-            return List.of(
-                "Player",
-                "Blinky",
-                "Pinky",
-                "Inky",
-                "Clyde",
-                "Pill",
-                "Powerpill",
-                "Wall",
-                "MapNode",
-                "LinkNodes",
-                "Eraser"
-            );
-        }
-    };
-
-    private final ConcurrentLinkedQueue<Pair<GameObject, Rectangle>> gameObjects = new ConcurrentLinkedQueue<>();
-    private final FileParser parser = new FileParser(WIDTH, HEIGHT, MAP_PATH);
-    private final List<MapNode> selectedNodes = new LinkedList<>();
-    private final Graph<MapNode> mapNodes = new GraphImpl<>();
+    private final Logic logic = new LogicImpl();
     private final JPanel buttonFrame;
     private final JPanel editorFrame;
     private final JLabel labelSelected;
@@ -97,7 +54,7 @@ public class Gui extends JFrame implements MouseListener {
         this.setVisible(true);
     }
 
-    private synchronized void addHandlerButtons() {
+    private void addHandlerButtons() {
         final JButton reset = new JButton("Reset");
         final JButton goBack = new JButton("Go back to last modify");
         final JButton save = new JButton("Save");
@@ -110,288 +67,174 @@ public class Gui extends JFrame implements MouseListener {
         this.buttonFrame.add(save, BorderLayout.EAST);
     }
 
-    private synchronized void addEditorButtons() {
-        GameObjects.getAll().forEach(t -> this.editorFrame.add(new JButton(t)));
+    private void addEditorButtons() {
+        Arrays.asList(GameObjects.values()).stream().map(GameObjects::name).map(String::toLowerCase).forEach(t -> this.editorFrame.add(new JButton(t)));
         List.of(this.editorFrame.getComponents())
             .stream()
             .filter(t -> t instanceof JButton)
             .map(t -> (JButton) t)
             .forEach(t -> t.addActionListener(e -> this.selected = GameObjects.valueOf(t.getText().toUpperCase())));
 
-        final JButton link = new JButton("Link");
-        link.addActionListener(t -> this.linkNodes());
+        final JButton link = new JButton("link");
+        link.addActionListener(t -> this.logic.linkNodes());
         this.editorFrame.add(link);
         this.editorFrame.add(this.labelSelected);
     }
 
-    private synchronized void saveToFile() {
-        if (this.areAllLimitedObjectsPresent()) {
-            this.parser.save(this.gameObjects.stream()
-                .collect(Collectors.toMap(
-                    t -> new Pair<>(t.x().getPosition(), new Vector2D(t.y().getWidth(), t.y().getHeight())),
-                    t -> t.x().getClass().getName())
-                ), this.mapNodes.edges()
-                    .entrySet()
-                    .stream()
-                    .map(t -> new Pair<>(t.getKey().getPosition(), t.getValue().keySet().stream().map(a -> a.getPosition()).toList()))
-                    .toList()
-            );
-        } else {
-            System.out.println("Cannot save, some mandatory game objects are missing");
-        }
+    private void saveToFile() {
+        this.logic.save();
     }
 
-    private synchronized boolean areAllLimitedObjectsPresent() {
-        return LIMITED_GAME_OBJECTS.stream().filter(a -> 
-                this.gameObjects.stream().anyMatch(t ->
-                    a.name().equals(t.x().getClass().getSimpleName().toUpperCase())
-                )
-            ).toList()
-            .equals(LIMITED_GAME_OBJECTS);
-    }
-
-    private synchronized void loadFromFile() {
-        try {
-            this.gameObjects.addAll(this.parser.load()
-                .entrySet()
-                .stream()
-                .map(t -> {
-                    try {
-                        GameObject g = null;
-                        if (t.getValue().equals(Wall.class.getName())) {
-                            g = (GameObject) Class.forName(t.getValue())
-                                .getConstructor(Vector2D.class, Vector2D.class)
-                                .newInstance(t.getKey().x(), t.getKey().y());
-                        } else {
-                            g = (GameObject) Class.forName(t.getValue())
-                                .getConstructor(Vector2D.class)
-                                .newInstance(t.getKey().x());
-                        }
-                        return new Pair<>(
-                            g,
-                            new Rectangle((int) g.getPosition().getX(), (int) g.getPosition().getY(), (int) t.getKey().y().getX(), (int) t.getKey().y().getY())
-                        );
-                    } catch (Exception e) {
-                        throw new IllegalStateException();
-                    }
-                }).toList()
-            );
-            for (final var node : this.parser.getMapNodes()) {
-                final var x = new MapNode(node.x());
-                this.mapNodes.addNode(x);
-                for (final var elem : node.y()) {
-                    final var y = new MapNode(elem);
-                    this.mapNodes.addNode(y);
-                    this.mapNodes.addEdge(x, y, Pacman.distance(node.x(), elem));
-                }
-            }
-        } catch (IllegalStateException e) {
-            System.out.println("Cannot load from file");
-        }
+    private void loadFromFile() {
+        this.logic.load();
     }
 
     public void run() {
-        final Graphics g = this.canvas.getGraphics();
-        try {
-            while (true) {
-                g.drawImage(this.readImage(), LEFT_MARGIN, 0, WIDTH * SCALE, HEIGHT * SCALE, this.canvas);
-                for (final var entry : this.gameObjects) {
-                    if (entry.x() instanceof Wall) {
-                        g.setColor(Color.BLUE);
-                        final Rectangle t = entry.y();
-                        g.fillRect(t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE);
-                    } else {
-                        final GameObject gameObject = entry.x();
-                        final Image image = gameObject.getDrawable().getImage();
-                        final Rectangle t = entry.y();
-                        if (image != null) {
-                            g.drawImage(image, t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE, this.canvas);
-                        }
-                    }
-                }
-                g.setColor(Color.RED);
-                for (final var node : this.mapNodes.edges().entrySet()) {
-                    final int x1 = (int) node.getKey().getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
-                    final int y1 = (int) node.getKey().getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
-                    final Rectangle t = new Rectangle((int) node.getKey().getPosition().dot(SCALE).getX(), (int) node.getKey().getPosition().dot(SCALE).getY(), SIZE, SIZE);
-                    g.drawRect(t.x, t.y, t.width * SCALE, t.height * SCALE);
-                    for (final var edge : node.getValue().keySet()) {
-                        final int x2 = (int) edge.getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
-                        final int y2 = (int) edge.getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
-                        g.drawLine(x1, y1, x2, y2);
-                    }
-                }
-                this.labelSelected.setText(this.selected.name().toLowerCase());
-                try {
-                    Thread.sleep(10);
-                } catch (Exception e) {
-                }
+        while (true) {
+            this.draw();
+            this.labelSelected.setText(this.selected.name().toLowerCase());
+            try {
+                Thread.sleep(10);
+            } catch (Exception e) {
             }
-        } catch (IOException e) {}
+        }
     }
 
-    private synchronized Rectangle getRectangle(final Point p1, final Point p2) {
+    private void draw() {
+        final Graphics g = this.canvas.getGraphics();
+        this.drawBackground(g);
+        for (final GameObject gameObject : this.logic.getGameObjects()) {
+            final Vector2D position = gameObject.getPosition();
+            final Vector2D size = gameObject instanceof Wall w
+                ? w.getColliders().getFirst().getDimensions()
+                : gameObject.getDrawable().getImageSize();
+            final Rectangle rect = new Rectangle((int) position.getX(), (int) position.getY(), (int) size.getX(), (int) size.getY());
+            if (gameObject instanceof Wall) {
+                this.drawWall(g, rect);
+            } else {
+                this.drawImage(g, gameObject, rect);
+            }
+        }
+        this.drawGraph(g);
+    }
+
+    private void drawBackground(final Graphics g) {
+        Image image = null;
+        try {
+            image = this.readImage();
+        } catch (final IOException e) {
+            System.out.println("Cant found image");
+        }
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, this.getContentPane().getWidth() * SCALE, this.getContentPane().getHeight() * SCALE);
+        if (image != null) {
+            g.drawImage(image, LEFT_MARGIN, 0, WIDTH * SCALE, HEIGHT * SCALE, this.canvas);
+        }
+    }
+
+    private Image readImage() throws IOException {
+        return ImageIO.read(new File("src/main/resources/sprites/map/map_hitboxes.png"));
+    }
+
+    private void drawWall(final Graphics g, final Rectangle t) {
+        g.setColor(Color.BLUE);
+        g.fillRect(t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE);
+    }
+
+    private void drawImage(final Graphics g, final GameObject gameObject, final Rectangle t) {
+        final Image image = gameObject.getDrawable().getImage();
+        if (image != null) {
+            g.drawImage(image, t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE, this.canvas);
+        }
+    }
+
+    private void drawGraph(final Graphics g) {
+        g.setColor(Color.RED);
+        try {
+            for (final var node : this.logic.getMap().edges().entrySet()) {
+                final int x1 = (int) node.getKey().getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
+                final int y1 = (int) node.getKey().getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
+                final Rectangle t = new Rectangle((int) node.getKey().getPosition().dot(SCALE).getX(), (int) node.getKey().getPosition().dot(SCALE).getY(), SIZE, SIZE);
+                g.drawRect(t.x, t.y, t.width * SCALE, t.height * SCALE);
+                for (final var edge : node.getValue().keySet()) {
+                    final int x2 = (int) edge.getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
+                    final int y2 = (int) edge.getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
+                    g.drawLine(x1, y1, x2, y2);
+                }
+            }
+        } catch (ConcurrentModificationException e) {
+        }
+    }
+
+    private Rectangle getRectangle(final Point p1, final Point p2) {
         final int w = (int) Math.abs(p2.getX() - p1.getX());
         final int h = (int) Math.abs(p2.getY() - p1.getY());
         return new Rectangle(approximate((int)p1.x / SCALE), approximate((int)p1.y / SCALE), approximate(w / SCALE), approximate(h / SCALE));
     }
 
-    private synchronized int approximate(final int x) {
+    private int approximate(final int x) {
         return x - (x % 4);
     }
 
-    private synchronized int approximateGrid(final int x) {
-        return x - (x % (LIMITED_GAME_OBJECTS.stream().anyMatch(t -> t.equals(this.selected)) ? GRID_SIZE / 2 : GRID_SIZE)) - 4;
+    private int approximateGrid(final int x) {
+        return x - (x % (this.logic.isLimited(this.selected) ? GRID_SIZE / 2 : GRID_SIZE)) - 4;
     }
 
-    private synchronized void reset() {
+    private void reset() {
         final Graphics g = this.canvas.getGraphics();
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, WIDTH * SCALE + LEFT_MARGIN, HEIGHT * SCALE);
         this.canvas.update(g);
-        this.gameObjects.clear();
+        this.logic.reset();
     }
 
-    private synchronized void goBack() {
-        if (this.gameObjects.size() > 0) {
-            this.gameObjects.remove(this.gameObjects.toArray()[this.gameObjects.size() - 1]);
-        }
-        final Graphics g = this.canvas.getGraphics();
-        g.setColor(Color.WHITE);
-        g.fillRect(0, 0, WIDTH * SCALE + LEFT_MARGIN, HEIGHT * SCALE);
-        this.canvas.update(g);
-    }
-
-    public synchronized Image readImage() throws IOException {
-        return ImageIO.read(new File("src/main/resources/sprites/map/map_hitboxes.png"));
+    private void goBack() {
+        // unimplemented
+        // if (this.logic.getGameObjects().size() > 0) {
+        //     this.logic.getGameObjects().remove(this.logic.getGameObjects().toArray()[this.logic.getGameObjects().size() - 1]);
+        // }
+        // final Graphics g = this.canvas.getGraphics();
+        // g.setColor(Color.WHITE);
+        // g.fillRect(0, 0, WIDTH * SCALE + LEFT_MARGIN, HEIGHT * SCALE);
+        // this.canvas.update(g);
     }
 
     @Override
-    public synchronized void mouseClicked(final MouseEvent e) {
+    public void mouseClicked(final MouseEvent e) {
     }
 
     @Override
-    public synchronized void mousePressed(final MouseEvent e) {
-        if (this.selected.equals(GameObjects.ERASER)) {
-            final Point p = new Point(e.getX() / SCALE, e.getY() / SCALE);
-            this.removeGameObject(p);
-            this.removeWall(p);
-            this.removeNode(p);
-        } else if (this.selected.equals(GameObjects.WALL)) {
+    public void mousePressed(final MouseEvent e) {
+        if (this.selected.equals(GameObjects.WALL)) {
             this.startPos = e.getPoint();
-        } else if (this.selected.equals(GameObjects.LINKNODES)) {
-            final Vector2D p = new Vector2D(approximateGrid(e.getX() / SCALE), approximateGrid(e.getY() / SCALE));
-            if (this.mapNodes.nodes().stream()
-                .map(GameObject::getPosition)
-                .anyMatch(t -> t.equals(p))
-                && this.selectedNodes.size() < 2
-            ) {
-                final MapNode node = this.mapNodes.nodes().stream()
-                    .filter(t -> t.getPosition().equals(p))
-                    .findFirst()
-                    .get();
-                this.selectedNodes.add(node);
-            }
-        } else if (this.selected.equals(GameObjects.MAPNODE)) {
-            final Vector2D p = new Vector2D(approximateGrid(e.getX() / SCALE), approximateGrid(e.getY() / SCALE));
-            if (this.mapNodes.nodes().stream().noneMatch(t -> t.getPosition().equals(p))) {
-                this.mapNodes.addNode(new MapNode(p));
-            }
         } else {
-            final Point p = new Point(approximateGrid(e.getX() / SCALE), approximateGrid(e.getY() / SCALE));
-            if (this.selected.equals(GameObjects.MAPNODE) || this.gameObjects.stream().map(t -> t.y()).filter(t -> t.x == p.x && t.y == p.y).count() < 1) {
-                final Rectangle rect = new Rectangle(p.x, p.y, SIZE, SIZE);
-                this.addGameObject(e.getPoint(), rect);
-            }
+            final Vector2D p = this.selected.equals(GameObjects.ERASER)
+                ? new Vector2D(e.getX() / SCALE, e.getY() / SCALE)
+                : new Vector2D(approximateGrid(e.getX() / SCALE), approximateGrid(e.getY() / SCALE));
+            this.logic.click(this.selected, p);
         }
     }
 
     @Override
-    public synchronized void mouseReleased(final MouseEvent e) {
-        if (selected.equals(GameObjects.WALL)) {
+    public void mouseReleased(final MouseEvent e) {
+        if (this.selected.equals(GameObjects.WALL)) {
             final Rectangle rect = this.getRectangle(this.startPos, e.getPoint());
             this.addGameObject(e.getPoint(), rect);
         }
     }
 
-    private synchronized void removeGameObject(final Point p) {
-        final Vector2D position = new Vector2D(approximateGrid((int) p.getX()), approximateGrid((int) p.getY()));
-        final var gameObject = this.gameObjects.stream().filter(t -> t.x().getPosition().equals(position)).findFirst();
-        if (gameObject.isPresent()) {
-            gameObjects.remove(gameObject.get());
-        }
-    }
-
-    private synchronized void removeWall(final Point p) {
-        final var wall = this.gameObjects.stream().filter(
-            t -> p.getX() >= t.x().getPosition().getX()
-                && p.getX() <= t.x().getPosition().getX() + t.y().getWidth()
-                && p.getY() >= t.x().getPosition().getY()
-                && p.getY() <= t.x().getPosition().getY() + t.y().getHeight()
-        ).findFirst();
-        if (wall.isPresent()) {
-            gameObjects.remove(wall.get());
-        }
-    }
-
-    private synchronized void addGameObject(final Point p, final Rectangle rect) {
-        final Vector2D position = new Vector2D(approximateGrid((int) p.getX() / SCALE), approximateGrid((int) p.getY() / SCALE));
-        final GameObject gameObject = this.getGameObject(position, new Vector2D(rect.getWidth(), rect.getHeight()));
-        if (rect.width > 0 && rect.height > 0) {
-            if (!LIMITED_GAME_OBJECTS.contains(this.selected) ||
-                this.howManyInstanciesOfSelected() < 1
-            ) {
-                this.gameObjects.add(new Pair<>(gameObject, rect));
-            } else if (gameObject instanceof MapNode node) {
-                this.mapNodes.addNode(node);
-            }
-        }
-    }
-
-    private GameObject getGameObject(final Vector2D position, final Vector2D size) {
-        return switch (this.selected) {
-            case GameObjects.PLAYER -> new Player(position);
-            case GameObjects.BLINKY -> new Blinky(position);
-            case GameObjects.PINKY -> new Pinky(position);
-            case GameObjects.INKY -> new Inky(position);
-            case GameObjects.CLYDE -> new Clyde(position);
-            case GameObjects.PILL -> new Pill(position);
-            case GameObjects.POWERPILL -> new PowerPill(position);
-            case GameObjects.WALL -> new Wall(new Vector2D(approximate((int) this.startPos.getX() / SCALE), approximate((int) (this.startPos.getY() / SCALE))), size);
-            default -> throw new IllegalStateException("Invalid game object: " + this.selected);
-        };
-    }
-
-    private void linkNodes() {
-        if (this.selectedNodes.size() == 2) {
-            final MapNode src = this.selectedNodes.removeFirst();
-            final MapNode dst = this.selectedNodes.removeFirst();
-            this.mapNodes.addEdge(src, dst, Pacman.distance(src.getPosition(), dst.getPosition()));
-        }
-    }
-
-    private void removeNode(final Point p) {
-        final var node = this.mapNodes.nodes().stream().filter(t -> t.getPosition().equals(new Vector2D(approximateGrid((int) p.getX()), approximateGrid((int) p.getY())))).findFirst();
-        if (node.isPresent()) {
-            this.mapNodes.removeNode(node.get());
-        }
-    }
-
-    private long howManyInstanciesOf(final GameObjects g) {
-        return this.gameObjects.stream()
-            .filter(t -> t.x().getClass().getSimpleName().toUpperCase().equals(g.name()))
-            .count();
-    }
-
-    private long howManyInstanciesOfSelected() {
-        return howManyInstanciesOf(this.selected);
+    private void addGameObject(final Point p, final Rectangle rect) {
+        final Vector2D position = this.selected.equals(GameObjects.WALL)
+            ? new Vector2D(approximate((int) this.startPos.getX() / SCALE), approximate((int) (this.startPos.getY() / SCALE)))
+            : new Vector2D(approximateGrid((int) p.getX() / SCALE), approximateGrid((int) p.getY() / SCALE));
+        this.logic.addGameObject(this.selected, position, new Vector2D(rect.getWidth(), rect.getHeight()));
     }
 
     @Override
-    public synchronized void mouseEntered(final MouseEvent e) {
+    public void mouseEntered(final MouseEvent e) {
     }
 
     @Override
-    public synchronized void mouseExited(final MouseEvent e) {
+    public void mouseExited(final MouseEvent e) {
     }
 }
