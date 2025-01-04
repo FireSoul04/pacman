@@ -20,19 +20,15 @@ public interface Logic {
 
     void addGameObject(GameObjects selected, Vector2D position, Vector2D size);
 
-    void removeGameObject(Vector2D position);
-
-    void removeWall(Vector2D position);
-
     void click(GameObjects selected, Vector2D position);
 
     void linkNodes();
 
-    void removeNode(Vector2D p);
-
-    long howManyInstanciesOf(GameObjects g);
-
     boolean isLimited(GameObjects g);
 
     Graph<MapNode> getMap();
+
+    void setEditGraphMode(boolean editGraphMode);
+
+    boolean isInEditGraphMode();
 }

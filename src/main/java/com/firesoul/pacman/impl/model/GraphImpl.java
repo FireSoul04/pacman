@@ -13,7 +13,7 @@ public class GraphImpl<T> implements Graph<T> {
 
     @Override
     public void addNode(final T node) {
-        this.nodes.put(node, new LinkedHashMap<>());
+        this.nodes.putIfAbsent(node, new LinkedHashMap<>());
     }
 
     @Override
@@ -24,7 +24,7 @@ public class GraphImpl<T> implements Graph<T> {
 
     @Override
     public void addEdge(final T source, final T destination, final double weight) {
-        if (!this.nodes.containsKey(source)) {
+        if (!this.nodes.containsKey(source) || !this.nodes.containsKey(destination)) {
             throw new IllegalStateException("Cannot add an edge to a non existant node");
         }
         this.nodes.get(source).put(destination, weight);
@@ -33,6 +33,9 @@ public class GraphImpl<T> implements Graph<T> {
 
     @Override
     public void removeEdge(final T source, final T destination) {
+        if (!this.nodes.containsKey(source) || !this.nodes.containsKey(destination)) {
+            throw new IllegalStateException("Cannot add an edge to a non existant node");
+        }
         this.nodes.get(source).remove(destination);
         this.nodes.get(destination).remove(source);
     }
@@ -61,5 +64,10 @@ public class GraphImpl<T> implements Graph<T> {
     @Override
     public void clear() {
         this.nodes.clear();
+    }
+
+    @Override
+    public int hashCode() {
+        return this.nodes.hashCode();
     }
 }

@@ -51,7 +51,6 @@ public class Pacman {
     private static final int MAX_LIVES = 3;
     private static final String MAP_PATH = "src/main/resources/map/map.txt";
     private static final Vector2D EXIT_POSITION = new Vector2D(112, 84);
-    private static final Vector2D CAGE_CENTER_POSITION = new Vector2D(112, 112);
     
     private final GameCore game;
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
@@ -73,11 +72,6 @@ public class Pacman {
         this.level = 1;
         this.nextLevelTimer.start();
         this.createScene();
-        for (final var src : this.map.nodes()) {
-            if (src.getPosition().getX() == 108) {
-                System.out.println(src.getPosition());
-            }
-        }
     }
 
     public void update(final double deltaTime) {
@@ -218,6 +212,9 @@ public class Pacman {
     }
 
     private void createScene() {
+
+        GameObject test = null;
+
         this.scene = new Scene2D(MAP_PATH);
         this.addGameObject(this.outsideCageNotifier);
         this.map = this.scene.getMapNodes();
@@ -233,7 +230,24 @@ public class Pacman {
             } else if (g instanceof PowerPill pl) {
                 pl.connectToGameLogic(this);
             }
+
+            else if (g instanceof CageEnter) {
+                test = g;
+            } else if (g instanceof CageExit) {
+                test = g;
+            }
         }
+        
+
+        for (var x : this.map.nodes()) {
+            for (var y : this.map.edgesOf(x).keySet()) {
+                if (y.getPosition().equals(test.getPosition())) {
+                    System.out.println("Found exit position");
+                }
+            }
+        }
+
+
         if (this.player == null) {
             throw new IllegalStateException("Cannot find player in this scene");
         } else if (this.ghosts.size() != 4) {

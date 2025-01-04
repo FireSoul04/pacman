@@ -6,7 +6,6 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.ConcurrentModificationException;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -16,6 +15,7 @@ import com.firesoul.editor.gui.LogicImpl.GameObjects;
 import com.firesoul.pacman.api.model.*;
 import com.firesoul.pacman.impl.model.entities.*;
 import com.firesoul.pacman.impl.util.Vector2D;
+import com.firesoul.pacman.impl.view.Invisible2D;
 
 public class Gui extends JFrame implements MouseListener {
 
@@ -75,9 +75,12 @@ public class Gui extends JFrame implements MouseListener {
             .map(t -> (JButton) t)
             .forEach(t -> t.addActionListener(e -> this.selected = GameObjects.valueOf(t.getText().toUpperCase())));
 
-        final JButton link = new JButton("link");
-        link.addActionListener(t -> this.logic.linkNodes());
-        this.editorFrame.add(link);
+        final JButton switchToEditGraphMode = new JButton("graph mode");
+        final JButton switchToInsertMode = new JButton("insert mode");
+        switchToEditGraphMode.addActionListener(t -> this.logic.setEditGraphMode(true));
+        switchToInsertMode.addActionListener(t -> this.logic.setEditGraphMode(false));
+        this.editorFrame.add(switchToEditGraphMode);
+        this.editorFrame.add(switchToInsertMode);
         this.editorFrame.add(this.labelSelected);
     }
 
@@ -110,12 +113,21 @@ public class Gui extends JFrame implements MouseListener {
                 : gameObject.getDrawable().getImageSize();
             final Rectangle rect = new Rectangle((int) position.getX(), (int) position.getY(), (int) size.getX(), (int) size.getY());
             if (gameObject instanceof Wall) {
-                this.drawWall(g, rect);
+                this.drawRect(g, rect, Color.BLUE);
+            }
+            if (this.logic.isInEditGraphMode()) {
+                if (gameObject instanceof CageEnter) {
+                    this.drawRect(g, rect, Color.ORANGE);
+                } else if (gameObject instanceof CageExit) {
+                    this.drawRect(g, rect, Color.GREEN);
+                }
             } else {
                 this.drawImage(g, gameObject, rect);
             }
         }
-        this.drawGraph(g);
+        if (this.logic.isInEditGraphMode()) {
+            this.drawGraph(g);
+        }
     }
 
     private void drawBackground(final Graphics g) {
@@ -123,7 +135,7 @@ public class Gui extends JFrame implements MouseListener {
         try {
             image = this.readImage();
         } catch (final IOException e) {
-            System.out.println("Cant found image");
+            System.out.println("Cant find image");
         }
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, this.getContentPane().getWidth() * SCALE, this.getContentPane().getHeight() * SCALE);
@@ -136,33 +148,45 @@ public class Gui extends JFrame implements MouseListener {
         return ImageIO.read(new File("src/main/resources/sprites/map/map_hitboxes.png"));
     }
 
-    private void drawWall(final Graphics g, final Rectangle t) {
-        g.setColor(Color.BLUE);
+    private void drawRect(final Graphics g, final Rectangle t, final Color color) {
+        g.setColor(color);
         g.fillRect(t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE);
     }
 
     private void drawImage(final Graphics g, final GameObject gameObject, final Rectangle t) {
-        final Image image = gameObject.getDrawable().getImage();
-        if (image != null) {
-            g.drawImage(image, t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE, this.canvas);
+        if (gameObject.getDrawable() != null && !(gameObject.getDrawable() instanceof Invisible2D)) {
+            final Image image = gameObject.getDrawable().getImage();
+            if (image != null) {
+                g.drawImage(image, t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE, this.canvas);
+            }
         }
     }
 
     private void drawGraph(final Graphics g) {
         g.setColor(Color.RED);
         try {
-            for (final var node : this.logic.getMap().edges().entrySet()) {
-                final int x1 = (int) node.getKey().getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
-                final int y1 = (int) node.getKey().getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
-                final Rectangle t = new Rectangle((int) node.getKey().getPosition().dot(SCALE).getX(), (int) node.getKey().getPosition().dot(SCALE).getY(), SIZE, SIZE);
-                g.drawRect(t.x, t.y, t.width * SCALE, t.height * SCALE);
-                for (final var edge : node.getValue().keySet()) {
-                    final int x2 = (int) edge.getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
-                    final int y2 = (int) edge.getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
-                    g.drawLine(x1, y1, x2, y2);
-                }
+            this.drawNodes(g);
+            this.drawEdges(g);
+        } catch (Exception e) {
+        }
+    }
+
+    private void drawNodes(final Graphics g) {
+        for (final var src : this.logic.getMap().edges().entrySet()) {
+            final Rectangle t = new Rectangle((int) src.getKey().getPosition().dot(SCALE).getX(), (int) src.getKey().getPosition().dot(SCALE).getY(), SIZE, SIZE);
+            g.drawRect(t.x, t.y, t.width * SCALE, t.height * SCALE);
+        }
+    }
+
+    private void drawEdges(final Graphics g) {
+        for (final var src : this.logic.getMap().edges().entrySet()) {
+            int x1 = (int) src.getKey().getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
+            int y1 = (int) src.getKey().getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
+            for (final var dst : src.getValue().keySet()) {
+                int x2 = (int) dst.getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
+                int y2 = (int) dst.getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
+                g.drawLine(x1, y1, x2, y2);
             }
-        } catch (ConcurrentModificationException e) {
         }
     }
 
