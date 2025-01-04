@@ -1,8 +1,11 @@
 package com.firesoul.editor.gui;
 
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferStrategy;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -19,12 +22,11 @@ import com.firesoul.pacman.impl.view.Invisible2D;
 
 public class Gui extends JFrame implements MouseListener {
 
-    private static final int SCALE = 3;
-    private static final int LEFT_MARGIN = 48;
+    private static final int MARGIN = 16;
     private static final int SIZE = 16;
     private static final int GRID_SIZE = 8;
-    private static final int WIDTH = 224;
-    private static final int HEIGHT = 248;
+    private static final int MAP_WIDTH = 224;
+    private static final int MAP_HEIGHT = 248;
 
     private final Logic logic = new LogicImpl();
     private final JPanel buttonFrame;
@@ -33,38 +35,50 @@ public class Gui extends JFrame implements MouseListener {
     private final Canvas canvas;
     private GameObjects selected = GameObjects.WALL;
     private Point startPos;
+    private double scaleX;
+    private double scaleY;
 
     public Gui() {
         super("Level editor");
         this.buttonFrame = new JPanel(new BorderLayout());
-        this.editorFrame = new JPanel(new GridLayout(5, 5, 20, 20));
+        this.editorFrame = new JPanel(new GridLayout(5, 6, 20, 20));
         this.canvas = new Canvas();
         this.canvas.addMouseListener(this);
-        this.setSize((int)(WIDTH * SCALE * 1.8), (HEIGHT + 30) * SCALE);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLayout(new BorderLayout());
-        this.add(this.canvas);
         this.labelSelected = new JLabel(this.selected.name().toLowerCase());
 
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        this.scaleX = screenSize.getWidth() / 10000 * 9;
+        this.scaleY = screenSize.getHeight() / 10000 * 16;
+
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLayout(new GridLayout());
         this.loadFromFile();
-        this.addHandlerButtons();
         this.addEditorButtons();
-        this.add(this.buttonFrame, BorderLayout.SOUTH);
-        this.add(this.editorFrame, BorderLayout.EAST);
+        this.addHandlerButtons();
+        this.getContentPane().add(this.canvas);
+        this.getContentPane().add(this.editorFrame);
+        this.getContentPane().setPreferredSize(new Dimension((int) ((MAP_WIDTH + MARGIN * 2) * this.scaleX * 2), (int) ((MAP_HEIGHT) * this.scaleY)));
         this.setVisible(true);
+        this.pack();
+        this.setMinimumSize(this.getSize());
+        this.addComponentListener(new ComponentAdapter() {
+            public void componentResized(final ComponentEvent componentEvent) {
+                final Gui w = Gui.this;
+                final Dimension d = ((JFrame) componentEvent.getComponent()).getContentPane().getSize();
+                w.setScaleX((d.getWidth() - w.editorFrame.getWidth()) / (Gui.MAP_WIDTH + MARGIN * 2));
+                w.setScaleY((d.getHeight() - w.buttonFrame.getHeight()) / Gui.MAP_HEIGHT);
+            }
+        });
     }
 
     private void addHandlerButtons() {
         final JButton reset = new JButton("Reset");
-        final JButton goBack = new JButton("Go back to last modify");
         final JButton save = new JButton("Save");
-        reset.addActionListener(e -> reset());
-        goBack.addActionListener(e -> goBack());
+        reset.addActionListener(e -> this.reset());
         save.addActionListener(e -> this.saveToFile());
 
-        this.buttonFrame.add(reset, BorderLayout.WEST);
-        this.buttonFrame.add(goBack, BorderLayout.CENTER);
-        this.buttonFrame.add(save, BorderLayout.EAST);
+        this.editorFrame.add(reset);
+        this.editorFrame.add(save);
     }
 
     private void addEditorButtons() {
@@ -104,7 +118,12 @@ public class Gui extends JFrame implements MouseListener {
     }
 
     private void draw() {
-        final Graphics g = this.canvas.getGraphics();
+        BufferStrategy bs = this.canvas.getBufferStrategy();
+        if (bs == null) {
+            this.canvas.createBufferStrategy(2);
+            bs = this.canvas.getBufferStrategy();
+        }
+        final Graphics g = bs.getDrawGraphics();
         this.drawBackground(g);
         for (final GameObject gameObject : this.logic.getGameObjects()) {
             final Vector2D position = gameObject.getPosition();
@@ -128,6 +147,8 @@ public class Gui extends JFrame implements MouseListener {
         if (this.logic.isInEditGraphMode()) {
             this.drawGraph(g);
         }
+        g.dispose();
+        bs.show();
     }
 
     private void drawBackground(final Graphics g) {
@@ -138,9 +159,16 @@ public class Gui extends JFrame implements MouseListener {
             System.out.println("Cant find image");
         }
         g.setColor(Color.WHITE);
-        g.fillRect(0, 0, this.getContentPane().getWidth() * SCALE, this.getContentPane().getHeight() * SCALE);
+        g.fillRect(0, 0, (int) ((MAP_WIDTH + MARGIN * 2) * this.scaleX), (int) (MAP_HEIGHT * this.scaleY));
         if (image != null) {
-            g.drawImage(image, LEFT_MARGIN, 0, WIDTH * SCALE, HEIGHT * SCALE, this.canvas);
+            g.drawImage(
+                image,
+                (int)(MARGIN * this.scaleX),
+                0,
+                (int)(MAP_WIDTH * this.scaleX),
+                (int)(MAP_HEIGHT * this.scaleY),
+                this.canvas
+            );
         }
     }
 
@@ -150,14 +178,21 @@ public class Gui extends JFrame implements MouseListener {
 
     private void drawRect(final Graphics g, final Rectangle t, final Color color) {
         g.setColor(color);
-        g.fillRect(t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE);
+        g.fillRect((int) (t.x * this.scaleX), (int) (t.y * this.scaleY), (int) (t.width * this.scaleX), (int) (t.height * this.scaleY));
     }
 
     private void drawImage(final Graphics g, final GameObject gameObject, final Rectangle t) {
         if (gameObject.getDrawable() != null && !(gameObject.getDrawable() instanceof Invisible2D)) {
             final Image image = gameObject.getDrawable().getImage();
             if (image != null) {
-                g.drawImage(image, t.x * SCALE, t.y * SCALE, t.width * SCALE, t.height * SCALE, this.canvas);
+                g.drawImage(
+                    image,
+                    (int) (t.x * this.scaleX),
+                    (int) (t.y * this.scaleY),
+                    (int) (t.width * this.scaleX),
+                    (int) (t.height * this.scaleY),
+                    this.canvas
+                );
             }
         }
     }
@@ -173,18 +208,18 @@ public class Gui extends JFrame implements MouseListener {
 
     private void drawNodes(final Graphics g) {
         for (final var src : this.logic.getMap().edges().entrySet()) {
-            final Rectangle t = new Rectangle((int) src.getKey().getPosition().dot(SCALE).getX(), (int) src.getKey().getPosition().dot(SCALE).getY(), SIZE, SIZE);
-            g.drawRect(t.x, t.y, t.width * SCALE, t.height * SCALE);
+            final Rectangle t = new Rectangle((int) src.getKey().getPosition().dot(this.scaleX).getX(), (int) src.getKey().getPosition().dot(this.scaleY).getY(), SIZE, SIZE);
+            g.drawRect(t.x, t.y, (int) (t.width * this.scaleX), (int) (t.height * this.scaleY));
         }
     }
 
     private void drawEdges(final Graphics g) {
         for (final var src : this.logic.getMap().edges().entrySet()) {
-            int x1 = (int) src.getKey().getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
-            int y1 = (int) src.getKey().getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
+            int x1 = (int) src.getKey().getPosition().dot(this.scaleX).getX() + (int) ((SIZE / 2) * this.scaleX);
+            int y1 = (int) src.getKey().getPosition().dot(this.scaleY).getY() + (int) ((SIZE / 2) * this.scaleY);
             for (final var dst : src.getValue().keySet()) {
-                int x2 = (int) dst.getPosition().dot(SCALE).getX() + (SIZE / 2) * SCALE;
-                int y2 = (int) dst.getPosition().dot(SCALE).getY() + (SIZE / 2) * SCALE;
+                int x2 = (int) dst.getPosition().dot(this.scaleX).getX() + (int) ((SIZE / 2) * this.scaleX);
+                int y2 = (int) dst.getPosition().dot(this.scaleY).getY() + (int) ((SIZE / 2) * this.scaleY);
                 g.drawLine(x1, y1, x2, y2);
             }
         }
@@ -193,7 +228,7 @@ public class Gui extends JFrame implements MouseListener {
     private Rectangle getRectangle(final Point p1, final Point p2) {
         final int w = (int) Math.abs(p2.getX() - p1.getX());
         final int h = (int) Math.abs(p2.getY() - p1.getY());
-        return new Rectangle(approximate((int)p1.x / SCALE), approximate((int)p1.y / SCALE), approximate(w / SCALE), approximate(h / SCALE));
+        return new Rectangle(approximate((int) (p1.x / this.scaleX)), approximate((int) (p1.y / this.scaleY)), approximate((int) (w / this.scaleX)), approximate((int) (h / this.scaleY)));
     }
 
     private int approximate(final int x) {
@@ -207,20 +242,9 @@ public class Gui extends JFrame implements MouseListener {
     private void reset() {
         final Graphics g = this.canvas.getGraphics();
         g.setColor(Color.WHITE);
-        g.fillRect(0, 0, WIDTH * SCALE + LEFT_MARGIN, HEIGHT * SCALE);
+        g.fillRect(0, 0, (int) ((MAP_WIDTH + MARGIN) * this.scaleX), (int) (MAP_HEIGHT * this.scaleY));
         this.canvas.update(g);
         this.logic.reset();
-    }
-
-    private void goBack() {
-        // unimplemented
-        // if (this.logic.getGameObjects().size() > 0) {
-        //     this.logic.getGameObjects().remove(this.logic.getGameObjects().toArray()[this.logic.getGameObjects().size() - 1]);
-        // }
-        // final Graphics g = this.canvas.getGraphics();
-        // g.setColor(Color.WHITE);
-        // g.fillRect(0, 0, WIDTH * SCALE + LEFT_MARGIN, HEIGHT * SCALE);
-        // this.canvas.update(g);
     }
 
     @Override
@@ -233,8 +257,8 @@ public class Gui extends JFrame implements MouseListener {
             this.startPos = e.getPoint();
         } else {
             final Vector2D p = this.selected.equals(GameObjects.ERASER)
-                ? new Vector2D(e.getX() / SCALE, e.getY() / SCALE)
-                : new Vector2D(approximateGrid(e.getX() / SCALE), approximateGrid(e.getY() / SCALE));
+                ? new Vector2D(e.getX() / this.scaleX, e.getY() / this.scaleY)
+                : new Vector2D(approximateGrid((int) (e.getX() / this.scaleX)), approximateGrid((int) (e.getY() / this.scaleY)));
             this.logic.click(this.selected, p);
         }
     }
@@ -247,10 +271,18 @@ public class Gui extends JFrame implements MouseListener {
         }
     }
 
+    public void setScaleX(final double scaleX) {
+        this.scaleX = scaleX;
+    }
+
+    public void setScaleY(final double scaleY) {
+        this.scaleY = scaleY;
+    }
+    
     private void addGameObject(final Point p, final Rectangle rect) {
         final Vector2D position = this.selected.equals(GameObjects.WALL)
-            ? new Vector2D(approximate((int) this.startPos.getX() / SCALE), approximate((int) (this.startPos.getY() / SCALE)))
-            : new Vector2D(approximateGrid((int) p.getX() / SCALE), approximateGrid((int) p.getY() / SCALE));
+            ? new Vector2D(approximate((int) (this.startPos.getX() / this.scaleX)), approximate((int) ((this.startPos.getY() / this.scaleY))))
+            : new Vector2D(approximateGrid((int) (p.getX() / this.scaleX)), approximateGrid((int) (p.getY() / this.scaleY)));
         this.logic.addGameObject(this.selected, position, new Vector2D(rect.getWidth(), rect.getHeight()));
     }
 

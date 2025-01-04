@@ -149,10 +149,39 @@ public class LogicImpl implements Logic {
     @Override
     public void reset() {
         if (this.editGraphMode) {
+            this.removeCageFromGraph(CageEnter.class);
+            this.removeCageFromGraph(CageExit.class);
             this.selectedNodes.clear();
             this.mapNodes.clear();
         } else {
+            this.removeCageFromGameObjects(CageEnter.class);
+            this.removeCageFromGameObjects(CageExit.class);
             this.gameObjects.clear();
+        }
+    }
+
+    private void removeCageFromGraph(final Class<?> cageClass) {
+        final GameObject cage = this.gameObjects.stream()
+            .filter(t -> t.getClass().equals(cageClass))
+            .findFirst()
+            .orElse(null);
+        if (cage != null) {
+            this.gameObjects.remove(cage);
+        }
+    }
+
+    private void removeCageFromGameObjects(final Class<?> cageClass) {
+        final GameObject cage = this.gameObjects.stream()
+            .filter(t -> t.getClass().equals(cageClass))
+            .findFirst()
+            .orElse(null);
+        if (cage != null) {
+            final MapNode node = this.mapNodes.nodes()
+                .stream()
+                .filter(t -> t.getPosition().equals(cage.getPosition()))
+                .findFirst()
+                .get();
+            this.mapNodes.removeNode(node);
         }
     }
 

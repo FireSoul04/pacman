@@ -11,6 +11,7 @@ import java.util.List;
 import com.firesoul.editor.gui.Pair;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Map;
+import com.firesoul.pacman.impl.controller.GameCore;
 import com.firesoul.pacman.impl.model.entities.Wall;
 import com.firesoul.pacman.impl.util.Vector2D;
 
@@ -65,7 +66,7 @@ public class Map2D implements Map {
             }
             this.mapNodes = (List<Pair<Vector2D, List<Vector2D>>>) reader.readObject();
         } catch (final IOException | ClassNotFoundException e) {
-            System.out.println("Cannot read file: " + e);
+            GameCore.log("Cannot read file: " + e);
             System.exit(1);
         }
     }

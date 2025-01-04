@@ -1,5 +1,7 @@
 package com.firesoul.pacman.impl.controller;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.PrintStream;
 
 import com.firesoul.pacman.api.controller.Game;
@@ -13,16 +15,19 @@ public class GameCore implements Game {
     private static final String TITLE = "Pacman";
     private static final int WIDTH = 224;
     private static final int HEIGHT = 288;
-    private static final double SCALE = 3;
     private static final PrintStream logger = System.out;
 
     private final Thread displayThread = new Thread(this, "Display");
-    private final Renderer renderer = new Window(TITLE, WIDTH, HEIGHT, SCALE, SCALE);
+    private final Renderer renderer;
     private final InputController inputController = new InputController();
     private final Pacman pacman;
     private State state;
 
     public GameCore() {
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        final double scaleX = screenSize.getWidth() / 10000 * 9;
+        final double scaleY = screenSize.getHeight() / 10000 * 16;
+        this.renderer = new Window(TITLE, WIDTH, HEIGHT, scaleX, scaleY);
         this.renderer.addInputController(this.inputController);
         this.pacman = new Pacman(this);
     }

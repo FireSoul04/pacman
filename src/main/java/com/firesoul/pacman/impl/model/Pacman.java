@@ -85,7 +85,7 @@ public class Pacman {
         this.nextLevelTimer.update();
         this.liveLostTimer.update();
         if (this.game.isOver()) {
-            System.out.println("Game Over!");
+            GameCore.log("Game Over!");
             try {
                 Thread.sleep(Timer.secondsToMillis(1));
             } catch (final InterruptedException e) {
@@ -242,7 +242,7 @@ public class Pacman {
         for (var x : this.map.nodes()) {
             for (var y : this.map.edgesOf(x).keySet()) {
                 if (y.getPosition().equals(test.getPosition())) {
-                    System.out.println("Found exit position");
+                    GameCore.log("Found exit position");
                 }
             }
         }
