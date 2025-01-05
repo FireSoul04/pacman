@@ -13,6 +13,7 @@ import com.firesoul.pacman.api.model.Graph;
 import com.firesoul.pacman.impl.model.*;
 import com.firesoul.pacman.impl.model.entities.*;
 import com.firesoul.pacman.impl.model.entities.ghosts.*;
+import com.firesoul.pacman.impl.util.Pair;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class LogicImpl implements Logic {

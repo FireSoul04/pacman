@@ -8,13 +8,14 @@ import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.model.entities.colliders.ColliderSurfaceLayout;
 import com.firesoul.pacman.impl.util.Vector2D;
+import com.firesoul.pacman.impl.view.Invisible2D;
 
 public class Wall extends GameObject2D implements Collidable {
 
     private final Collider collider;
 
     public Wall(final Vector2D position, final Vector2D size) {
-        super(position);
+        super(position, new Invisible2D(size));
         this.collider = new BoxCollider2D(this, size, new ColliderSurfaceLayout(), true);
         this.setVisible(false);
     }

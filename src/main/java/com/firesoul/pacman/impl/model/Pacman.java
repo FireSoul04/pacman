@@ -3,11 +3,9 @@ package com.firesoul.pacman.impl.model;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.firesoul.editor.gui.Pair;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Graph;
 import com.firesoul.pacman.api.model.GraphOperators;
@@ -57,7 +55,7 @@ public class Pacman {
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final OutsideCageNotifier outsideCageNotifier = new OutsideCageNotifier(EXIT_POSITION);
     private final List<Ghost> ghosts = new ArrayList<>();
-    private Graph<MapNode> map = new GraphImpl<>();
+    private Graph<MapNode> mapNodes = new GraphImpl<>();
     private int lives = MAX_LIVES;
     private Player player;
     private Scene2D scene;
@@ -142,15 +140,11 @@ public class Pacman {
 
     public List<Vector2D> findPathToCage(final Vector2D position) {
         final List<Vector2D> path = new LinkedList<>();
-
-        // double distanceToCage = 0;
-        // this.dummy.setPosition(new Vector2D(Math.round(position.getX()), Math.round(position.getY())));
-        // do {
-        //     distanceToCage = this.distance(this.dummy.getPosition(), CAGE_CENTER_POSITION);
-        //     Vector2D direction = Vector2D.zero();
-        //     this.dummy.setPosition(this.dummy.getPosition().add(direction));
-        //     // path.add(direction);
-        // } while (distanceToCage > 0);
+        // TODO
+        // Find the closest node from where to start and destination should be CageEnter
+        // final MapNode src;
+        // final MapNode dst;
+        // System.out.println(GraphOperators.findShortestPath(this.mapNodes, null, null));
         return path;
     }
 
@@ -217,7 +211,7 @@ public class Pacman {
 
         this.scene = new Scene2D(MAP_PATH);
         this.addGameObject(this.outsideCageNotifier);
-        this.map = this.scene.getMapNodes();
+        this.mapNodes = this.scene.getMapNodes();
         this.ghosts.clear();
         for (final GameObject g : this.getGameObjects()) {
             if (g instanceof Player p) {
@@ -239,8 +233,8 @@ public class Pacman {
         }
         
 
-        for (var x : this.map.nodes()) {
-            for (var y : this.map.edgesOf(x).keySet()) {
+        for (var x : this.mapNodes.nodes()) {
+            for (var y : this.mapNodes.edgesOf(x).keySet()) {
                 if (y.getPosition().equals(test.getPosition())) {
                     GameCore.log("Found exit position");
                 }

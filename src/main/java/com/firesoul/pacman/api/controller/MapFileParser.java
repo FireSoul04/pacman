@@ -1,12 +1,13 @@
-package com.firesoul.pacman.api.model;
+package com.firesoul.pacman.api.controller;
 
 import java.util.List;
 
-import com.firesoul.editor.gui.Pair;
+import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.util.Vector;
+import com.firesoul.pacman.impl.util.Pair;
 import com.firesoul.pacman.impl.util.Vector2D;
 
-public interface Map {
+public interface MapFileParser {
 
     /**
      * @return all game objects in the map

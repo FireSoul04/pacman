@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.firesoul.pacman.impl.util.Pair;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class FileParser {

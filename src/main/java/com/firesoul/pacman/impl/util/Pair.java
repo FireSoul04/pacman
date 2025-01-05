@@ -1,4 +1,4 @@
-package com.firesoul.editor.gui;
+package com.firesoul.pacman.impl.util;
 
 import java.io.Serializable;
 

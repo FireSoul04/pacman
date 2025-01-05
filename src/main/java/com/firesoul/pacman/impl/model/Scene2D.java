@@ -1,32 +1,27 @@
 package com.firesoul.pacman.impl.model;
 
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 
-import com.firesoul.editor.gui.Pair;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Graph;
 import com.firesoul.pacman.api.model.Scene;
 import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
-import com.firesoul.pacman.api.util.Timer;
+import com.firesoul.pacman.impl.controller.MapFileParserImpl;
 import com.firesoul.pacman.impl.model.entities.PowerPill;
-import com.firesoul.pacman.impl.model.entities.Wall;
-import com.firesoul.pacman.impl.util.TimerImpl;
+import com.firesoul.pacman.impl.util.Pair;
 import com.firesoul.pacman.impl.util.Vector2D;
-import com.firesoul.pacman.impl.view.Invisible2D;
 
 public class Scene2D implements Scene {
 
     private static final int DEFAULT_WIDTH = 224;
     private static final int DEFAULT_HEIGHT = 288;
 
-    private final Timer collisionTimer = new TimerImpl(Timer.secondsToMillis(1 / 60));
-    private final List<GameObject> gameObjects = new ArrayList<GameObject>();
-    private final List<Collidable> cachedCollidables = new ArrayList<Collidable>();
+    private final List<GameObject> gameObjects = new LinkedList<GameObject>();
     private final Graph<MapNode> mapNodes = new GraphImpl<>();
     private final Vector2D dimensions;
     private Pacman pacman;
@@ -40,7 +35,6 @@ public class Scene2D implements Scene {
 
     public Scene2D(final int width, final int height) {
         this.dimensions = new Vector2D(width, height);
-        this.collisionTimer.start();
     }
 
     /**
@@ -50,18 +44,10 @@ public class Scene2D implements Scene {
      * @param blockMapPath the path to the block map
      */
     public Scene2D(final String mapPath) {
-        final Map2D map = new Map2D(mapPath);
+        final MapFileParserImpl map = new MapFileParserImpl(mapPath);
         this.dimensions = map.getDimensions();
-        this.collisionTimer.start();
-        for (final var node : map.getMapNodes()) {
-            this.addNode(node);
-        }
-        for (final GameObject g : map.getGameObjects()) {
-            if (g instanceof Wall w) {
-                w.setDrawable(new Invisible2D(w.getColliders().get(0).getDimensions()));
-            }
-            this.addGameObject(g);
-        }
+        map.getMapNodes().forEach(this::addNode);
+        map.getGameObjects().forEach(this::addGameObject);
     }
 
     public void connectToGameLogic(final Pacman pacman) {
@@ -81,25 +67,19 @@ public class Scene2D implements Scene {
 
     @Override
     public void pauseAll() {
-        for (final GameObject gameObject : this.gameObjects) {
-            gameObject.pause();
-        }
+        this.gameObjects.forEach(GameObject::pause);
     }
 
     @Override
     public void wakeAll() {
-        for (final GameObject gameObject : this.gameObjects) {
-            gameObject.wake();
-        }
+        this.gameObjects.forEach(GameObject::wake);
     }
 
     @Override
     public void addGameObject(final GameObject gameObject) {
         gameObject.setScene(this);
         this.gameObjects.add(gameObject);
-        if (gameObject instanceof Collidable collidable) {
-            this.cachedCollidables.add(collidable);
-        } else if (gameObject instanceof PowerPill powerPill) {
+        if (gameObject instanceof PowerPill powerPill) {
             powerPill.connectToGameLogic(this.pacman);
         }
     }
@@ -107,9 +87,6 @@ public class Scene2D implements Scene {
     @Override
     public void removeGameObject(final GameObject gameObject) {
         this.gameObjects.remove(gameObject);
-        if (gameObject instanceof Collidable collidable) {
-            this.cachedCollidables.remove(collidable);
-        }
     }
 
     @Override
@@ -148,31 +125,30 @@ public class Scene2D implements Scene {
             final GameObject gameObject = it.next();
             if (!gameObject.isActive()) {
                 it.remove();
-                if (gameObject instanceof Collidable collidable) {
-                    this.cachedCollidables.remove(collidable);
-                }
             }
         }
     }
 
     private void checkCollisions() {
-        this.collisionTimer.update();
-        if (this.collisionTimer.isExpired()) {
-            for (final Collidable g1 : this.cachedCollidables) {
-                for (final Collidable g2 : this.cachedCollidables) {
-                    if (g1 != g2) {
-                        for (final Collider c1 : g1.getColliders()) {
-                            for (final Collider c2 : g2.getColliders()) {
-                                if (c1.isColliding(c2)) {
-                                    g1.onCollide(c1, c2);
-                                    g2.onCollide(c2, c1);
-                                }
-                            }
-                        }
+        for (final GameObject g1 : this.gameObjects) {
+            if (g1 instanceof Movable) {
+                for (final GameObject g2 : this.gameObjects) {
+                    if (g1 != g2 && g1 instanceof Collidable c1 && g2 instanceof Collidable c2) {
+                        checkCollidersCollisions(c1, c2);
                     }
                 }
             }
-            this.collisionTimer.restart();
+        }
+    }
+
+    private void checkCollidersCollisions(final Collidable g1, final Collidable g2) {
+        for (final Collider c1 : g1.getColliders()) {
+            for (final Collider c2 : g2.getColliders()) {
+                if (c1.isColliding(c2)) {
+                    g1.onCollide(c1, c2);
+                    g2.onCollide(c2, c1);
+                }
+            }
         }
     }
 }
