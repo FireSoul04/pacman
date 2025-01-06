@@ -16,7 +16,7 @@ import com.firesoul.pacman.impl.model.Pacman.OutsideCageNotifier;
 public abstract class Ghost extends SolidObject2D implements Movable {
 
     private static final long VULNERABILITY_START_BLINKING_TIME = Timer.secondsToMillis(3);
-    private static final long VULNERABILITY_TIME = Timer.secondsToMillis(5);
+    private static final long VULNERABILITY_TIME = Timer.secondsToMillis(20);
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.2);
     private static final double NORMAL_SPEED = 0.5;
     private static final double DEAD_SPEED = 2;
@@ -65,6 +65,7 @@ public abstract class Ghost extends SolidObject2D implements Movable {
             this.exitCage();
         } else if (this.dead) {
             this.goToCage();
+            this.currentDirection = Vector2D.zero();
         } else {
             this.move();
             this.goToDirection(this.nextDirection);
@@ -97,7 +98,8 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     }
 
     private void goToCage() {
-        System.out.println(this.pacman.findPathToCage(this.getPosition()));
+        this.pacman.findPathToCage(this.getPosition());
+        // System.out.println();
     }
 
     public void goToDirection(final Vector2D direction) {

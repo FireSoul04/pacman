@@ -2,7 +2,7 @@ package com.firesoul.pacman.api.model;
 
 import java.util.List;
 
-import com.firesoul.pacman.impl.model.MapNode;
+import com.firesoul.pacman.impl.util.Vector2D;
 
 public interface Scene {
 
@@ -41,5 +41,5 @@ public interface Scene {
     /**
      * @return the nodes of the map
      */
-    Graph<MapNode> getMapNodes();
+    Graph<Vector2D> getMapNodes();
 }

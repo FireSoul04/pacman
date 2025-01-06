@@ -208,18 +208,18 @@ public class Gui extends JFrame implements MouseListener {
 
     private void drawNodes(final Graphics g) {
         for (final var src : this.logic.getMap().edges().entrySet()) {
-            final Rectangle t = new Rectangle((int) src.getKey().getPosition().dot(this.scaleX).getX(), (int) src.getKey().getPosition().dot(this.scaleY).getY(), SIZE, SIZE);
+            final Rectangle t = new Rectangle((int) src.getKey().dot(this.scaleX).getX(), (int) src.getKey().dot(this.scaleY).getY(), SIZE, SIZE);
             g.drawRect(t.x, t.y, (int) (t.width * this.scaleX), (int) (t.height * this.scaleY));
         }
     }
 
     private void drawEdges(final Graphics g) {
         for (final var src : this.logic.getMap().edges().entrySet()) {
-            int x1 = (int) src.getKey().getPosition().dot(this.scaleX).getX() + (int) ((SIZE / 2) * this.scaleX);
-            int y1 = (int) src.getKey().getPosition().dot(this.scaleY).getY() + (int) ((SIZE / 2) * this.scaleY);
+            int x1 = (int) src.getKey().dot(this.scaleX).getX() + (int) ((SIZE / 2) * this.scaleX);
+            int y1 = (int) src.getKey().dot(this.scaleY).getY() + (int) ((SIZE / 2) * this.scaleY);
             for (final var dst : src.getValue().keySet()) {
-                int x2 = (int) dst.getPosition().dot(this.scaleX).getX() + (int) ((SIZE / 2) * this.scaleX);
-                int y2 = (int) dst.getPosition().dot(this.scaleY).getY() + (int) ((SIZE / 2) * this.scaleY);
+                int x2 = (int) dst.dot(this.scaleX).getX() + (int) ((SIZE / 2) * this.scaleX);
+                int y2 = (int) dst.dot(this.scaleY).getY() + (int) ((SIZE / 2) * this.scaleY);
                 g.drawLine(x1, y1, x2, y2);
             }
         }

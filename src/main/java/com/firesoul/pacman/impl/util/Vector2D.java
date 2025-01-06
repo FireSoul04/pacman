@@ -1,5 +1,7 @@
 package com.firesoul.pacman.impl.util;
 
+import java.util.Objects;
+
 import com.firesoul.pacman.api.util.Vector;
 
 public class Vector2D implements Vector {
@@ -102,10 +104,10 @@ public class Vector2D implements Vector {
         return wrapped;
     }
 
-    // @Override
-    // public Vector2D approx() {
-    //     return new Vector2D((int)this.x, (int)this.y);
-    // }
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.x, this.y);
+    }
 
     @Override
     public boolean equals(final Object o) {

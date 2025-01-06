@@ -13,7 +13,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.firesoul.pacman.impl.util.Pair;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class FileParser {
@@ -29,8 +28,8 @@ public class FileParser {
         this.mapPath = mapPath;
     }
 
-    public synchronized void save(
-        final Map<Pair<Vector2D, Vector2D>, String> gameObjects,
+    public void save(
+        final Map<Pair<String, Vector2D>, Vector2D> gameObjects,
         final List<Pair<Vector2D, List<Vector2D>>> mapNodes
     ) {
         try (ObjectOutputStream os = new ObjectOutputStream(
@@ -47,16 +46,14 @@ public class FileParser {
     }
 
     @SuppressWarnings("unchecked")
-    public synchronized Map<Pair<Vector2D, Vector2D>, String> load() {
-        final Map<Pair<Vector2D, Vector2D>, String> gameObjects = new HashMap<>();
+    public Map<Pair<String, Vector2D>, Vector2D> load() {
+        final Map<Pair<String, Vector2D>, Vector2D> gameObjects = new HashMap<>();
         try (
-            final ObjectInputStream reader = new ObjectInputStream(
-                new FileInputStream(this.mapPath)
-            )
+            final ObjectInputStream reader = new ObjectInputStream(new FileInputStream(this.mapPath))
         ) {
             if (Files.size(Path.of(this.mapPath)) > 0) {
                 reader.readObject();
-                gameObjects.putAll((Map<Pair<Vector2D, Vector2D>, String>) reader.readObject());
+                gameObjects.putAll((Map<Pair<String, Vector2D>, Vector2D>) reader.readObject());
                 this.mapNodes = (List<Pair<Vector2D, List<Vector2D>>>) reader.readObject();
             }
         } catch (final IOException | ClassNotFoundException e) {

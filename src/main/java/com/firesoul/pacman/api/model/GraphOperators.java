@@ -56,7 +56,7 @@ public interface GraphOperators {
     public static <T> List<T> findShortestPath(final Graph<T> g, final T source, final T destination) {
         final Map<T, Node<T>> nodes = g.nodes().stream().map(Node::new).collect(Collectors.toMap(Node::node, Function.identity()));
         nodes.get(source).setWeight(0);
-        final PriorityQueue<Node<T>> queue = new PriorityQueue<>(nodes.values());
+        PriorityQueue<Node<T>> queue = new PriorityQueue<>(nodes.values());
         while (!queue.isEmpty()) {
             final Node<T> src = queue.remove();
             for (final var edge : g.edgesOf(src.node()).entrySet()) {
@@ -64,6 +64,7 @@ public interface GraphOperators {
                 final double weight = edge.getValue();
                 relax(src, dst, weight);
             }
+            queue = new PriorityQueue<>(queue.stream().toList());
         }
         return computePath(nodes.get(source), nodes.get(destination), nodes).stream().map(Node::node).toList();
     }

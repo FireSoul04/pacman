@@ -5,7 +5,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import com.firesoul.editor.gui.LogicImpl.GameObjects;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Graph;
-import com.firesoul.pacman.impl.model.MapNode;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public interface Logic {
@@ -26,7 +25,7 @@ public interface Logic {
 
     boolean isLimited(GameObjects g);
 
-    Graph<MapNode> getMap();
+    Graph<Vector2D> getMap();
 
     void setEditGraphMode(boolean editGraphMode);
 

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.firesoul.pacman.api.model.GameObject;
@@ -13,7 +12,6 @@ import com.firesoul.pacman.api.model.Graph;
 import com.firesoul.pacman.impl.model.*;
 import com.firesoul.pacman.impl.model.entities.*;
 import com.firesoul.pacman.impl.model.entities.ghosts.*;
-import com.firesoul.pacman.impl.util.Pair;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class LogicImpl implements Logic {
@@ -49,8 +47,8 @@ public class LogicImpl implements Logic {
 
     private final ConcurrentLinkedQueue<GameObject> gameObjects = new ConcurrentLinkedQueue<>();
     private final FileParser parser = new FileParser(WIDTH, HEIGHT, MAP_PATH);
-    private final List<MapNode> selectedNodes = new LinkedList<>();
-    private final Graph<MapNode> mapNodes = new GraphImpl<>();
+    private final List<Vector2D> selectedNodes = new LinkedList<>();
+    private final Graph<Vector2D> mapNodes = new GraphImpl<>();
     private boolean editGraphMode = false;
 
     @Override
@@ -71,13 +69,13 @@ public class LogicImpl implements Logic {
             .equals(LIMITED_GAME_OBJECTS);
     }
 
-    private Map<Pair<Vector2D, Vector2D>, String> parseGameObjects() {
+    private Map<Pair<String, Vector2D>, Vector2D> parseGameObjects() {
         return this.gameObjects.stream()
             .collect(Collectors.toMap(
-                t -> new Pair<>(t.getPosition(), t instanceof Wall
+                t -> new Pair<>(t.getClass().getName(), t.getPosition()),
+                t -> t instanceof Wall
                     ? ((Wall) t).getColliders().getFirst().getDimensions()
-                    : new Vector2D(t.getDrawable().getImageSize().getY(), t.getDrawable().getImageSize().getY())),
-                t -> t.getClass().getName())
+                    : new Vector2D(t.getDrawable().getImageSize().getY(), t.getDrawable().getImageSize().getY()))
             );
     }
 
@@ -85,7 +83,7 @@ public class LogicImpl implements Logic {
         return this.mapNodes.edges()
             .entrySet()
             .stream()
-            .map(t -> new Pair<>(t.getKey().getPosition(), t.getValue().keySet().stream().map(a -> a.getPosition()).toList()))
+            .map(t -> new Pair<>(t.getKey(), t.getValue().keySet().stream().toList()))
             .distinct()
             .toList();
     }
@@ -110,38 +108,31 @@ public class LogicImpl implements Logic {
 
     private void loadMapNodes() {
         this.mapNodes.clear();
-        final Map<MapNode, List<Vector2D>> nodes = this.parser.getMapNodes()
+        final Map<Vector2D, List<Vector2D>> nodes = this.parser.getMapNodes()
             .stream()
             .collect(Collectors.toMap(
-                t -> new MapNode(t.x()),
+                t -> t.x(),
                 t -> t.y()
             ));
         nodes.keySet().forEach(t -> this.mapNodes.addNode(t));
-        final Map<Vector2D, MapNode> nodePositions = this.mapNodes.nodes()
-            .stream()
-            .collect(Collectors.toMap(
-                MapNode::getPosition,
-                Function.identity()
-            ));
-
         for (final var node : nodes.entrySet()) {
             final var src = node.getKey();
             for (final var position : nodes.get(src)) {
-                final var dst = nodePositions.get(position);
-                this.mapNodes.addEdge(src, dst, Pacman.distance(src.getPosition(), dst.getPosition()));
+                final var dst = position;
+                this.mapNodes.addEdge(src, dst, Pacman.distance(src, dst));
             }
         }
     }
 
-    private GameObject createGameObject(final Map.Entry<Pair<Vector2D, Vector2D>, String> t) {{
+    private GameObject createGameObject(final Map.Entry<Pair<String, Vector2D>, Vector2D> t) {{
         try {
-            return t.getValue().equals(Wall.class.getName())
-                ? (GameObject) Class.forName(t.getValue())
+            return t.getKey().x().equals(Wall.class.getName())
+                ? (GameObject) Class.forName(t.getKey().x())
                     .getConstructor(Vector2D.class, Vector2D.class)
-                    .newInstance(t.getKey().x(), t.getKey().y())
-                : (GameObject) Class.forName(t.getValue())
+                    .newInstance(t.getKey().y(), t.getValue())
+                : (GameObject) Class.forName(t.getKey().x())
                     .getConstructor(Vector2D.class)
-                    .newInstance(t.getKey().x());
+                    .newInstance(t.getKey().y());
         } catch (Exception e) {
             throw new IllegalStateException();
         }
@@ -177,9 +168,9 @@ public class LogicImpl implements Logic {
             .findFirst()
             .orElse(null);
         if (cage != null) {
-            final MapNode node = this.mapNodes.nodes()
+            final Vector2D node = this.mapNodes.nodes()
                 .stream()
-                .filter(t -> t.getPosition().equals(cage.getPosition()))
+                .filter(t -> t.equals(cage.getPosition()))
                 .findFirst()
                 .get();
             this.mapNodes.removeNode(node);
@@ -221,7 +212,7 @@ public class LogicImpl implements Logic {
         } else if (selected.equals(GameObjects.CAGEENTER) || selected.equals(GameObjects.CAGEEXIT)) {
             if (this.editGraphMode) {
                 this.addGameObject(selected, position, new Vector2D(16, 16));
-                this.mapNodes.addNode(new MapNode(position));
+                this.mapNodes.addNode(position);
             }
         } else if (this.gameObjects.stream().filter(t -> t.getPosition().equals(position)).count() < 1) {
             if (!this.editGraphMode) {
@@ -231,11 +222,9 @@ public class LogicImpl implements Logic {
     }
 
     private void erase(final Vector2D position) {
-        if (this.editGraphMode) {
-            this.removeGameObject(position);
-            this.removeWall(position);
-            this.removeNode(position);
-        }
+        this.removeNode(position);
+        this.removeGameObject(position);
+        this.removeWall(position);
     }
 
     private void removeGameObject(final Vector2D position) {
@@ -277,9 +266,9 @@ public class LogicImpl implements Logic {
 
     private void removeNode(final Vector2D position) {
         if (this.editGraphMode) {
-            final var node = this.mapNodes.nodes().stream().filter(t -> this.inRangeOf(t.getPosition(), position.sub(new Vector2D(8, 8)), 8)).findFirst();
+            final var node = this.mapNodes.nodes().stream().filter(t -> this.inRangeOf(t, position.sub(new Vector2D(8, 8)), 8)).findFirst();
             if (node.isPresent()) {
-                final GameObject g = this.gameObjects.stream().filter(t -> t.getPosition().equals(node.get().getPosition())).findFirst().orElse(null);
+                final GameObject g = this.gameObjects.stream().filter(t -> t.getPosition().equals(node.get())).findFirst().orElse(null);
                 if (g instanceof CageEnter || g instanceof CageExit) {
                     this.gameObjects.removeIf(t -> t.getPosition().equals(g.getPosition()));
                 }
@@ -291,10 +280,10 @@ public class LogicImpl implements Logic {
     private void link(final Vector2D position) {
         if (this.editGraphMode &&
             this.selectedNodes.size() < 2 &&
-            this.mapNodes.nodes().stream().anyMatch(t -> this.inRangeOf(t.getPosition(), position, 8))
+            this.mapNodes.nodes().stream().anyMatch(t -> this.inRangeOf(t, position, 8))
         ) {
-            final MapNode node = this.mapNodes.nodes().stream()
-                .filter(t -> this.inRangeOf(t.getPosition(), position, 8))
+            final Vector2D node = this.mapNodes.nodes().stream()
+                .filter(t -> this.inRangeOf(t, position, 8))
                 .findFirst()
                 .get();
             this.selectedNodes.add(node);
@@ -310,21 +299,21 @@ public class LogicImpl implements Logic {
     private void insertMapNode(final Vector2D position) {
         if (
             this.editGraphMode &&
-            this.mapNodes.nodes().stream().noneMatch(t -> t.getPosition().equals(position))
+            this.mapNodes.nodes().stream().noneMatch(t -> t.equals(position))
         ) {
-            this.mapNodes.addNode(new MapNode(position));
+            this.mapNodes.addNode(position);
         }
     }
 
     @Override
     public void linkNodes() {
         if (this.editGraphMode && this.selectedNodes.size() == 2) {
-            final MapNode src = this.selectedNodes.removeFirst();
-            final MapNode dst = this.selectedNodes.removeFirst();
+            final Vector2D src = this.selectedNodes.removeFirst();
+            final Vector2D dst = this.selectedNodes.removeFirst();
             if (src.equals(dst)) {
                 return;
             }
-            this.mapNodes.addEdge(src, dst, Pacman.distance(src.getPosition(), dst.getPosition()));
+            this.mapNodes.addEdge(src, dst, Pacman.distance(src, dst));
         }
     }
 
@@ -345,7 +334,7 @@ public class LogicImpl implements Logic {
     }
 
     @Override
-    public Graph<MapNode> getMap() {
+    public Graph<Vector2D> getMap() {
         return this.mapNodes;
     }
 

@@ -13,7 +13,6 @@ import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.impl.controller.MapFileParserImpl;
 import com.firesoul.pacman.impl.model.entities.PowerPill;
-import com.firesoul.pacman.impl.util.Pair;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public class Scene2D implements Scene {
@@ -22,7 +21,7 @@ public class Scene2D implements Scene {
     private static final int DEFAULT_HEIGHT = 288;
 
     private final List<GameObject> gameObjects = new LinkedList<GameObject>();
-    private final Graph<MapNode> mapNodes = new GraphImpl<>();
+    private final Graph<Vector2D> mapNodes;
     private final Vector2D dimensions;
     private Pacman pacman;
 
@@ -35,6 +34,7 @@ public class Scene2D implements Scene {
 
     public Scene2D(final int width, final int height) {
         this.dimensions = new Vector2D(width, height);
+        this.mapNodes = new GraphImpl<>();
     }
 
     /**
@@ -46,7 +46,7 @@ public class Scene2D implements Scene {
     public Scene2D(final String mapPath) {
         final MapFileParserImpl map = new MapFileParserImpl(mapPath);
         this.dimensions = map.getDimensions();
-        map.getMapNodes().forEach(this::addNode);
+        this.mapNodes = map.getMapNodes();
         map.getGameObjects().forEach(this::addGameObject);
     }
 
@@ -95,18 +95,8 @@ public class Scene2D implements Scene {
     }
 
     @Override
-    public Graph<MapNode> getMapNodes() {
+    public Graph<Vector2D> getMapNodes() {
         return this.mapNodes;
-    }
-
-    private void addNode(final Pair<Vector2D, List<Vector2D>> node) {
-        final MapNode x = new MapNode(node.x());
-        this.mapNodes.addNode(x);
-        for (final var elem : node.y()) {
-            final var y = new MapNode(elem);
-            this.mapNodes.addNode(y);
-            this.mapNodes.addEdge(x, y, Pacman.distance(node.x(), elem));
-        }
     }
 
     /**

@@ -3,8 +3,8 @@ package com.firesoul.pacman.api.controller;
 import java.util.List;
 
 import com.firesoul.pacman.api.model.GameObject;
+import com.firesoul.pacman.api.model.Graph;
 import com.firesoul.pacman.api.util.Vector;
-import com.firesoul.pacman.impl.util.Pair;
 import com.firesoul.pacman.impl.util.Vector2D;
 
 public interface MapFileParser {
@@ -22,5 +22,5 @@ public interface MapFileParser {
     /**
      * @return the graph representing all the nodes in the map
      */
-    List<Pair<Vector2D, List<Vector2D>>> getMapNodes();
+    Graph<Vector2D> getMapNodes();
 }

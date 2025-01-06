@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.firesoul.editor.gui.Pair;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Graph;
 import com.firesoul.pacman.api.model.GraphOperators;
@@ -55,10 +58,12 @@ public class Pacman {
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final OutsideCageNotifier outsideCageNotifier = new OutsideCageNotifier(EXIT_POSITION);
     private final List<Ghost> ghosts = new ArrayList<>();
-    private Graph<MapNode> mapNodes = new GraphImpl<>();
+    private Graph<Vector2D> mapNodes = new GraphImpl<>();
     private int lives = MAX_LIVES;
     private Player player;
     private Scene2D scene;
+    private GameObject cageEnter;
+    private GameObject cageExit;
     
     private int level;
 
@@ -141,11 +146,26 @@ public class Pacman {
     public List<Vector2D> findPathToCage(final Vector2D position) {
         final List<Vector2D> path = new LinkedList<>();
         // TODO
-        // Find the closest node from where to start and destination should be CageEnter
-        // final MapNode src;
-        // final MapNode dst;
-        // System.out.println(GraphOperators.findShortestPath(this.mapNodes, null, null));
-        return path;
+        // Find the closest node from here to start and destination should be CageEnter
+        var closestNodes = this.mapNodes.nodes().stream()
+            .map(t -> t.add(new Vector2D(-8, 8)))
+            .filter(t -> Math.abs(t.getX() - position.getX()) < 2 || Math.abs(t.getY() - position.getY()) < 2)
+            .filter(t -> Pacman.distance(t, position) > 0)
+            .collect(Collectors.toMap(t -> t, t -> Pacman.distance(t, position)))
+            .entrySet()
+            .stream()
+            .sorted((a, b) -> Double.compare(a.getValue(), b.getValue()))
+            .map(Map.Entry::getKey)
+            .map(t -> t.sub(new Vector2D(-8, 8)))
+            .limit(2)
+            .toList();
+
+        final Vector2D src1 = closestNodes.get(0);
+        final Vector2D src2 = closestNodes.size() > 1 ? closestNodes.get(1) : null;
+        final Vector2D dst = cageEnter.getPosition().sub(new Vector2D(-8, 8));
+        final List<Vector2D> path1 = GraphOperators.findShortestPath(this.mapNodes, src1, dst);
+        final List<Vector2D> path2 = src2 == null ? path1 : GraphOperators.findShortestPath(this.mapNodes, src2, dst);
+        return path1.size() < path2.size() ? path1 : path2;
     }
 
     /**
@@ -206,9 +226,6 @@ public class Pacman {
     }
 
     private void createScene() {
-
-        GameObject test = null;
-
         this.scene = new Scene2D(MAP_PATH);
         this.addGameObject(this.outsideCageNotifier);
         this.mapNodes = this.scene.getMapNodes();
@@ -223,25 +240,12 @@ public class Pacman {
                 this.ghosts.add(gh);
             } else if (g instanceof PowerPill pl) {
                 pl.connectToGameLogic(this);
-            }
-
-            else if (g instanceof CageEnter) {
-                test = g;
+            } else if (g instanceof CageEnter) {
+                this.cageEnter = g;
             } else if (g instanceof CageExit) {
-                test = g;
+                this.cageExit = g;
             }
         }
-        
-
-        for (var x : this.mapNodes.nodes()) {
-            for (var y : this.mapNodes.edgesOf(x).keySet()) {
-                if (y.getPosition().equals(test.getPosition())) {
-                    GameCore.log("Found exit position");
-                }
-            }
-        }
-
-
         if (this.player == null) {
             throw new IllegalStateException("Cannot find player in this scene");
         } else if (this.ghosts.size() != 4) {
