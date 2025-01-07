@@ -1,5 +1,8 @@
 package com.firesoul.pacman.impl.model.entities;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.firesoul.pacman.api.model.entities.Collidable;
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
@@ -11,7 +14,6 @@ import com.firesoul.pacman.impl.view.Animation2D;
 import com.firesoul.pacman.impl.view.DirectionalAnimation2D;
 import com.firesoul.pacman.impl.model.Pacman;
 import com.firesoul.pacman.impl.model.Pacman.Directions;
-import com.firesoul.pacman.impl.model.Pacman.OutsideCageNotifier;
 
 public abstract class Ghost extends SolidObject2D implements Movable {
 
@@ -22,7 +24,6 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     private static final double DEAD_SPEED = 2;
     private static final Vector2D SPRITE_SIZE = new Vector2D(16, 16);
     private static final Vector2D SIZE = SPRITE_SIZE.dot(0.5);
-    // private static final Vector2D CAGE_CENTER_POSITION = new Vector2D(112, 112);
 
     private final DirectionalAnimation2D movementAnimations;
     private final Animation2D vulnerableAnimation = new Animation2D("vulnerable", ANIMATION_SPEED);
@@ -32,9 +33,9 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     private final Timer vulnerabiltyTimer = new TimerImpl(VULNERABILITY_TIME);
     private final Vector2D startPosition;
     private final Vector2D startDirection;
+    private final List<Vector2D> path = new LinkedList<>();
     private Vector2D currentDirection;
     private Vector2D nextDirection;
-    private OutsideCageNotifier outsideCageNotifier;
     private Pacman pacman;
     private double speed = NORMAL_SPEED;
     private boolean dead = false;
@@ -65,7 +66,6 @@ public abstract class Ghost extends SolidObject2D implements Movable {
             this.exitCage();
         } else if (this.dead) {
             this.goToCage();
-            this.currentDirection = Vector2D.zero();
         } else {
             this.move();
             this.goToDirection(this.nextDirection);
@@ -82,7 +82,7 @@ public abstract class Ghost extends SolidObject2D implements Movable {
 
     private void exitCage() {
         if (this.roam) {
-            final Vector2D distanceToExit = this.getPosition().sub(this.outsideCageNotifier.getPosition());
+            final Vector2D distanceToExit = this.getPosition().sub(this.pacman.getCageExit().sub(new Vector2D(0, 8)));
             final double roundedX = Math.round(distanceToExit.getX());
             if (roundedX < 0) {
                 this.goToDirection(Vector2D.right());
@@ -98,8 +98,29 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     }
 
     private void goToCage() {
-        this.pacman.findPathToCage(this.getPosition());
-        // System.out.println();
+        if (this.path.isEmpty()) {
+            this.path.addAll(this.pacman.findPathToCage(this.getPosition()));
+        }
+        final Vector2D node = this.path.getFirst().add(new Vector2D(-8, 8));
+        final Vector2D rounded = rounded(this.getPosition());
+        if (Pacman.distance(rounded, node) > this.speed) {
+            this.currentDirection = new Vector2D(
+                Math.signum(node.getX() - rounded.getX()),
+                Math.signum(node.getY() - rounded.getY())
+            );
+        } else if (!this.path.isEmpty()) {
+            this.path.removeFirst();
+        }
+        if (this.path.isEmpty()) {
+            this.revive();
+        }
+    }
+
+    private Vector2D rounded(final Vector2D v) {
+        return new Vector2D(
+            Math.round(v.getX()),
+            Math.round(v.getY())
+        );
     }
 
     public void goToDirection(final Vector2D direction) {
@@ -144,7 +165,7 @@ public abstract class Ghost extends SolidObject2D implements Movable {
             }
         } else if (gameObject instanceof Wall) {
             this.checkMove();
-        } else if (gameObject instanceof OutsideCageNotifier) {
+        } else if (gameObject instanceof CageExit && this.bodyIsCollidingWithBodyOf(this, collider, other)) {
             this.insideCage = false;
         }
     }
@@ -175,6 +196,17 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         }
     }
 
+    private void revive() {
+        this.dead = false;
+        this.vulnerable = false;
+        this.roam = false;
+        this.insideCage = true;
+        this.speed = NORMAL_SPEED;
+        this.currentDirection = this.startDirection;
+        this.nextDirection = this.startDirection;
+        this.setPosition(this.pacman.getCageEnter());
+    }
+
     /**
      * Go to start position.
      */
@@ -190,13 +222,6 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         this.changeVariant(Vector2D.right());
         this.setPosition(this.startPosition);
         this.insideCageTimer.restart();
-    }
-
-    /**
-     * @param outsideCageNotifier that notifies a ghost when it's outside of the cage
-     */
-    public void addOutsideCageNotifier(final OutsideCageNotifier outsideCageNotifier) {
-        this.outsideCageNotifier = outsideCageNotifier;
     }
 
     /**

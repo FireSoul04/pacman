@@ -2,22 +2,16 @@ package com.firesoul.pacman.impl.model;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.firesoul.editor.gui.Pair;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Graph;
 import com.firesoul.pacman.api.model.GraphOperators;
-import com.firesoul.pacman.api.model.entities.Collidable;
-import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.GameCore;
 import com.firesoul.pacman.impl.model.entities.*;
-import com.firesoul.pacman.impl.model.entities.colliders.BoxCollider2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 
@@ -30,41 +24,19 @@ public class Pacman {
         LEFT,
         RIGHT
     }
-
-    public class OutsideCageNotifier extends GameObject2D implements Collidable {
-        private final Collider collider;
-
-        public OutsideCageNotifier(final Vector2D position) {
-            super(position.add(Vector2D.up()));
-            this.collider = new BoxCollider2D(this, new Vector2D(8, 1), false);
-        }
-
-        @Override
-        public void onCollide(final Collider collider, final Collider other) {
-        }
-
-        @Override
-        public List<Collider> getColliders() {
-            return Collections.unmodifiableList(List.of(this.collider));
-        }
-    }
-
     private static final int MAX_LIVES = 3;
     private static final String MAP_PATH = "src/main/resources/map/map.txt";
-    private static final Vector2D EXIT_POSITION = new Vector2D(112, 84);
     
     private final GameCore game;
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
-    private final OutsideCageNotifier outsideCageNotifier = new OutsideCageNotifier(EXIT_POSITION);
     private final List<Ghost> ghosts = new ArrayList<>();
     private Graph<Vector2D> mapNodes = new GraphImpl<>();
     private int lives = MAX_LIVES;
     private Player player;
     private Scene2D scene;
-    private GameObject cageEnter;
-    private GameObject cageExit;
-    
+    private Vector2D cageEnter;
+    private Vector2D cageExit;
     private int level;
 
     public Pacman(final GameCore game) {
@@ -143,29 +115,43 @@ public class Pacman {
         return counter;
     }
 
+    /**
+     * Search for the best path starting from the ghost position to the cage, considering the two closest nodes.
+     * @param position of the ghost
+     * @return path from position of the ghost to the inside of the cage
+     */
     public List<Vector2D> findPathToCage(final Vector2D position) {
-        final List<Vector2D> path = new LinkedList<>();
-        // TODO
-        // Find the closest node from here to start and destination should be CageEnter
-        var closestNodes = this.mapNodes.nodes().stream()
-            .map(t -> t.add(new Vector2D(-8, 8)))
-            .filter(t -> Math.abs(t.getX() - position.getX()) < 2 || Math.abs(t.getY() - position.getY()) < 2)
-            .filter(t -> Pacman.distance(t, position) > 0)
-            .collect(Collectors.toMap(t -> t, t -> Pacman.distance(t, position)))
+        final Vector2D movedPosition = position.sub(new Vector2D(-8, 8));
+        final List<Vector2D> closestNodes = this.mapNodes.nodes().stream()
+            .filter(t -> Math.abs(t.getX() - movedPosition.getX()) < 2 || Math.abs(t.getY() - movedPosition.getY()) < 2)
+            .filter(t -> Pacman.distance(t, movedPosition) > 0)
+            .collect(Collectors.toMap(t -> t, t -> Pacman.distance(t, movedPosition)))
             .entrySet()
             .stream()
             .sorted((a, b) -> Double.compare(a.getValue(), b.getValue()))
             .map(Map.Entry::getKey)
-            .map(t -> t.sub(new Vector2D(-8, 8)))
             .limit(2)
             .toList();
-
         final Vector2D src1 = closestNodes.get(0);
         final Vector2D src2 = closestNodes.size() > 1 ? closestNodes.get(1) : null;
-        final Vector2D dst = cageEnter.getPosition().sub(new Vector2D(-8, 8));
+        final Vector2D dst = cageEnter.sub(new Vector2D(-8, 8));
         final List<Vector2D> path1 = GraphOperators.findShortestPath(this.mapNodes, src1, dst);
         final List<Vector2D> path2 = src2 == null ? path1 : GraphOperators.findShortestPath(this.mapNodes, src2, dst);
         return path1.size() < path2.size() ? path1 : path2;
+    }
+
+    /**
+     * @return the position of the inside of the cage
+     */
+    public Vector2D getCageEnter() {
+        return cageEnter;
+    }
+    
+    /**
+     * @return the position of the cage's exit
+     */
+    public Vector2D getCageExit() {
+        return cageExit;
     }
 
     /**
@@ -193,7 +179,7 @@ public class Pacman {
     }
 
     /**
-     * Update all the gameObjects of the scene
+     * Update all the gameObjects of the scene.
      * @param deltaTime
      */
     public void updateAll(final double deltaTime) {
@@ -201,14 +187,14 @@ public class Pacman {
     }
 
     /**
-     * Wake all the gameObjects of the scene
+     * Wake all the gameObjects of the scene.
      */
     public void wakeAll() {
         this.scene.wakeAll();
     }
 
     /**
-     * Pause all the gameObjects of the scene
+     * Pause all the gameObjects of the scene.
      */
     public void pauseAll() {
         this.scene.pauseAll();
@@ -221,13 +207,15 @@ public class Pacman {
         return this.level;
     }
 
+    /**
+     * Decreases the player lives.
+     */
     public void playerDie() {
         this.lives--;
     }
 
     private void createScene() {
         this.scene = new Scene2D(MAP_PATH);
-        this.addGameObject(this.outsideCageNotifier);
         this.mapNodes = this.scene.getMapNodes();
         this.ghosts.clear();
         for (final GameObject g : this.getGameObjects()) {
@@ -235,15 +223,14 @@ public class Pacman {
                 p.addInput(this.game.getInputController());
                 this.player = p;
             } else if (g instanceof Ghost gh) {
-                gh.addOutsideCageNotifier(this.outsideCageNotifier);
                 gh.connectToGameLogic(this);
                 this.ghosts.add(gh);
             } else if (g instanceof PowerPill pl) {
                 pl.connectToGameLogic(this);
             } else if (g instanceof CageEnter) {
-                this.cageEnter = g;
+                this.cageEnter = g.getPosition();
             } else if (g instanceof CageExit) {
-                this.cageExit = g;
+                this.cageExit = g.getPosition();
             }
         }
         if (this.player == null) {
@@ -259,6 +246,12 @@ public class Pacman {
         }
     }
 
+    /**
+     * Caclulate the euclidean distance between two points.
+     * @param v1
+     * @param v2
+     * @return distance from v1 to v2
+     */
     public static double distance(final Vector2D v1, final Vector2D v2) {
         return Math.sqrt((v1.getX() - v2.getX()) * (v1.getX() - v2.getX()) + (v1.getY() - v2.getY()) * (v1.getY() - v2.getY()));
     }
