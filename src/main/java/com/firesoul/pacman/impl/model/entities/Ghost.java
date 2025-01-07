@@ -105,8 +105,8 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         final Vector2D rounded = rounded(this.getPosition());
         if (Pacman.distance(rounded, node) > this.speed) {
             this.currentDirection = new Vector2D(
-                Math.signum(node.getX() - rounded.getX()),
-                Math.signum(node.getY() - rounded.getY())
+                Math.abs(node.getX() - rounded.getX()) < this.speed ? 0 : Math.signum(node.getX() - rounded.getX()),
+                Math.abs(node.getY() - rounded.getY()) < this.speed ? 0 : Math.signum(node.getY() - rounded.getY())
             );
         } else if (!this.path.isEmpty()) {
             this.path.removeFirst();
