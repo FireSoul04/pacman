@@ -48,6 +48,7 @@ public class Scene2D implements Scene {
         this.dimensions = map.getDimensions();
         this.mapNodes = map.getMapNodes();
         map.getGameObjects().forEach(this::addGameObject);
+        this.gameObjects.sort((a, b) -> (a instanceof Movable && !(b instanceof Movable)) ? 1 : -1);
     }
 
     public void connectToGameLogic(final Pacman pacman) {

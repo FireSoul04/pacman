@@ -6,6 +6,7 @@ import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.InputController;
 import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.model.SolidObject2D;
+import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
 import com.firesoul.pacman.impl.view.DirectionalAnimation2D;
@@ -19,6 +20,8 @@ public class Player extends SolidObject2D implements Movable {
 
     private final Vector2D startPosition;
     private final DirectionalAnimation2D animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
+    private final Animation2D deadAnimation = new Animation2D("dead_pacman", ANIMATION_SPEED, true);
+    private final Timer dieAnimationTimer = new TimerImpl(Timer.secondsToMillis(1));
     private InputController input;
     private Vector2D currentDirection = Vector2D.right();
     private Vector2D nextDirection = Vector2D.right();
@@ -83,13 +86,23 @@ public class Player extends SolidObject2D implements Movable {
             animation.reset();
         } else {
             this.changeVariant(direction);
-            animation.start();
-            animation.update();
         }
     }
 
     private void changeVariant(final Vector2D direction) {
-        this.setDrawable(this.getAnimation(this.getDirectionFromVector(direction)));
+        final Animation2D animation = (Animation2D) this.getDrawable();
+        if (this.dead) {
+            this.setDrawable(this.deadAnimation);
+            this.dieAnimationTimer.update();
+            if (this.dieAnimationTimer.isExpired()) {
+                animation.start();
+                animation.update();
+            }
+        } else {
+            this.setDrawable(this.getAnimation(this.getDirectionFromVector(direction)));
+            animation.start();
+            animation.update();
+        }
     }
     
     private Animation2D getAnimation(final Directions direction) {
@@ -98,19 +111,26 @@ public class Player extends SolidObject2D implements Movable {
 
     @Override
     public void pause() {
+        if (this.dieAnimationTimer.isRunning()) {
+            this.dieAnimationTimer.pause();
+        }
     }
 
     @Override
     public void wake() {
+        if (this.dieAnimationTimer.isRunning()) {
+            this.dieAnimationTimer.start();
+        }
     }
 
     /**
-     * Go to start position
+     * Go to start position.
      */
     @Override
     public void reset() {
         this.dead = false;
         this.animate(Vector2D.right());
+        this.deadAnimation.reset();
         this.setPosition(this.startPosition);
         this.moveColliders();
     }
@@ -119,11 +139,14 @@ public class Player extends SolidObject2D implements Movable {
      * The player dies.
      */
     public void die() {
+        this.setDrawable(this.deadAnimation);
+        this.deadAnimation.stop();
+        this.dieAnimationTimer.restart();
         this.dead = true;
     }
 
     /**
-     * @return if the player is dead.
+     * @return if the player is dead
      */
     public boolean isDead() {
         return this.dead;

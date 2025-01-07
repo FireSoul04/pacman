@@ -5,27 +5,32 @@ public interface Timer {
     public static long CONVERT_SECONDS_MILLISECONDS = 1000;
 
     /**
-     * Start the time count
+     * Start the time count.
      */
     void start();
 
     /**
-     * Restart the time count
+     * Reset the time count.
+     */
+    void reset();
+
+    /**
+     * Restart the time count.
      */
     void restart();
 
     /**
-     * Stop when the time count reach the end
+     * Stop when the time count reach the end.
      */
     void update();
 
     /**
-     * Stop the timer manually
+     * Stop the timer manually.
      */
     void stop();
 
     /**
-     * Pause the time count
+     * Pause the time count.
      */
     void pause();
 
@@ -55,7 +60,7 @@ public interface Timer {
     boolean isExpired();
 
     /**
-     * Convert from millis to seconds
+     * Convert from millis to seconds.
      * @param millis
      * @return millis in seconds
      */
@@ -64,7 +69,7 @@ public interface Timer {
     }
 
     /**
-     * Convert from seconds to millis
+     * Convert from seconds to millis.
      * @param seconds
      * @return seconds in millis
      */
@@ -73,7 +78,7 @@ public interface Timer {
     }
 
     /**
-     * Convert from seconds to millis
+     * Convert from seconds to millis.
      * @param seconds
      * @return seconds in millis
      */
@@ -90,7 +95,7 @@ public interface Timer {
     }
 
     /**
-     * Get the difference between two times expressed in milliseconds, the order don't change the result
+     * Get the difference between two times expressed in milliseconds, the order don't change the result.
      * @param t1
      * @param t2
      * @return Difference between two times in milliseconds

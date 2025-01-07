@@ -44,6 +44,14 @@ public class TimerImpl implements Timer {
     }
 
     @Override
+    public void reset() {
+        this.startTime = 0;
+        this.pauseTime = 0;
+        this.isCounting = false;
+        this.isStopped = false;
+    }
+
+    @Override
     public void restart() {
         this.pauseTime = 0;
         this.isStopped = false;

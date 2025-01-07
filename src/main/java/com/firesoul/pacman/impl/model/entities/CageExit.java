@@ -18,6 +18,7 @@ public class CageExit extends GameObject2D implements Collidable {
     public CageExit(final Vector2D position) {
         super(position, new Invisible2D(SIZE));
         this.collider = new BoxCollider2D(this, new Vector2D(8, 1), false);
+        this.setVisible(false);
     }
     
     @Override

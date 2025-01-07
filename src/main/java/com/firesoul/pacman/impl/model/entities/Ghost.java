@@ -21,14 +21,14 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     private static final long VULNERABILITY_TIME = Timer.secondsToMillis(20);
     private static final long ANIMATION_SPEED = Timer.secondsToMillis(0.2);
     private static final double NORMAL_SPEED = 0.5;
-    private static final double DEAD_SPEED = 2;
+    private static final double DEAD_SPEED = 3;
     private static final Vector2D SPRITE_SIZE = new Vector2D(16, 16);
     private static final Vector2D SIZE = SPRITE_SIZE.dot(0.5);
 
     private final DirectionalAnimation2D movementAnimations;
+    private final DirectionalAnimation2D deadAnimation = new DirectionalAnimation2D("dead_ghost", 0);
     private final Animation2D vulnerableAnimation = new Animation2D("vulnerable", ANIMATION_SPEED);
     private final Animation2D vulnerableAnimationBlinking = new Animation2D("vulnerable_blinking", ANIMATION_SPEED);
-    // private final Animation2D deadAnimation = new Animation2D("vulnerable_blinking", ANIMATION_SPEED); // TODO
     private final Timer insideCageTimer;
     private final Timer vulnerabiltyTimer = new TimerImpl(VULNERABILITY_TIME);
     private final Vector2D startPosition;
@@ -272,8 +272,8 @@ public abstract class Ghost extends SolidObject2D implements Movable {
      * @param direction where the animation is directed.
      * @return the animation in that direction.
      */
-    protected Animation2D getAnimation(final Directions direction) {
-        return this.movementAnimations.getAnimation(direction);
+    protected Animation2D getAnimation(final DirectionalAnimation2D animation, final Directions direction) {
+        return animation.getAnimation(direction);
     }
 
     /**
@@ -281,8 +281,8 @@ public abstract class Ghost extends SolidObject2D implements Movable {
      * @param direction where the ghost is going.
      */
     protected void animate(final Vector2D direction) {
-        final Animation2D animation = (Animation2D) this.getDrawable();
         this.changeVariant(direction);
+        final Animation2D animation = (Animation2D) this.getDrawable();
         animation.start();
         animation.update();
     }
@@ -304,26 +304,28 @@ public abstract class Ghost extends SolidObject2D implements Movable {
     }
 
     private void changeVariant(final Vector2D direction) {
-        if (this.isVulnerable()) {
+        if (this.dead) {
+            this.changeBasedOnDirection(this.deadAnimation, direction);
+        } else if (this.isVulnerable()) {
             if (this.vulnerabiltyTimer.getRemainingTime() < VULNERABILITY_START_BLINKING_TIME) {
                 this.setDrawable(vulnerableAnimationBlinking);
             } else {
                 this.setDrawable(vulnerableAnimation);
             }
         } else {
-            this.changeBasedOnDirection(direction);
+            this.changeBasedOnDirection(this.movementAnimations, direction);
         }
     }
 
-    private void changeBasedOnDirection(final Vector2D direction) {
+    private void changeBasedOnDirection(final DirectionalAnimation2D animation, final Vector2D direction) {
         if (direction.equals(Vector2D.up())) {
-            this.setDrawable(this.getAnimation(Directions.UP));
+            this.setDrawable(this.getAnimation(animation, Directions.UP));
         } else if (direction.equals(Vector2D.down())) {
-            this.setDrawable(this.getAnimation(Directions.DOWN));
+            this.setDrawable(this.getAnimation(animation, Directions.DOWN));
         } else if (direction.equals(Vector2D.left())) {
-            this.setDrawable(this.getAnimation(Directions.LEFT));
+            this.setDrawable(this.getAnimation(animation, Directions.LEFT));
         } else if (direction.equals(Vector2D.right())) {
-            this.setDrawable(this.getAnimation(Directions.RIGHT));
+            this.setDrawable(this.getAnimation(animation, Directions.RIGHT));
         }
     }
 

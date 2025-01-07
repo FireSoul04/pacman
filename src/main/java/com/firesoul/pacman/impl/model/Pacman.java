@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.firesoul.pacman.api.model.GameObject;
@@ -29,7 +30,13 @@ public class Pacman {
     
     private final GameCore game;
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
-    private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(2));
+    private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(3));
+    private final Timer eatenTimer = new TimerImpl(Timer.secondsToMillis(0.5));
+    private final Set<Timer> timers = Set.of(
+        this.nextLevelTimer,
+        this.liveLostTimer,
+        this.eatenTimer
+    );
     private final List<Ghost> ghosts = new ArrayList<>();
     private Graph<Vector2D> mapNodes = new GraphImpl<>();
     private int lives = MAX_LIVES;
@@ -50,20 +57,25 @@ public class Pacman {
     }
 
     public void update(final double deltaTime) {
-        if (!this.isWaitingNextLevel() && !this.isPlayerWaitingRespawn()) {
-            this.game.pauseOnKeyPressed(KeyEvent.VK_ESCAPE);
+        this.game.pauseOnKeyPressed(KeyEvent.VK_ESCAPE);
+        this.timers.forEach(Timer::update);
+        if (this.eatenTimer.isRunning() || this.liveLostTimer.isRunning()) {
+            this.updateAll(0);
+        } else if (this.player.isDead() && this.liveLostTimer.isExpired()) {
+            this.reset();
+            this.nextLevelTimer.restart();
+            this.liveLostTimer.reset();
+        } else if (this.timers.stream().noneMatch(Timer::isRunning)) {
             this.checkNextLevel();
             this.checkPlayerDeath();
             this.checkGameOver();
             this.updateAll(deltaTime);
         }
-        this.nextLevelTimer.update();
-        this.liveLostTimer.update();
         if (this.game.isOver()) {
             GameCore.log("Game Over!");
             try {
                 Thread.sleep(Timer.secondsToMillis(1));
-            } catch (final InterruptedException e) {
+            } catch (InterruptedException e) {
             }
             System.exit(0);
         }
@@ -80,10 +92,8 @@ public class Pacman {
 
     private void checkPlayerDeath() {
         if (this.player.isDead()) {
-            this.lives--;
             GameCore.log("Player is dead, lives remaining: " + this.lives);
-            this.reset();
-            this.liveLostTimer.restart();
+            this.playerDie();
         }
     }
 
@@ -91,14 +101,6 @@ public class Pacman {
         if (this.lives <= 0) {
             this.game.gameOver();
         }
-    }
-
-    private boolean isWaitingNextLevel() {
-        return this.nextLevelTimer.isRunning();
-    }
-
-    private boolean isPlayerWaitingRespawn() {
-        return this.liveLostTimer.isRunning();
     }
 
     private boolean isLevelCompleted() {
@@ -121,6 +123,7 @@ public class Pacman {
      * @return path from position of the ghost to the inside of the cage
      */
     public List<Vector2D> findPathToCage(final Vector2D position) {
+        this.eatenTimer.restart();
         final Vector2D movedPosition = position.sub(new Vector2D(-8, 8));
         final List<Vector2D> closestNodes = this.mapNodes.nodes().stream()
             .filter(t -> Math.abs(t.getX() - movedPosition.getX()) < 2 || Math.abs(t.getY() - movedPosition.getY()) < 2)
@@ -134,7 +137,7 @@ public class Pacman {
             .toList();
         final Vector2D src1 = closestNodes.get(0);
         final Vector2D src2 = closestNodes.size() > 1 ? closestNodes.get(1) : null;
-        final Vector2D dst = cageEnter.sub(new Vector2D(-8, 8));
+        final Vector2D dst = this.cageEnter.sub(new Vector2D(-8, 8));
         final List<Vector2D> path1 = GraphOperators.findShortestPath(this.mapNodes, src1, dst);
         final List<Vector2D> path2 = src2 == null ? path1 : GraphOperators.findShortestPath(this.mapNodes, src2, dst);
         return path1.size() < path2.size() ? path1 : path2;
@@ -144,14 +147,14 @@ public class Pacman {
      * @return the position of the inside of the cage
      */
     public Vector2D getCageEnter() {
-        return cageEnter;
+        return this.cageEnter;
     }
     
     /**
      * @return the position of the cage's exit
      */
     public Vector2D getCageExit() {
-        return cageExit;
+        return this.cageExit;
     }
 
     /**
@@ -212,6 +215,7 @@ public class Pacman {
      */
     public void playerDie() {
         this.lives--;
+        this.liveLostTimer.restart();
     }
 
     private void createScene() {

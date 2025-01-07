@@ -16,8 +16,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import com.firesoul.pacman.api.model.GameObject;
-import com.firesoul.pacman.api.model.entities.Collidable;
-import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.view.Renderer;
 import com.firesoul.pacman.impl.controller.InputController;
 import com.firesoul.pacman.impl.util.Vector2D;
@@ -99,8 +97,8 @@ public class Window extends JFrame implements Renderer {
                 final int w = image.getWidth(this.canvas);
                 final int h = image.getHeight(this.canvas);
                 final Vector2D start = gameObject.getPosition().sub(new Vector2D(w, h).dot(0.5));
-                final int x = (int)start.getX();
-                final int y = (int)start.getY();
+                final int x = (int) start.getX();
+                final int y = (int) start.getY();
                 this.graphics.drawImage(
                     image,
                     (int) (x * this.scaleX), 
@@ -111,25 +109,25 @@ public class Window extends JFrame implements Renderer {
                 );
             }
         }
-        gameObjects.forEach(this::drawColliders);
+        // gameObjects.forEach(this::drawColliders);
         this.graphics.dispose();
         this.bufferStrategy.show();
     }
 
     // DEBUG PURPOSE
-    final Color color = new Color(1, 0, 0, 0.5f);
-    private void drawColliders(final GameObject g) {
-        this.graphics.setColor(color);
-        if (g instanceof Collidable collidable) {
-            for (final Collider c : collidable.getColliders()) {
-                int cx = (int) c.getPosition().dot(this.scaleX).getX();
-                int cy = (int) c.getPosition().dot(this.scaleY).getY();
-                int cw = (int) c.getDimensions().dot(this.scaleX).getX();
-                int ch = (int) c.getDimensions().dot(this.scaleY).getY();
-                this.graphics.fillRect(cx, cy, cw, ch);
-            }
-        }
-    }
+    // final Color color = new Color(1, 0, 0, 0.5f);
+    // private void drawColliders(final GameObject g) {
+    //     this.graphics.setColor(color);
+    //     if (g instanceof Collidable collidable) {
+    //         for (final Collider c : collidable.getColliders()) {
+    //             int cx = (int) c.getPosition().dot(this.scaleX).getX();
+    //             int cy = (int) c.getPosition().dot(this.scaleY).getY();
+    //             int cw = (int) c.getDimensions().dot(this.scaleX).getX();
+    //             int ch = (int) c.getDimensions().dot(this.scaleY).getY();
+    //             this.graphics.fillRect(cx, cy, cw, ch);
+    //         }
+    //     }
+    // }
 
     @Override
     public synchronized void setColor(final Color color) {
