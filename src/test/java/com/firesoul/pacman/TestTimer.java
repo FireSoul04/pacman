@@ -97,7 +97,7 @@ public class TestTimer {
         timer.stop();
         assertTrue(timer.isExpired());
         Thread.sleep(WAIT_TIME);
-        timer.restart();
+        timer.startAgain();
         assertFalse(timer.isExpired());
         assertEquals(startTime, timer.getCurrentTime());
         assertTrue(timer.isRunning());

@@ -75,7 +75,7 @@ public class Animation2D implements Drawable {
             if (this.animationFrame >= this.frames.size()) {
                 this.animationFrame = 0;
             }
-            this.animationTimer.restart();
+            this.animationTimer.startAgain();
         }
     }
 

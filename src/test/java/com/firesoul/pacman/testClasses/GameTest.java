@@ -70,7 +70,7 @@ public class GameTest implements Game {
                 GameCore.log(updates + " ups, " + frames + " fps");
                 updates = 0;
                 frames = 0;
-                timer.restart();
+                timer.startAgain();
             }
         }
     }

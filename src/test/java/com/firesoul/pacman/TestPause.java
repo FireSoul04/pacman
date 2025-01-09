@@ -50,7 +50,7 @@ public class TestPause {
         }
         interval.update();
         if (interval.isExpired()) {
-            interval.restart();
+            interval.startAgain();
             if (game.isPaused()) {
                 Assertions.assertEquals(expected, entity.getPosition());
                 game.start();

@@ -2,17 +2,23 @@ package com.firesoul.pacman.impl.model;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.sound.sampled.Clip;
+
+import com.firesoul.editor.gui.Pair;
 import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.Graph;
 import com.firesoul.pacman.api.model.GraphOperators;
+import com.firesoul.pacman.api.util.AudioPlayer;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.GameCore;
 import com.firesoul.pacman.impl.model.entities.*;
+import com.firesoul.pacman.impl.util.SoundPlayer;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 
@@ -29,16 +35,22 @@ public class Pacman {
     private static final String MAP_PATH = "src/main/resources/map/map.txt";
     
     private final GameCore game;
+    private final Timer startTimer = new TimerImpl(Timer.secondsToMillis(/*4.5*/0));
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(3));
     private final Timer eatenTimer = new TimerImpl(Timer.secondsToMillis(0.5));
     private final Set<Timer> timers = Set.of(
+        this.startTimer,
         this.nextLevelTimer,
         this.liveLostTimer,
         this.eatenTimer
     );
     private final List<Ghost> ghosts = new ArrayList<>();
+    private final AudioPlayer startSound = new SoundPlayer("start");
+    private final AudioPlayer ghostVulnerableSound = new SoundPlayer("fright", Clip.LOOP_CONTINUOUSLY);
+    private final AudioPlayer eatGhostSound = new SoundPlayer("eat_ghost");
     private Graph<Vector2D> mapNodes = new GraphImpl<>();
+    private Map<Pair<Vector2D, Vector2D>, List<Vector2D>> paths = new HashMap<>();
     private int lives = MAX_LIVES;
     private Player player;
     private Scene2D scene;
@@ -51,9 +63,11 @@ public class Pacman {
     }
 
     public void init() {
-        this.level = 1;
-        this.nextLevelTimer.start();
         this.createScene();
+        this.mapNodes.nodes().stream().forEach(s ->this.mapNodes.nodes().stream().forEach(d -> this.paths.put(new Pair<>(s, d), GraphOperators.findShortestPath(this.mapNodes, s, d))));
+        this.level = 1;
+        this.startTimer.start();
+        this.startSound.playOnce();
     }
 
     public void update(final double deltaTime) {
@@ -63,13 +77,16 @@ public class Pacman {
             this.updateAll(0);
         } else if (this.player.isDead() && this.liveLostTimer.isExpired()) {
             this.reset();
-            this.nextLevelTimer.restart();
+            this.nextLevelTimer.startAgain();
             this.liveLostTimer.reset();
         } else if (this.timers.stream().noneMatch(Timer::isRunning)) {
             this.checkNextLevel();
             this.checkPlayerDeath();
             this.checkGameOver();
             this.updateAll(deltaTime);
+        }
+        if (this.ghosts.stream().noneMatch(Ghost::isVulnerable)) {
+            this.ghostVulnerableSound.stop();
         }
         if (this.game.isOver()) {
             GameCore.log("Game Over!");
@@ -86,14 +103,15 @@ public class Pacman {
             GameCore.log("Level " + this.level + " completed!");
             this.level++;
             this.createScene();
-            this.nextLevelTimer.restart();
+            this.nextLevelTimer.startAgain();
+            this.ghostVulnerableSound.stop();
         }
     }
 
     private void checkPlayerDeath() {
         if (this.player.isDead()) {
-            GameCore.log("Player is dead, lives remaining: " + this.lives);
             this.playerDie();
+            GameCore.log("Player is dead, lives remaining: " + this.lives);
         }
     }
 
@@ -108,39 +126,36 @@ public class Pacman {
     }
 
     private int howManyInstancesOf(final Class<?> clazz) {
-        int counter = 0;
-        for (final GameObject g : this.getGameObjects()) {
-            if (g.getClass().equals(clazz)) {
-                counter++;
-            }
-        }
-        return counter;
+        return (int) this.getGameObjects().stream().map(Object::getClass).filter(t -> t.equals(clazz)).count();
     }
 
     /**
      * Search for the best path starting from the ghost position to the cage, considering the two closest nodes.
      * @param position of the ghost
-     * @return path from position of the ghost to the inside of the cage
+     * @return path from position to the inside of the cage
      */
-    public List<Vector2D> findPathToCage(final Vector2D position) {
-        this.eatenTimer.restart();
-        final Vector2D movedPosition = position.sub(new Vector2D(-8, 8));
-        final List<Vector2D> closestNodes = this.mapNodes.nodes().stream()
-            .filter(t -> Math.abs(t.getX() - movedPosition.getX()) < 2 || Math.abs(t.getY() - movedPosition.getY()) < 2)
-            .filter(t -> Pacman.distance(t, movedPosition) > 0)
-            .collect(Collectors.toMap(t -> t, t -> Pacman.distance(t, movedPosition)))
+    public List<Vector2D> findPathTo(final Vector2D source, final Vector2D destination) {
+        final Vector2D src = this.closestNodeTo(source.sub(new Vector2D(-8, 8)));
+        final Vector2D dst = this.closestNodeTo(destination.sub(new Vector2D(-8, 8)));
+        return this.paths.get(new Pair<>(src, dst));
+    }
+
+    /**
+     * Get the closest graph node from the position given.
+     * @param position
+     * @return closest note
+     */
+    public Vector2D closestNodeTo(final Vector2D position) {
+        return this.mapNodes.nodes().stream()
+            .filter(t -> Math.abs(t.getX() - position.getX()) < 2 || Math.abs(t.getY() - position.getY()) < 2)
+            .filter(t -> Pacman.distance(t, position) >= 0)
+            .collect(Collectors.toMap(t -> t, t -> Pacman.distance(t, position)))
             .entrySet()
             .stream()
             .sorted((a, b) -> Double.compare(a.getValue(), b.getValue()))
             .map(Map.Entry::getKey)
-            .limit(2)
-            .toList();
-        final Vector2D src1 = closestNodes.get(0);
-        final Vector2D src2 = closestNodes.size() > 1 ? closestNodes.get(1) : null;
-        final Vector2D dst = this.cageEnter.sub(new Vector2D(-8, 8));
-        final List<Vector2D> path1 = GraphOperators.findShortestPath(this.mapNodes, src1, dst);
-        final List<Vector2D> path2 = src2 == null ? path1 : GraphOperators.findShortestPath(this.mapNodes, src2, dst);
-        return path1.size() < path2.size() ? path1 : path2;
+            .findFirst()
+            .get();
     }
 
     /**
@@ -161,9 +176,18 @@ public class Pacman {
      * Set all the ghosts vulnerable.
      */
     public void setGhostVulnerable() {
-        for (final Ghost g : this.ghosts) {
-            g.setVulnerable();
+        this.ghosts.forEach(Ghost::setVulnerable);
+        this.ghostVulnerableSound.play();
+    }
+
+    /**
+     * Start the timer when a ghost is eaten.
+     */
+    public void ghostEaten() {
+        if (!this.eatenTimer.isRunning()) {
+            this.eatenTimer.startAgain();
         }
+        this.eatGhostSound.play();
     }
 
     /**
@@ -194,6 +218,9 @@ public class Pacman {
      */
     public void wakeAll() {
         this.scene.wakeAll();
+        if (this.ghostVulnerableSound.alreadyPlaying()) {
+            this.ghostVulnerableSound.resume();
+        }
     }
 
     /**
@@ -201,6 +228,7 @@ public class Pacman {
      */
     public void pauseAll() {
         this.scene.pauseAll();
+        this.ghostVulnerableSound.pause();
     }
 
     /**
@@ -215,7 +243,15 @@ public class Pacman {
      */
     public void playerDie() {
         this.lives--;
-        this.liveLostTimer.restart();
+        this.liveLostTimer.startAgain();
+        this.ghostVulnerableSound.stop();
+    }
+
+    /**
+     * @return player's position
+     */
+    public Vector2D getPlayerPosition() {
+        return this.player.getPosition();
     }
 
     private void createScene() {
@@ -245,9 +281,7 @@ public class Pacman {
     }
 
     private void reset() {
-        for (final GameObject g : this.getGameObjects()) {
-            g.reset();
-        }
+        this.getGameObjects().forEach(t -> t.reset());
     }
 
     /**

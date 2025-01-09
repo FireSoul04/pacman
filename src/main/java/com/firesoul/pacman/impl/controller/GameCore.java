@@ -23,9 +23,9 @@ public class GameCore implements Game {
     private static final String TITLE = "Pacman";
     private static final int WIDTH = 224;
     private static final int HEIGHT = 288;
-    private static final PrintStream logger = System.out;
+    private static final PrintStream LOGGER = System.out;
 
-    private final Thread displayThread = new Thread(this, "Display");
+    private final Thread logicThread = new Thread(this, "Game");
     private final Renderer renderer;
     private final InputController inputController = new InputController();
     private final Pacman pacman;
@@ -42,9 +42,9 @@ public class GameCore implements Game {
 
     @Override
     public void init() {
-        this.pacman.init();
         this.renderer.init(MAP_IMAGE_PATH);
-        this.displayThread.start();
+        this.pacman.init();
+        this.logicThread.start();
         this.start();
     }
 
@@ -81,10 +81,10 @@ public class GameCore implements Game {
             frames++;
             timer.update();
             if (timer.isExpired()) {
-                GameCore.log(updates + " ups, " + frames + " fps");
+                this.renderer.setTitle(updates + " ups, " + frames + " fps");
                 updates = 0;
                 frames = 0;
-                timer.restart();
+                timer.startAgain();
             }
         }
     }
@@ -165,6 +165,6 @@ public class GameCore implements Game {
      * @param message
      */
     public static void log(final String message) {
-        GameCore.logger.println(message);
+        GameCore.LOGGER.println(message);
     }
 }

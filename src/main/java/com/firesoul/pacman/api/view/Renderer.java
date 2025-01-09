@@ -63,6 +63,12 @@ public interface Renderer {
     void setScaleY(double scaleY);
 
     /**
+     * Set the title of the window.
+     * @param title
+     */
+    void setTitle(String title);
+
+    /**
      * Add input controller to the game.
      * @param inputController Input controller.
      */

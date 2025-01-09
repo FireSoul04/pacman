@@ -52,7 +52,7 @@ public class TimerImpl implements Timer {
     }
 
     @Override
-    public void restart() {
+    public void startAgain() {
         this.pauseTime = 0;
         this.isStopped = false;
         this.start();

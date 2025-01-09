@@ -17,7 +17,7 @@ public interface Timer {
     /**
      * Restart the time count.
      */
-    void restart();
+    void startAgain();
 
     /**
      * Stop when the time count reach the end.

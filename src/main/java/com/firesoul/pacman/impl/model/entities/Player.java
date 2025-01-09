@@ -2,10 +2,12 @@ package com.firesoul.pacman.impl.model.entities;
 
 import com.firesoul.pacman.api.model.entities.Collider;
 import com.firesoul.pacman.api.model.entities.Movable;
+import com.firesoul.pacman.api.util.AudioPlayer;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.impl.controller.InputController;
 import com.firesoul.pacman.impl.model.GameObject2D;
 import com.firesoul.pacman.impl.model.SolidObject2D;
+import com.firesoul.pacman.impl.util.SoundPlayer;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.util.Vector2D;
 import com.firesoul.pacman.impl.view.Animation2D;
@@ -22,11 +24,15 @@ public class Player extends SolidObject2D implements Movable {
     private final DirectionalAnimation2D animations = new DirectionalAnimation2D("pacman", ANIMATION_SPEED);
     private final Animation2D deadAnimation = new Animation2D("dead_pacman", ANIMATION_SPEED, true);
     private final Timer dieAnimationTimer = new TimerImpl(Timer.secondsToMillis(1));
+    private final AudioPlayer playerDeadSound = new SoundPlayer("death");
+    private final AudioPlayer munchSound = new SoundPlayer("eat_dot_0", 1);
+    private final AudioPlayer movementSound = new SoundPlayer("siren0", 1);
     private InputController input;
     private Vector2D currentDirection = Vector2D.right();
     private Vector2D nextDirection = Vector2D.right();
     private double speed = 1.0;
     private boolean dead = false;
+    private boolean pillEaten = false;
 
     public Player(final Vector2D position) {
         super(position, SPRITE_SIZE, SIZE);
@@ -39,12 +45,26 @@ public class Player extends SolidObject2D implements Movable {
         final GameObject2D gameObject = other.getAttachedGameObject();
         if (gameObject instanceof Wall) {
             this.checkMove();
+        } else if (this.bodyIsCollidingWith(collider) && gameObject instanceof Pill) {
+            this.pillEaten = true;
+        } else {
+            this.pillEaten = false;
         }
     }
 
     @Override
     public void update(final double deltaTime) {
+        if (this.dead && this.dieAnimationTimer.isExpired()) {
+            this.playerDeadSound.playOnce();
+        }
         this.readInput();
+        if (!this.currentDirection.equals(Vector2D.zero()) && !this.dead) {
+            if (this.pillEaten) {
+                this.munchSound.playOnce();
+            } else {
+                this.movementSound.playOnce();
+            }
+        }
         final Vector2D newPosition = this.getPosition()
             .add(this.currentDirection.dot(this.speed)
             .dot(deltaTime))
@@ -114,6 +134,12 @@ public class Player extends SolidObject2D implements Movable {
         if (this.dieAnimationTimer.isRunning()) {
             this.dieAnimationTimer.pause();
         }
+        if (this.munchSound.alreadyPlaying()) {
+            this.munchSound.pause();
+        }
+        if (this.movementSound.alreadyPlaying()) {
+            this.movementSound.pause();
+        }
     }
 
     @Override
@@ -139,10 +165,11 @@ public class Player extends SolidObject2D implements Movable {
      * The player dies.
      */
     public void die() {
+        this.dead = true;
         this.setDrawable(this.deadAnimation);
         this.deadAnimation.stop();
-        this.dieAnimationTimer.restart();
-        this.dead = true;
+        this.dieAnimationTimer.startAgain();
+        this.playerDeadSound.reset();
     }
 
     /**
