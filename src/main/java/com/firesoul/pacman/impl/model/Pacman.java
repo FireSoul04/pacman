@@ -37,7 +37,7 @@ public class Pacman {
     private static final String MAP_PATH = "src/main/resources/map/map.txt";
     
     private final PacmanCore game;
-    private final Timer startTimer = new TimerImpl(Timer.secondsToMillis(/*4.5*/0.5));
+    private final Timer startTimer = new TimerImpl(Timer.secondsToMillis(4.5));
     private final Timer nextLevelTimer = new TimerImpl(Timer.secondsToMillis(2));
     private final Timer liveLostTimer = new TimerImpl(Timer.secondsToMillis(3));
     private final Timer eatenTimer = new TimerImpl(Timer.secondsToMillis(0.5));
