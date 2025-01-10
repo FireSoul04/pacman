@@ -8,7 +8,7 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
 import com.firesoul.pacman.api.util.AudioPlayer;
-import com.firesoul.pacman.impl.controller.GameCore;
+import com.firesoul.pacman.impl.controller.PacmanCore;
 
 public class SoundPlayer implements AudioPlayer {
 
@@ -36,7 +36,7 @@ public class SoundPlayer implements AudioPlayer {
             FloatControl gainControl = (FloatControl) this.clip.getControl(FloatControl.Type.MASTER_GAIN);
             gainControl.setValue(-10.0f);
         } catch (Exception e) {
-            GameCore.log("Cannot load audio file " + this.filePath);
+            PacmanCore.log("Cannot load audio file " + this.filePath);
             System.exit(0);
         }
     }

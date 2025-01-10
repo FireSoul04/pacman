@@ -178,4 +178,8 @@ public class Player extends SolidObject2D implements Movable {
     public boolean isDead() {
         return this.dead;
     }
+
+    public Vector2D getDirection() {
+        return this.currentDirection;
+    }
 }

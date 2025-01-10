@@ -3,17 +3,17 @@ package com.firesoul.pacman.impl.model.entities.ghosts;
 import com.firesoul.pacman.impl.model.entities.Ghost;
 import com.firesoul.pacman.impl.util.Vector2D;
 
-import java.util.Map;
+import java.util.List;
 
 import com.firesoul.pacman.impl.model.Pacman.Directions;
 
 public class Blinky extends Ghost {
 
-    private Map<Vector2D, Directions> allDirections = Map.of(
-        Vector2D.up(), Directions.UP,
-        Vector2D.down(), Directions.DOWN,
-        Vector2D.left(), Directions.LEFT,
-        Vector2D.right(), Directions.RIGHT
+    private List<Directions> allDirections = List.of(
+        Directions.UP,
+        Directions.DOWN,
+        Directions.LEFT,
+        Directions.RIGHT
     );
 
     /**
@@ -25,9 +25,18 @@ public class Blinky extends Ghost {
 
     @Override
     protected void move() {
-        if (this.allDirections.values().stream().filter(this::canMove).count() > 2 || this.getPath().isEmpty()) {
-            this.changePath((this.getPlayerPosition()));
+        if (this.allDirections.stream().filter(this::canMove).count() > 2 || this.getPath().isEmpty()) {
+            this.changePathOnSituation();
         }
         this.followPath();
+    }
+
+    private void changePathOnSituation() {
+        this.clearPath();
+        if (this.isVulnerable()) {
+            this.changePath(this.getMostFarPositionFromPlayer());
+        } else {
+            this.changePath(this.getPlayerPosition());
+        }
     }
 }

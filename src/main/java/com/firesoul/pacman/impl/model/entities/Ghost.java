@@ -109,6 +109,10 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         return Collections.unmodifiableList(this.path);
     }
 
+    protected void clearPath() {
+        this.path.clear();
+    }
+
     protected void changePath(final Vector2D position) {
         if (this.path.isEmpty()) {
             this.path.addAll(this.pacman.findPathTo(this.getPosition(), position));
@@ -119,8 +123,6 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         if (!this.path.isEmpty()) {
             final Vector2D node = this.path.getFirst().add(new Vector2D(-8, 8));
             final Vector2D rounded = this.rounded(this.getPosition());
-            double distance = Pacman.distance(rounded, node);
-            System.out.println("Current Position: " + this.getPosition() + ", Node: " + node + ", Distance: " + distance);
             if (Pacman.distance(rounded, node) > this.speed) {
                 this.currentDirection = new Vector2D(
                     Math.abs(node.getX() - rounded.getX()) < this.speed ? 0 : Math.signum(node.getX() - rounded.getX()),
@@ -150,7 +152,7 @@ public abstract class Ghost extends SolidObject2D implements Movable {
         }
     }
 
-    private Vector2D rounded(final Vector2D v) {
+    protected Vector2D rounded(final Vector2D v) {
         return new Vector2D(
             Math.round(v.getX()),
             Math.round(v.getY())
@@ -342,6 +344,22 @@ public abstract class Ghost extends SolidObject2D implements Movable {
 
     protected Vector2D getPlayerPosition() {
         return this.pacman.getPlayerPosition();
+    }
+
+    protected Vector2D getPlayerDirection() {
+        return this.pacman.getPlayerDirection();
+    }
+
+    protected Vector2D getMostFarPositionFromPlayer() {
+        return this.pacman.getMostFarPositionFromPlayer();
+    }
+
+    protected Vector2D getRandomNode() {
+        return this.pacman.getRandomNode();
+    }
+
+    protected Vector2D closestNodeTo(final Vector2D position) {
+        return this.pacman.closestNodeTo(position);
     }
 
     private void changeVariant(final Vector2D direction) {

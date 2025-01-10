@@ -7,11 +7,12 @@ import java.io.PrintStream;
 import com.firesoul.pacman.api.controller.Game;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.api.view.Renderer;
+import com.firesoul.pacman.api.view.Renderer.UIType;
 import com.firesoul.pacman.impl.model.Pacman;
 import com.firesoul.pacman.impl.util.TimerImpl;
 import com.firesoul.pacman.impl.view.Window;
 
-public class GameCore implements Game {
+public class PacmanCore implements Game {
 
     private enum GameState {
         RUNNING,
@@ -26,24 +27,25 @@ public class GameCore implements Game {
     private static final PrintStream LOGGER = System.out;
 
     private final Thread logicThread = new Thread(this, "Game");
-    private final Renderer renderer;
     private final InputController inputController = new InputController();
+    private final Renderer renderer;
     private final Pacman pacman;
     private GameState state;
 
-    public GameCore() {
+    public PacmanCore() {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         final double scaleX = screenSize.getWidth() / 10000 * 9;
         final double scaleY = screenSize.getHeight() / 10000 * 16;
+        this.pacman = new Pacman(this);
         this.renderer = new Window(TITLE, WIDTH, HEIGHT, scaleX, scaleY);
         this.renderer.addInputController(this.inputController);
-        this.pacman = new Pacman(this);
     }
 
     @Override
     public void init() {
         this.renderer.init(MAP_IMAGE_PATH);
         this.pacman.init();
+        this.render();
         this.logicThread.start();
         this.start();
     }
@@ -108,7 +110,7 @@ public class GameCore implements Game {
 
     @Override
     public void update(final double deltaTime) {
-        pacman.update(deltaTime);
+        this.pacman.update(deltaTime);
     }
 
     /**
@@ -130,7 +132,12 @@ public class GameCore implements Game {
 
     @Override
     public void render() {
+        this.renderer.startDraw();
         this.renderer.draw(this.pacman.getGameObjects());
+        this.renderer.drawText(UIType.LEVEL, "Level: " + Integer.toString(this.pacman.getLevel()));
+        this.renderer.drawText(UIType.LIVES, "Lives: " + Integer.toString(this.pacman.getLives()));
+        this.renderer.drawText(UIType.SCORE, "Score: " + Integer.toString(this.pacman.getScore()));
+        this.renderer.endDraw();
     }
 
     @Override
@@ -165,6 +172,6 @@ public class GameCore implements Game {
      * @param message
      */
     public static void log(final String message) {
-        GameCore.LOGGER.println(message);
+        PacmanCore.LOGGER.println(message);
     }
 }

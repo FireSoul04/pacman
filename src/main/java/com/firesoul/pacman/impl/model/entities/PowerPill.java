@@ -12,8 +12,10 @@ import com.firesoul.pacman.impl.view.Sprite2D;
 
 public class PowerPill extends GameObject2D implements Collidable {
 
-    private Pacman pacman;
+    private static final int EATEN_SCORE = 1000;
+
     private final Collider collider;
+    private Pacman pacman;
 
     /**
      * Create a pill that if eaten by pacman ghosts are vulnerable
@@ -34,6 +36,7 @@ public class PowerPill extends GameObject2D implements Collidable {
         if (gameObject instanceof Player player && player.bodyIsCollidingWith(other)) {
             this.disable();
             this.pacman.setGhostVulnerable();
+            this.pacman.addScore(EATEN_SCORE);
         }
     }
 

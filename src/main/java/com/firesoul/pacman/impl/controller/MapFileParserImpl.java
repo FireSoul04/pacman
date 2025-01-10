@@ -70,7 +70,7 @@ public class MapFileParserImpl implements MapFileParser {
             final var nodeParsed = (List<Pair<Vector2D, List<Vector2D>>>) reader.readObject();
             this.loadGraph(nodeParsed);
         } catch (final IOException | ClassNotFoundException e) {
-            GameCore.log("Cannot read file: " + e);
+            PacmanCore.log("Cannot read file: " + e);
             System.exit(1);
         }
     }

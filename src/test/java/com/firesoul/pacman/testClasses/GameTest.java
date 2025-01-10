@@ -5,7 +5,7 @@ import com.firesoul.pacman.api.model.GameObject;
 import com.firesoul.pacman.api.model.entities.Movable;
 import com.firesoul.pacman.api.util.Timer;
 import com.firesoul.pacman.api.view.Renderer;
-import com.firesoul.pacman.impl.controller.GameCore;
+import com.firesoul.pacman.impl.controller.PacmanCore;
 import com.firesoul.pacman.impl.model.Scene2D;
 import com.firesoul.pacman.impl.util.TimerImpl;
 
@@ -67,7 +67,7 @@ public class GameTest implements Game {
             frames++;
             timer.update();
             if (timer.isExpired()) {
-                GameCore.log(updates + " ups, " + frames + " fps");
+                PacmanCore.log(updates + " ups, " + frames + " fps");
                 updates = 0;
                 frames = 0;
                 timer.startAgain();

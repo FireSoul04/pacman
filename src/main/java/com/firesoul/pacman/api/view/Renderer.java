@@ -9,6 +9,12 @@ import com.firesoul.pacman.impl.util.Vector2D;
 
 public interface Renderer {
 
+    enum UIType {
+        LEVEL,
+        LIVES,
+        SCORE
+    }
+
     /**
      * Setup the game screen.
      */
@@ -22,9 +28,25 @@ public interface Renderer {
 
     /**
      * Draw the game to the screen.
-     * @param gameObjects List of game objects to draw.
+     * @param gameObjects List of game objects to draw
      */
     void draw(List<GameObject> gameObjects);
+
+    /**
+     * Draw a text to the screen.
+     * @param text
+     */
+    void drawText(UIType type, String text);
+
+    /**
+     * 
+     */
+    void startDraw();
+
+    /**
+     * 
+     */
+    void endDraw();
 
     /**
      * Clears game's screen.
@@ -70,7 +92,7 @@ public interface Renderer {
 
     /**
      * Add input controller to the game.
-     * @param inputController Input controller.
+     * @param inputController Input controller
      */
     void addInputController(InputController inputController);
 
